@@ -16,7 +16,7 @@ ALLOWED_ORIGINS = []
     HOST = ''
     USER = ''
     PASSWORD = ''
-    DATABASE = 'seed'
+    DATABASE = 'seed.db'
     CHARSET = 'utf8'
 
     [default.password]
