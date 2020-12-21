@@ -1,0 +1,28 @@
+[default]
+DEBUG = true
+API_PREFIX = ''
+ALLOWED_ORIGINS = []
+
+    [default.logging]
+    INTERCEPT_LOGGERS = [
+        'uvicorn',
+        'uvicorn.access',
+        'uvicorn.error',
+        'fastapi'
+    ]
+
+    [default.database]
+    DBMS = 'sqlite'
+    HOST = ''
+    USER = ''
+    PASSWORD = ''
+    DATABASE = 'seed'
+    CHARSET = 'utf8'
+
+    [default.password]
+    DATABASE_PASSWORD = ''
+
+[development]
+
+[production]
+DEBUG = false

@@ -1,0 +1,8 @@
+dynaconf
+fastapi
+fastapi_sqlalchemy
+loguru
+pydantic
+pydantic_sqlalchemy
+SQLAlchemy
+uvicorn
