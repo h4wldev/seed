@@ -1,10 +1,10 @@
 [default]
-DEBUG = true
-API_PREFIX = ''
-ALLOWED_ORIGINS = []
+debug = true
+api_prefix = ''
+allowed_origins = []
 
     [default.logging]
-    INTERCEPT_LOGGERS = [
+    intercept_loggers = [
         'uvicorn',
         'uvicorn.access',
         'uvicorn.error',
@@ -12,17 +12,23 @@ ALLOWED_ORIGINS = []
     ]
 
     [default.database]
-    DBMS = 'sqlite'
-    HOST = ''
-    USER = ''
-    PASSWORD = ''
-    DATABASE = 'seed.db'
-    CHARSET = 'utf8'
+    dbms = 'sqlite'
+    host = ''
+    user = ''
+    password = ''
+    database = 'seed.db'
+    charset = 'utf8'
 
     [default.password]
-    DATABASE_PASSWORD = ''
+    database_password = ''
+
+    [default.sqlalchemy]
+    commit_on_exit = false
+    
+        [default.sqlalchemy.session_args]
+        expire_on_commit = false
 
 [development]
 
 [production]
-DEBUG = false
+debug = false
