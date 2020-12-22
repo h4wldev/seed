@@ -3,6 +3,11 @@ debug = true
 api_prefix = ''
 allowed_origins = []
 
+    [default.plugin]
+        [default.plugin.role]
+        permissions = ['auth']
+        roles = ['']
+
     [default.logging]
     intercept_loggers = [
         'uvicorn',
