@@ -4,6 +4,8 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
+from plugins.role.column_types import MutableRole, Role, Permission
+
 from . import Base, ModelMixin
 from .user_profile_model import UserProfileModel
 from .user_meta_model import UserMetaModel
@@ -20,8 +22,8 @@ class UserModel(Base, ModelMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, unique=True, nullable=False)
     username = Column(String, unique=True, nullable=False)
-    role = Column(Integer, default=0, nullable=False)
-    permission = Column(Integer, default=0, nullable=False)
+    role = Column(MutableRole.as_mutable(Role), default=0, nullable=False)
+    permission = Column(MutableRole.as_mutable(Permission), default=0, nullable=False)
     updated_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.datetime.now)
 

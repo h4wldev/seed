@@ -1,3 +1,4 @@
+import types
 import typing
 
 from utils.convert import (
@@ -99,6 +100,17 @@ class Flag:
 
         return f'<{self.__class__.__name__} flags=[{",".join(flags)}]>'
 
+    def __eq__(
+        self,
+        other: 'Flag'
+    ) -> bool:
+        try:
+            if issubclass(other.__class__, self.__class__):
+                return self.value == other.value
+        except: pass
+
+        return False
+
 
 class Role(Flag):
     def __init__(
@@ -112,7 +124,7 @@ class Role(Flag):
         super().__init__(value, mapping)
 
 
-class Permission(Flag):
+class Permission(Role):
     def __init__(
         self,
         value: int,
