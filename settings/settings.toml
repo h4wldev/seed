@@ -12,8 +12,8 @@ timezone = 'Asia/Seoul'
 
         [default.plugin.jwt]
         algorithm = 'HS256'
-        access_token_expires = 10800 # seconds
-        refresh_token_expires = 86400 # seconds
+        access_token_expires = '3h'
+        refresh_token_expires = '1d'
 
     [default.logging]
     intercept_loggers = [

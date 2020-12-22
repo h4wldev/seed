@@ -12,6 +12,7 @@ from fastapi import (
 )
 
 from setting import setting
+from utils.convert import units2seconds
 
 
 class JWT:
@@ -57,9 +58,9 @@ class JWT:
 
         if token_type == 'refresh':
             payload = {}
-        
-        if isinstance(expires, int):
-            claims['exp'] = now_timestamp + expires
+
+        if expires:
+            claims['exp'] = now_timestamp + units2seconds(expires)
 
         return jwt.encode(
             {**claims, **{'payload': payload}},
