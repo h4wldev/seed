@@ -3,10 +3,17 @@ debug = true
 api_prefix = ''
 allowed_origins = []
 
+timezone = 'Asia/Seoul'
+
     [default.plugin]
         [default.plugin.role]
         permissions = ['auth']
         roles = ['']
+
+        [default.plugin.jwt]
+        algorithm = 'HS256'
+        access_token_expires = 10800 # seconds
+        refresh_token_expires = 86400 # seconds
 
     [default.logging]
     intercept_loggers = [
