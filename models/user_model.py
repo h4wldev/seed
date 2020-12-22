@@ -4,11 +4,10 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
-from models import Base, ModelMixin
-
-from models.user_profile_model import UserProfileModel
-from models.user_meta_model import UserMetaModel
-from models.user_social_account_model import UserSocialAccountModel
+from . import Base, ModelMixin
+from .user_profile_model import UserProfileModel
+from .user_meta_model import UserMetaModel
+from .user_social_account_model import UserSocialAccountModel
 
 class UserModel(Base, ModelMixin):
     __tablename__ = 'users'
