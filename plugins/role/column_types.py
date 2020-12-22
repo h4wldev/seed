@@ -11,9 +11,6 @@ from .types import (
     Permission as PermissionType,
 )
 
-import sys
-sys.tracebacklimit = 0
-
 
 class MutableRole(Mutable, FlagType):
     def __init__(
