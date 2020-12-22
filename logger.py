@@ -17,11 +17,11 @@ class InterceptHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover
         try:
-            level = logger.level(record.levelname).name
+            level: str = logger.level(record.levelname).name
         except ValueError:
-            level = self.loglevel_mapping[record.levelno]
+            level: str = self.loglevel_mapping[record.levelno]
 
-        frame, depth = logging.currentframe(), 2
+        frame: 'Frame', depth: int = logging.currentframe(), 2
 
         while frame.f_code.co_filename == logging.__file__:  # noqa: WPS609
             frame = frame.f_back

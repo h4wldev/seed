@@ -10,10 +10,10 @@ class ModelMixin:
     _repr_attrs: typing.Tuple[str] = ()
 
     def __repr__(self) -> str:
-        attr_string = ''
+        attr_string: str = ''
 
         if len(self._repr_attrs):
-            repr_attrs = {
+            repr_attrs: typing.Dict[str, any] = {
                 attr: getattr(self, attr, None) for attr in self._repr_attrs
             }
 

@@ -20,15 +20,15 @@ class Application:
         setting: Dynaconf = setting,
         router: APIRouter = router
     ) -> None:
-        self.name = name
-        self.env = env
-        self.setting = setting
-        self.router = router
+        self.name: str = name
+        self.env: str = env
+        self.setting: Dynaconf = setting
+        self.router: APIRouter = router
 
         self.setting.setenv(self.env)
 
     def create_app(self) -> FastAPI:
-        self.app = FastAPI(title=self.name, debug=self.setting.debug)
+        self.app: FastAPI = FastAPI(title=self.name, debug=self.setting.debug)
 
         self.app.add_middleware(
             CORSMiddleware,
@@ -53,7 +53,7 @@ class Application:
         return self.app
 
     def logger_configure(self) -> None:
-        log_level = logging.DEBUG if self.setting.debug else logging.INFO
+        log_level: int = logging.DEBUG if self.setting.debug else logging.INFO
 
         logger.logger_configure(log_level)
         logger.intercept_loggers(self.setting.logging.intercept_loggers, log_level)
