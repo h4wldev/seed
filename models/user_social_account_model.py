@@ -4,7 +4,7 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
-from models import Base, ModelMixin
+from . import Base, ModelMixin
 
 
 class UserSocialAccountModel(Base, ModelMixin):
