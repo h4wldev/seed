@@ -23,10 +23,11 @@ allowed_origins = []
     database_password = ''
 
     [default.sqlalchemy]
-    commit_on_exit = false
-    
+    commit_on_exit = true
+
         [default.sqlalchemy.session_args]
         expire_on_commit = false
+        autoflush = false
 
 [development]
 
