@@ -124,7 +124,7 @@ class Role(Flag):
         super().__init__(value, mapping)
 
 
-class Permission(Role):
+class Permission(Flag):
     def __init__(
         self,
         value: int,
