@@ -52,6 +52,9 @@ class Flag:
             for k, v in self.mapping.items()
         }
 
+    def reset(self) -> None:
+        self._set_bitfield(0)
+
     def set(
         self,
         name: str,
@@ -113,24 +116,18 @@ class Flag:
 
 
 class Role(Flag):
+    _default_mapping: typing.List[str] = setting.plugin.role.roles
+
     def __init__(
         self,
         value: int,
         mapping: typing.Optional[typing.List[str]] = None
     ) -> None:
         if not mapping:
-            mapping = setting.plugin.role.roles
+            mapping = self._default_mapping
 
         super().__init__(value, mapping)
 
 
-class Permission(Flag):
-    def __init__(
-        self,
-        value: int,
-        mapping: typing.Optional[typing.List[str]] = None
-    ) -> None:
-        if not mapping:
-            mapping = setting.plugin.role.permissions
-
-        super().__init__(value, mapping)
+class Permission(Role):
+    _default_mapping: typing.List[str] = setting.plugin.role.permissions

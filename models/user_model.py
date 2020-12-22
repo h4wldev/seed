@@ -11,6 +11,7 @@ from .user_profile_model import UserProfileModel
 from .user_meta_model import UserMetaModel
 from .user_social_account_model import UserSocialAccountModel
 
+
 class UserModel(Base, ModelMixin):
     __tablename__ = 'users'
     __table_args__ = (

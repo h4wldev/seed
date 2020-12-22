@@ -37,6 +37,11 @@ class MutableRole(Mutable, FlagType):
 
         return super().set(*args, **kwargs)
 
+    def _set_bitfield(self, *args, **kwargs) -> typing.List[bool]:
+        self.changed()
+
+        return super()._set_bitfield(*args, **kwargs)
+
     def __repr__(self) -> str:
         return self._class.__repr__()
 
@@ -51,8 +56,7 @@ class Role(atypes.TypeDecorator):
         dialect: 'SQLAlchemyDialect'
     ) -> int:
         try:
-            if issubclass(value.__class__, FlagType.__class__):
-                return value.value
+            return value.value
         except: pass
 
         return value
