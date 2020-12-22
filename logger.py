@@ -21,7 +21,8 @@ class InterceptHandler(logging.Handler):
         except ValueError:
             level: str = self.loglevel_mapping[record.levelno]
 
-        frame: 'Frame', depth: int = logging.currentframe(), 2
+        frame: 'Frame' = logging.currentframe()
+        depth: int = 2
 
         while frame.f_code.co_filename == logging.__file__:  # noqa: WPS609
             frame = frame.f_back
