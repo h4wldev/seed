@@ -1,5 +1,8 @@
+import typing
+
 import sqlalchemy.types as atypes
 
+from sqlalchemy.sql import operators
 from sqlalchemy.ext.mutable import Mutable
 
 from .types import (
@@ -25,7 +28,11 @@ class MutableRole(Mutable, FlagType):
         )
 
     @classmethod
-    def coerce(cls, key, value):
+    def coerce(
+        cls,
+        key: str,
+        value: FlagType
+    ) -> 'MutableRole':
         return MutableRole(value)
 
     def set(self, *args, **kwargs) -> None:
@@ -39,19 +46,30 @@ class MutableRole(Mutable, FlagType):
 
 class Role(atypes.TypeDecorator):
     impl: atypes.TypeEngine = atypes.Integer
+    type_: FlagType = RoleType
 
-    def process_bind_param(self, value, dialect):
-        return value.value
+    def process_bind_param(
+        self,
+        value: typing.Any,
+        dialect: 'SQLAlchemyDialect'
+    ) -> int:
+        try:
+            if issubclass(value.__class__, FlagType.__class__):
+                return value.value
+        except: pass
 
-    def process_result_value(self, value, dialect):
-        return RoleType(value)
+        return value
+
+    def process_result_value(
+        self,
+        value: int,
+        dialect: 'SQLAlchemyDialect'
+    ) -> FlagType:
+        if isinstance(value, int):
+            return self.type_(value)
+        
+        return value
 
 
-class Permission(atypes.TypeDecorator):
-    impl: atypes.TypeEngine = atypes.Integer
-
-    def process_bind_param(self, value, dialect):
-        return value.value
-
-    def process_result_value(self, value, dialect):
-        return PermissionType(value)
+class Permission(Role):
+    type_: FlagType = PermissionType
