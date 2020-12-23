@@ -1,8 +1,11 @@
+arrow
 dynaconf
 fastapi
 fastapi_sqlalchemy
 loguru
 pydantic
 pydantic_sqlalchemy
+pyjwt
 SQLAlchemy
+uuid
 uvicorn
