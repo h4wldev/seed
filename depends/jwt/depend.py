@@ -8,11 +8,16 @@ from fastapi import (
     Depends,
     Header,
     Request,
-    Response,
+    Response
 )
 
+from exceptions import JWTHTTPException
 from setting import setting
 from utils.convert import units2seconds
+from utils.exception import exception_wrapper
+from utils.http import HTTPStatusCode
+
+
 
 
 class JWT:
@@ -30,17 +35,58 @@ class JWT:
         response: Response,
         authorization: typing.Optional[str] = Header(None)
     ) -> None:
+        if authorization:
+            tokens: typing.List[str] = authorization.split(' ')
+
+            if len(tokens) != 2:
+                raise JWTHTTPException(
+                    detail="Authorization header must like 'Bearer <credentials>'"
+                )
+
+            type_: str = tokens[0]
+            credential: str = tokens[1]
+
+            if type_ != 'Bearer':
+                raise JWTHTTPException(
+                    detail="Authorization token type must be 'Bearer'",
+                )
+
+            payloads: typing.Dict[str, typing.Any] = self.decode_token(credential)
+
         return self
 
     @classmethod
+    @exception_wrapper(
+        JWTHTTPException,
+        excs=(jwt.exceptions.PyJWTError),
+    )
+    def decode_token(
+        cls,
+        token: str,
+        algorithm: str = 'HS256'
+    ) -> typing.Dict[str, typing.Any]:
+        return jwt.decode(
+            token,
+            setting.secret_key.jwt_secret_key,
+            algorithms=algorithm
+        )
+
+    @classmethod
+    @exception_wrapper(
+        JWTHTTPException,
+        excs=(jwt.exceptions.PyJWTError),
+    )
     def _create_token(
         cls,
         subject: str,
         token_type: str = 'access',
         expires: typing.Optional[int] = None,
         payload: typing.Dict[str, typing.Any] = {},
-        algorithm: str = 'HS256'
+        algorithm: typing.Optional[str] = None
     ) -> str:
+        if algorithm is None:
+            algorithm = cls.setting.algorithm
+
         now_timestamp: int = arrow.now(setting.timezone).int_timestamp
 
         headers: typing.Dict[str, typing.Any] = {
