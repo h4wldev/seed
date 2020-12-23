@@ -4,7 +4,7 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
-from plugins.role.column_types import MutableRole, Role, Permission
+from depends.role.column_types import MutableRole, Role, Permission
 
 from . import Base, ModelMixin
 from .user_profile_model import UserProfileModel
