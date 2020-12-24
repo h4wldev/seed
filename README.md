@@ -6,6 +6,7 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 
 ## Features
 - __[Endpoints]__ Auth, Sign up, Withdrawal, ... routes included
+- __[Router]__ Support class based Route
 - __[Config]__ `.toml` based config system, support environments
 - __[Authorize]__ Support custom OAuth2 authorization
 - __[Model]__ User and User related(meta, profile, ...) models
@@ -28,6 +29,36 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 
 
 ## How to Use
+### Class based Route
+```python
+from api.router import Router, Route
+
+router = Router()
+
+@router.Route('/{item_id}')  # This decorator add route into router
+class Item(Route):
+  def get(item_id: int) -> Any:
+    return f'item_id = {item_id}'
+
+  @Route.option(tags=['Item'], summary='it is post!')  # You can use FastAPI options like this
+  def post(item_id: int) -> Any:
+    return f'item_id = {item_id}'
+
+router.Route('/foo/{item_id}')(Item)  # Or you can add route like this
+router += '/bar/{item_id}', Item  # Or this
+router.add('/daz/{item_id}')  # Or this
+
+other_router = Router()
+
+router.join(other_router, prefix='/foobar')  # You can include router like this
+router.join(
+  other_router,
+  prefix='/barbaz',
+  tags=['other_router'],
+  responses={418: {"description": "I'm a teapot"}}
+)  # Also, Support fastapi options!
+```
+
 ### JWT Depend
 ```python
 from depends.jwt import JWT
