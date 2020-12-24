@@ -65,3 +65,10 @@ class Router(APIRouter):
         route_class: 'Route'
     ) -> None:
         self.Route(path)(route_class)
+
+    def join(self, router: 'Router', **kwargs) -> None:
+        assert issubclass(
+            router.__class__, APIRouter.__class__
+        ), "Router must be 'Router' or 'APIRouter' class"
+
+        self.include_router(router, **kwargs)
