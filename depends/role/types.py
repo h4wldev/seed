@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from utils.convert import (
     int2bitfield,
@@ -29,21 +29,25 @@ class Flag:
 
     def has(
         self,
-        *names: List[str],
+        *roles: Union[List[str], str],
         any_: bool = False
     ) -> bool:
-        method: Callable[List[str], bool] = all
+        for role in roles:
+            if isinstance(role, (list, tuple)):
+                authorized: bool = False
 
-        if any_:
-            method = any
+                for r in role:
+                    if self.get(r):
+                        authorized = True
+                        break
 
-        return method([self.get(n) for n in names])
+                if not authorized:
+                    return False
+            else:
+                if not self.get(role):
+                    return False
 
-    def has_any(
-        self,
-        *names: List[str]
-    ) -> bool:
-        return self.has(*names, any_=True)
+        return True
 
     def get_all(self) -> Dict[str, bool]:
         return {
@@ -115,7 +119,7 @@ class Flag:
 
 
 class Role(Flag):
-    _default_mapping: List[str] = setting.plugin.role.roles
+    _default_mapping: List[str] = setting.depend.role.roles
 
     def __init__(
         self,
@@ -129,4 +133,4 @@ class Role(Flag):
 
 
 class Permission(Role):
-    _default_mapping: List[str] = setting.plugin.role.permissions
+    _default_mapping: List[str] = setting.depend.role.permissions

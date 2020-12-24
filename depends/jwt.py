@@ -17,8 +17,11 @@ from utils.convert import units2seconds
 from utils.exception import exception_wrapper
 
 
+__version__ = '0.0.1'
+
+
 class JWT:
-    setting: 'Dynaconf' = setting.plugin.jwt
+    setting: 'Dynaconf' = setting.depend.jwt
 
     def __init__(
         self,

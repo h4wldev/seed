@@ -6,12 +6,17 @@ from utils.http import HTTPStatusCode
 
 
 class HTTPException(FastAPIHTTPException):
+    _default_status_code = HTTPStatusCode.BAD_REQUEST
+
     def __init__(
         self,
-        status_code: Union[int, HTTPStatusCode] = 400,
+        status_code: Optional[Union[int, HTTPStatusCode]] = None,
         detail: Any = None,
         headers: Optional[Dict[str, Any]] = None
     ) -> None:
+        if status_code is None:
+            status_code = self._default_status_code
+
         if isinstance(status_code, HTTPStatusCode):
             status_code = status_code.value
 
@@ -20,4 +25,8 @@ class HTTPException(FastAPIHTTPException):
 
 
 class JWTHTTPException(HTTPException):
-    pass
+    _default_status_code = HTTPStatusCode.BAD_REQUEST
+
+
+class RoleHTTPException(HTTPException):
+    _default_status_code = HTTPStatusCode.FORBIDDEN
