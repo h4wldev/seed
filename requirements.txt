@@ -2,10 +2,13 @@ arrow
 dynaconf
 fastapi
 fastapi_sqlalchemy
+flake8
 loguru
 pydantic
 pydantic_sqlalchemy
 pyjwt
+pytest
+pytest-flake8
 SQLAlchemy
 uuid
 uvicorn
