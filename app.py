@@ -44,6 +44,7 @@ class Application:
             }),
             commit_on_exit=self.setting.sqlalchemy.commit_on_exit,
             session_args=self.setting.sqlalchemy.session_args,
+            engine_args=self.setting.sqlalchemy.engine_args
         )
 
         self.app.include_router(router, prefix=self.setting.api_prefix)

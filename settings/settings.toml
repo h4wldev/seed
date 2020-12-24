@@ -41,6 +41,10 @@ timezone = 'Asia/Seoul'
         expire_on_commit = false
         autoflush = false
 
+        [default.sqlalchemy.engine_args]
+            [default.sqlalchemy.engine_args.connect_args]
+            check_same_thread = false
+
 [development]
 
 [production]
