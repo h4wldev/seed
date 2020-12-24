@@ -7,9 +7,9 @@ from sqlalchemy.orm import relationship
 from depends.role.column_types import MutableRole, Role, Permission
 
 from . import Base, ModelMixin
-from .user_profile_model import UserProfileModel
-from .user_meta_model import UserMetaModel
-from .user_social_account_model import UserSocialAccountModel
+from .user_profile_model import UserProfileModel  # noqa: F401
+from .user_meta_model import UserMetaModel  # noqa: F401
+from .user_social_account_model import UserSocialAccountModel  # noqa: F401
 
 
 class UserModel(Base, ModelMixin):

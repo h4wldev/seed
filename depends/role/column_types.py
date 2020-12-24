@@ -1,6 +1,5 @@
 import sqlalchemy.types as atypes
 
-from sqlalchemy.sql import operators
 from sqlalchemy.ext.mutable import Mutable
 from typing import Any, List
 
@@ -56,7 +55,8 @@ class Role(atypes.TypeDecorator):
     ) -> int:
         try:
             return value.value
-        except: pass
+        except Exception:
+            pass
 
         return value
 
@@ -67,7 +67,7 @@ class Role(atypes.TypeDecorator):
     ) -> FlagType:
         if isinstance(value, int):
             return self.type_(value)
-        
+
         return value
 
 

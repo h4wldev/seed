@@ -1,8 +1,5 @@
-import datetime
-
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Index
-from sqlalchemy.orm import relationship
 
 from . import Base, ModelMixin
 

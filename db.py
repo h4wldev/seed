@@ -1,4 +1,4 @@
-from fastapi_sqlalchemy import db
+from fastapi_sqlalchemy import db  # noqa: F401
 
 
 def make_database_uri(
@@ -11,7 +11,7 @@ def make_database_uri(
 ) -> str:
     if len(password):
         password = f':{password}'
-    
+
     if len(host):
         host = f'@{host}'
 

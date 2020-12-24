@@ -1,10 +1,8 @@
 import arrow
-import datetime
 import jwt
 import uuid
 
 from fastapi import (
-    Depends,
     Header,
     Request,
     Response
@@ -17,7 +15,6 @@ from setting import setting
 from models.user_model import UserModel
 from utils.convert import units2seconds
 from utils.exception import exception_wrapper
-from utils.http import HTTPStatusCode
 
 
 class JWT:
@@ -27,9 +24,7 @@ class JWT:
         self,
         required: bool = False,
         token_type: str = 'access',
-        user_loader: Optional[
-            Callable[[str], Any]
-        ] = None,
+        user_loader: Optional[Callable[[str], Any]] = None,
         user_cache: bool = True
     ) -> None:
         self.claims: Dict[str, Any] = {}
@@ -64,8 +59,7 @@ class JWT:
         credential: str = self.get_credential_from_header(authorization)
         self.load_token(credential)
 
-        if 'type' not in self.claims \
-            or self.claims['type'] != self.token_type:
+        if 'type' not in self.claims or self.claims['type'] != self.token_type:
             raise JWTHTTPException(
                 detail=f"Token type must be '{self.token_type}'"
             )

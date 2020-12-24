@@ -7,11 +7,9 @@ def exception_wrapper(
         exc: 'HTTPException',
         excs: Tuple[Exception] = (),
         status_code: Union[int, HTTPStatusCode] = 400,
-        message_handler: Optional[Callable[[Exception], str]] = None
+        message_handler: Optional[Callable[[Exception], str]] = None,
     ) -> Callable[..., Callable[..., Any]]:
-        def decorator(
-            method: Callable[..., Any]
-        ) -> Callable[..., Any]:
+        def decorator(method: Callable[..., Any]) -> Callable[..., Any]:
             def _(*args, **kwargs) -> Any:
                 try:
                     return method(*args, **kwargs)
@@ -25,7 +23,7 @@ def exception_wrapper(
                         status_code=status_code,
                         detail=message
                     )
-            
+
             return _
 
         return decorator

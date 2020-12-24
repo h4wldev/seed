@@ -3,8 +3,7 @@ from typing import List
 
 def int2bitfield(value: int) -> List[bool]:
     return list(reversed([
-        bool(int(digit)) \
-        for digit in bin(value)[2:]
+        bool(int(digit)) for digit in bin(value)[2:]
     ]))
 
 
@@ -20,7 +19,7 @@ def bitfield2int(value: List[bool]) -> int:
 def units2seconds(value: str) -> int:
     if isinstance(value, int):
         return value
-    
+
     if value.isnumeric():
         return int(value)
 

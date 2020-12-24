@@ -1,5 +1,3 @@
-import types
-
 from typing import Dict, List, Optional
 
 from utils.convert import (
@@ -49,8 +47,7 @@ class Flag:
 
     def get_all(self) -> Dict[str, bool]:
         return {
-            k: self.bitfield[v] \
-            for k, v in self.mapping.items()
+            k: self.bitfield[v] for k, v in self.mapping.items()
         }
 
     def reset(self) -> None:
@@ -69,7 +66,7 @@ class Flag:
     @property
     def value(self) -> int:
         return bitfield2int(self.bitfield)
-    
+
     @value.setter
     def value(self, value: int) -> None:
         self._set_bitfield(value)
@@ -86,7 +83,7 @@ class Flag:
         bitfield: List[bool] = int2bitfield(value)
         size_diff: int = len(self.mapping) - len(bitfield)
 
-        if size_diff > 0: 
+        if size_diff > 0:
             bitfield += [False] * size_diff
         elif size_diff < 0:
             bitfield = bitfield[:len(self.mapping)]
@@ -96,11 +93,11 @@ class Flag:
         return self.bitfield
 
     def __repr__(self) -> str:
-        attr_string: str = ''
         flags: List[str] = []
 
         for k, v in self.get_all().items():
-            if v: flags.append(k)
+            if v:
+                flags.append(k)
 
         return f'<{self.__class__.__name__} flags=[{",".join(flags)}]>'
 
@@ -111,7 +108,8 @@ class Flag:
         try:
             if issubclass(other.__class__, self.__class__):
                 return self.value == other.value
-        except: pass
+        except Exception:
+            pass
 
         return False
 
