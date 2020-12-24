@@ -39,7 +39,7 @@ class Router(APIRouter):
             endpoints: Dict[str, Callable[..., Any]] = cls._get_endpoints()
 
             for method, endpoint in endpoints.items():
-                kwargs: Dict[str, Any] = getattr(method, 'options', {})
+                kwargs: Dict[str, Any] = getattr(endpoint, 'options', {})
 
                 kwargs['methods'] = [method.upper()]
 
