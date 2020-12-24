@@ -18,7 +18,7 @@ from utils.exception import exception_wrapper
 
 
 class JWT:
-    setting: 'Dynaconf' = setting.plugin.jwt
+    setting: 'Dynaconf' = setting.depend.jwt
 
     def __init__(
         self,
