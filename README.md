@@ -5,10 +5,10 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 
 
 ## Features
-- __[Endpoints]__ Auth, Sign up, Withdrawal, ... routes included
+- __[Endpoints]__ Auth, Sign up, Withdrawal, ... routes included *(In Progress)*
 - __[Router]__ Support class based Route
 - __[Config]__ `.toml` based config system, support environments
-- __[Authorize]__ Support custom OAuth2 authorization
+- __[Authorize]__ Support custom OAuth2 authorization *(In Progress)*
 - __[Model]__ User and User related(meta, profile, ...) models
 - __[Depend]__ JWT(Json Web Token) based authorize
 - __[Depend]__ Integer(Bitfield) based role, permission
@@ -185,8 +185,8 @@ Set value on role/permission
 Initialize with bitfield. detail on example.
 
 ## TODO
-- [ ] Class based route
 - [ ] API endpoints
+- [ ] Custom OAuth2 Authorization
 
 ## Requirements
 You can see [Here](requirements.txt)!
