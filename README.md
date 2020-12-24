@@ -30,6 +30,8 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 
 ## How to Use
 ### Class based Route
+seed's `Router` is inherit [fastapi.APIRouter](https://github.com/tiangolo/fastapi/blob/master/fastapi/routing.py#L408), So you can use all the methods in `APIRouter`
+
 ```python
 from api.router import Router, Route
 
