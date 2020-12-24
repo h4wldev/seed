@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from utils.convert import (
     int2bitfield,
@@ -29,7 +29,7 @@ class Flag:
 
     def has(
         self,
-        *roles: Union[List[str], str],
+        *roles: Tuple[Union[List[str], str]],
         any_: bool = False
     ) -> bool:
         for role in roles:
