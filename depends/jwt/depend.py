@@ -26,6 +26,7 @@ class JWT:
     def __init__(
         self,
         required: bool = False,
+        token_type: str = 'access',
         user_loader: typing.Optional[
             typing.Callable[[str], typing.Any]
         ] = None,
@@ -43,6 +44,7 @@ class JWT:
         self.cached_user: typing.Optional[UserModel] = None
 
         self.required: bool = required
+        self.token_type: str = token_type
         self.token_loaded: bool = False
 
     def __call__(
@@ -51,19 +53,29 @@ class JWT:
         response: Response,
         authorization: typing.Optional[str] = Header(None)
     ) -> None:
-        if authorization:
-            credential: str = self.get_credential_from_header(authorization)
-            
-            self.load_token(credential)
+        if authorization is None:
+            if self.required:
+                raise JWTHTTPException(
+                    detail="'Authorization' must not be empty"
+                )
+
+            return self
+
+        credential: str = self.get_credential_from_header(authorization)
+        self.load_token(credential)
+
+        if 'type' not in self.claims \
+            or self.claims['type'] != self.token_type:
+            raise JWTHTTPException(
+                detail=f"Token type must be '{self.token_type}'"
+            )
 
         return self
 
     @property
-    def user(self) -> UserModel:
+    def user(self) -> typing.Any:
         if not self.token_loaded:
-            raise JWTHTTPException(
-                detail='Token claims not loaded'
-            )
+            return None
 
         if 'sub' not in self.claims:
             raise JWTHTTPException(
@@ -93,7 +105,6 @@ class JWT:
             .first()
 
         return user
-
 
     @classmethod
     def get_credential_from_header(
@@ -148,10 +159,12 @@ class JWT:
     @classmethod
     def create_refresh_token(
         cls,
-        subject: str
+        subject: str,
+        payload: typing.Dict[str, typing.Any] = {}
     ) -> str:
         return cls._create_token(
             subject=subject,
+            payload=payload,
             token_type='refresh',
             expires=cls.setting.refresh_token_expires
         )
@@ -186,9 +199,6 @@ class JWT:
             'jti': str(uuid.uuid4()),
             'type': token_type
         }
-
-        if token_type == 'refresh':
-            payload = {}
 
         if expires:
             claims['exp'] = now_timestamp + units2seconds(expires)
