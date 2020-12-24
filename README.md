@@ -187,6 +187,7 @@ Initialize with bitfield. detail on example.
 ## TODO
 - [ ] API endpoints
 - [ ] Custom OAuth2 Authorization
+- [ ] Add unittest testcases
 
 ## Requirements
 You can see [Here](requirements.txt)!
