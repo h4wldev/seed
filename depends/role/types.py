@@ -1,5 +1,6 @@
 import types
-import typing
+
+from typing import Dict, List, Optional
 
 from utils.convert import (
     int2bitfield,
@@ -12,9 +13,9 @@ class Flag:
     def __init__(
         self,
         value: int,
-        mapping: typing.List[str] = []
+        mapping: List[str] = []
     ) -> None:
-        self.mapping: typing.Dict[int, str] = {
+        self.mapping: Dict[int, str] = {
             m: i for i, m in enumerate(mapping)
         }
         self._set_bitfield(value)
@@ -30,10 +31,10 @@ class Flag:
 
     def has(
         self,
-        *names: typing.List[str],
+        *names: List[str],
         any_: bool = False
     ) -> bool:
-        method: typing.Callable[typing.List[str], bool] = all
+        method: Callable[List[str], bool] = all
 
         if any_:
             method = any
@@ -42,11 +43,11 @@ class Flag:
 
     def has_any(
         self,
-        *names: typing.List[str]
+        *names: List[str]
     ) -> bool:
         return self.has(*names, any_=True)
 
-    def get_all(self) -> typing.Dict[str, bool]:
+    def get_all(self) -> Dict[str, bool]:
         return {
             k: self.bitfield[v] \
             for k, v in self.mapping.items()
@@ -76,13 +77,13 @@ class Flag:
     @classmethod
     def from_bitfield(
         cls,
-        value: typing.List[bool],
-        mapping: typing.List[str] = []
+        value: List[bool],
+        mapping: List[str] = []
     ) -> 'Flag':
         return cls(bitfield2int(value), mapping)
 
-    def _set_bitfield(self, value: int) -> typing.List[bool]:
-        bitfield: typing.List[bool] = int2bitfield(value)
+    def _set_bitfield(self, value: int) -> List[bool]:
+        bitfield: List[bool] = int2bitfield(value)
         size_diff: int = len(self.mapping) - len(bitfield)
 
         if size_diff > 0: 
@@ -96,7 +97,7 @@ class Flag:
 
     def __repr__(self) -> str:
         attr_string: str = ''
-        flags: typing.List[str] = []
+        flags: List[str] = []
 
         for k, v in self.get_all().items():
             if v: flags.append(k)
@@ -116,12 +117,12 @@ class Flag:
 
 
 class Role(Flag):
-    _default_mapping: typing.List[str] = setting.plugin.role.roles
+    _default_mapping: List[str] = setting.plugin.role.roles
 
     def __init__(
         self,
         value: int,
-        mapping: typing.Optional[typing.List[str]] = None
+        mapping: Optional[List[str]] = None
     ) -> None:
         if not mapping:
             mapping = self._default_mapping
@@ -130,4 +131,4 @@ class Role(Flag):
 
 
 class Permission(Role):
-    _default_mapping: typing.List[str] = setting.plugin.role.permissions
+    _default_mapping: List[str] = setting.plugin.role.permissions

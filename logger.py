@@ -1,8 +1,8 @@
 import sys
 import logging
-import typing
 
 from loguru import logger
+from typing import List
 
 
 class InterceptHandler(logging.Handler):
@@ -41,7 +41,7 @@ def logger_configure(log_level: int = logging.DEBUG) -> None:
 
 
 def intercept_loggers(
-    logger_names: typing.List[str] = [],
+    logger_names: List[str] = [],
     log_level: int = logging.DEBUG,
 ) -> None:
     for logger_name in logger_names:

@@ -1,4 +1,4 @@
-import typing
+from typing import Tuple
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -7,13 +7,13 @@ Base = declarative_base()
 
 
 class ModelMixin:
-    _repr_attrs: typing.Tuple[str] = ()
+    _repr_attrs: Tuple[str] = ()
 
     def __repr__(self) -> str:
         attr_string: str = ''
 
         if len(self._repr_attrs):
-            repr_attrs: typing.Dict[str, any] = {
+            repr_attrs: Dict[str, any] = {
                 attr: getattr(self, attr, None) for attr in self._repr_attrs
             }
 

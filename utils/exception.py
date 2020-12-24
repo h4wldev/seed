@@ -1,18 +1,18 @@
-import typing
+from typing import Any, Callable, Optional, Tuple, Union
 
 from utils.http import HTTPStatusCode
 
 
 def exception_wrapper(
         exc: 'HTTPException',
-        excs: typing.Tuple[Exception] = (),
-        status_code: typing.Union[int, HTTPStatusCode] = 400,
-        message_handler: typing.Optional[typing.Callable[[Exception], str]] = None
-    ) -> typing.Callable[..., typing.Callable[..., typing.Any]]:
+        excs: Tuple[Exception] = (),
+        status_code: Union[int, HTTPStatusCode] = 400,
+        message_handler: Optional[Callable[[Exception], str]] = None
+    ) -> Callable[..., Callable[..., Any]]:
         def decorator(
-            method: typing.Callable[..., typing.Any]
-        ) -> typing.Callable[..., typing.Any]:
-            def _(*args, **kwargs) -> typing.Any:
+            method: Callable[..., Any]
+        ) -> Callable[..., Any]:
+            def _(*args, **kwargs) -> Any:
                 try:
                     return method(*args, **kwargs)
                 except excs as e:

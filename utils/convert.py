@@ -1,14 +1,14 @@
-import typing
+from typing import List
 
 
-def int2bitfield(value: int) -> typing.List[bool]:
+def int2bitfield(value: int) -> List[bool]:
     return list(reversed([
         bool(int(digit)) \
         for digit in bin(value)[2:]
     ]))
 
 
-def bitfield2int(value: typing.List[bool]) -> int:
+def bitfield2int(value: List[bool]) -> int:
     result: int = 0
 
     for i, v in enumerate(value):
@@ -24,7 +24,7 @@ def units2seconds(value: str) -> int:
     if value.isnumeric():
         return int(value)
 
-    unit_map: typing.Dict[str, typing.Callable[..., int]] = {
+    unit_map: Dict[str, Callable[..., int]] = {
         's': lambda t: t,
         'm': lambda t: t * 60,
         'h': lambda t: t * 60 * 60,

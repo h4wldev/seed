@@ -1,7 +1,6 @@
 import arrow
 import datetime
 import jwt
-import typing
 import uuid
 
 from fastapi import (
@@ -10,6 +9,7 @@ from fastapi import (
     Request,
     Response
 )
+from typing import Any, Dict, Callable, Optional
 
 from db import db
 from exceptions import JWTHTTPException
@@ -27,21 +27,21 @@ class JWT:
         self,
         required: bool = False,
         token_type: str = 'access',
-        user_loader: typing.Optional[
-            typing.Callable[[str], typing.Any]
+        user_loader: Optional[
+            Callable[[str], Any]
         ] = None,
         user_cache: bool = True
     ) -> None:
-        self.claims: typing.Dict[str, typing.Any] = {}
-        self.payload: typing.Dict[str, typing.Any] = {}
+        self.claims: Dict[str, Any] = {}
+        self.payload: Dict[str, Any] = {}
 
         if user_loader is None:
             user_loader = self._default_user_loader
 
-        self.user_loader: typing.Callable[[str], typing.Any] = user_loader
+        self.user_loader: Callable[[str], Any] = user_loader
         self.user_cache: bool = user_cache
 
-        self.cached_user: typing.Optional[UserModel] = None
+        self.cached_user: Optional[UserModel] = None
 
         self.required: bool = required
         self.token_type: str = token_type
@@ -51,7 +51,7 @@ class JWT:
         self,
         request: Request,
         response: Response,
-        authorization: typing.Optional[str] = Header(None)
+        authorization: Optional[str] = Header(None)
     ) -> None:
         if authorization is None:
             if self.required:
@@ -73,7 +73,7 @@ class JWT:
         return self
 
     @property
-    def user(self) -> typing.Any:
+    def user(self) -> Any:
         if not self.token_loaded:
             return None
 
@@ -99,7 +99,7 @@ class JWT:
     def _default_user_loader(
         self,
         subject: str
-    ) -> typing.Optional[UserModel]:
+    ) -> Optional[UserModel]:
         user = db.session.query(UserModel)\
             .filter(UserModel.email == subject)\
             .first()
@@ -110,8 +110,8 @@ class JWT:
     def get_credential_from_header(
         cls,
         authorization: str
-    ) -> typing.Dict[str, typing.Any]:
-        tokens: typing.List[str] = authorization.split(' ')
+    ) -> Dict[str, Any]:
+        tokens: List[str] = authorization.split(' ')
 
         if len(tokens) != 2:
             raise JWTHTTPException(
@@ -137,7 +137,7 @@ class JWT:
         cls,
         token: str,
         algorithm: str = 'HS256'
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> Dict[str, Any]:
         return jwt.decode(
             token,
             setting.secret_key.jwt_secret_key,
@@ -148,7 +148,7 @@ class JWT:
     def create_access_token(
         cls,
         subject: str,
-        payload: typing.Dict[str, typing.Any] = {}
+        payload: Dict[str, Any] = {}
     ) -> str:
         return cls._create_token(
             subject=subject,
@@ -160,7 +160,7 @@ class JWT:
     def create_refresh_token(
         cls,
         subject: str,
-        payload: typing.Dict[str, typing.Any] = {}
+        payload: Dict[str, Any] = {}
     ) -> str:
         return cls._create_token(
             subject=subject,
@@ -178,21 +178,21 @@ class JWT:
         cls,
         subject: str,
         token_type: str = 'access',
-        expires: typing.Optional[int] = None,
-        payload: typing.Dict[str, typing.Any] = {},
-        algorithm: typing.Optional[str] = None
+        expires: Optional[int] = None,
+        payload: Dict[str, Any] = {},
+        algorithm: Optional[str] = None
     ) -> str:
         if algorithm is None:
             algorithm = cls.setting.algorithm
 
         now_timestamp: int = arrow.now(setting.timezone).int_timestamp
 
-        headers: typing.Dict[str, typing.Any] = {
+        headers: Dict[str, Any] = {
             'typ': 'JWT',
             'alg': algorithm
         }
 
-        claims: typing.Dict[str, typing.Any] = {
+        claims: Dict[str, Any] = {
             'sub': subject,
             'iat': now_timestamp,
             'nbf': now_timestamp,

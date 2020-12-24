@@ -1,9 +1,8 @@
-import typing
-
 import sqlalchemy.types as atypes
 
 from sqlalchemy.sql import operators
 from sqlalchemy.ext.mutable import Mutable
+from typing import Any, List
 
 from .types import (
     Flag as FlagType,
@@ -37,7 +36,7 @@ class MutableRole(Mutable, FlagType):
 
         return super().set(*args, **kwargs)
 
-    def _set_bitfield(self, *args, **kwargs) -> typing.List[bool]:
+    def _set_bitfield(self, *args, **kwargs) -> List[bool]:
         self.changed()
 
         return super()._set_bitfield(*args, **kwargs)
@@ -52,7 +51,7 @@ class Role(atypes.TypeDecorator):
 
     def process_bind_param(
         self,
-        value: typing.Any,
+        value: Any,
         dialect: 'SQLAlchemyDialect'
     ) -> int:
         try:

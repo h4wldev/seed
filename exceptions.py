@@ -1,4 +1,4 @@
-import typing
+from typing import Any, Dict, Optional, Union
 
 from fastapi import HTTPException as FastAPIHTTPException
 
@@ -8,9 +8,9 @@ from utils.http import HTTPStatusCode
 class HTTPException(FastAPIHTTPException):
     def __init__(
         self,
-        status_code: typing.Union[int, HTTPStatusCode] = 400,
-        detail: typing.Any = None,
-        headers: typing.Optional[typing.Dict[str, typing.Any]] = None
+        status_code: Union[int, HTTPStatusCode] = 400,
+        detail: Any = None,
+        headers: Optional[Dict[str, Any]] = None
     ) -> None:
         if isinstance(status_code, HTTPStatusCode):
             status_code = status_code.value
