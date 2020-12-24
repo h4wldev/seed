@@ -12,15 +12,17 @@ from exceptions import RoleHTTPException
 class Role:
     def __init__(
         self,
-        roles: List[str] = [],
-        perms: List[str] = [],
-        user_loader: Optional[Callable[[str], Any]] = None
+        roles: List[Union[List[str], str]] = [],
+        perms: List[Union[List[str], str]] = [],
+        user_loader: Optional[Callable[[str], Any]] = None,
+        user_cache: bool = True
     ) -> None:
-        self.roles: List[str] = roles
-        self.perms: List[str] = perms
+        self.roles: List[Union[List[str], str]] = roles
+        self.perms: List[Union[List[str], str]] = perms
 
         self.user: Optional[Any] = None
         self.user_loader: Callable[[str], Any] = user_loader
+        self.user_cache: bool = user_cache
 
     def __call__(
         self,
@@ -28,10 +30,14 @@ class Role:
         response: Response,
         authorization: Optional[str] = Header(None)
     ) -> None:
-        jwt: JWT = JWT(required=True)(
+        jwt: JWT = JWT(
+            required=True,
+            user_loader=self.user_loader,
+            user_cache=self.user_cache
+        )(
             request=request,
             response=response,
-            authorization=authorization,
+            authorization=authorization
         )
 
         self.user = jwt.user
