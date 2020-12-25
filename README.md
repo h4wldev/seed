@@ -12,6 +12,7 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 - __[Model]__ User and User related(meta, profile, ...) models
 - __[Depend]__ JWT(Json Web Token) based authorize
 - __[Depend]__ Integer(Bitfield) based role, permission
+- __[Integrate]__ Integrate with Sentry
 - And support all features of fastapi
 
 
@@ -227,6 +228,17 @@ Set value on role/permission
 
 ##### > Role.from_bitfield(value: List[bool], mapping: List[str])  @classmethod
 Initialize with bitfield. detail on example.
+
+
+## Integrate
+### Sentry
+Change or add setting `<env>.integrate.sentry`
+```toml
+[<env>.integrate.sentry]
+    enable = true
+    dsn = '<set_your_sentry_dsn'
+```
+
 
 ## TODO
 - [ ] API endpoints
