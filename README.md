@@ -49,7 +49,7 @@ class Item(Route):
   def get(item_id: int) -> Any:
     return f'item_id = {item_id}'
 
-  @Route.option(tags=['Item'], summary='it is post!')  # You can use FastAPI options like this
+  @Route.option(dependencies=[])  # Set FastAPI endpoints argument, More infos on below example
   def post(item_id: int) -> Any:
     return f'item_id = {item_id}'
 
@@ -67,6 +67,17 @@ router.join(
   responses={418: {"description": "I'm a teapot"}}
 )  # Also, Support fastapi options!
 ```
+
+#### Route
+##### > Route.option
+arguments : name, dependencies, operation_id, response_class, route_class_override, callbacks
+
+##### > Route.doc_option
+arguments : enable(=include_in_schema), status_code, tags, summary, description, response_description, responses, deprecated
+
+##### > Route.doc_option
+arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none
+
 
 ### JWT Depend
 ```python

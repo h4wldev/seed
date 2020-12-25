@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 class Route:
@@ -9,16 +9,74 @@ class Route:
     ]
 
     @classmethod
-    def docs(cls, **options):
+    def doc_option(
+        cls,
+        enable: bool = True,
+        status_code: int = 200,
+        tags: Optional[List[str]] = None,
+        summary: Optional[str] = None,
+        description: Optional[str] = None,
+        response_description: str = 'Successful Response',
+        responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
+        deprecated: Optional[bool] = None
+    ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def _(method):
-            method.options: Dict[str, Any] = options
+            method.doc_options: Dict[str, Any] = {
+               'include_in_schema': enable,
+               'status_code': status_code,
+               'tags': tags,
+               'summary': summary,
+               'description': description,
+               'response_description': response_description,
+               'responses': responses,
+               'deprecated': deprecated
+            }
             return method
         return _
 
     @classmethod
-    def option(cls, **options):
+    def option(
+        cls,
+        name: Optional[str] = None,
+        dependencies: Optional[List['Depends']] = None,
+        operation_id: Optional[str] = None,
+        response_class: Union['Response'] = ORJSONResponse,
+        route_class_override: Optional['APIRoute'] = None,
+        callbacks: Optional[List['BaseRoute']] = None
+    ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def _(method):
-            method.options: Dict[str, Any] = options
+            method.options: Dict[str, Any] = {
+               'dependencies': dependencies,
+               'operation_id': operation_id,
+               'response_class': response_class,
+               'name': name,
+               'route_class_override': route_class_override,
+               'callbacks': callbacks
+            }
+            return method
+        return _
+
+    @classmethod
+    def response_model(
+        cls,
+        response_model: Any,
+        response_model_include: Optional[Union['SetIntStr', 'DictIntStrAny']] = None,
+        response_model_exclude: Optional[Union['SetIntStr', 'DictIntStrAny']] = None,
+        response_model_by_alias: bool = True,
+        response_model_exclude_unset: bool = False,
+        response_model_exclude_defaults: bool = False,
+        response_model_exclude_none: bool = False
+    ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+        def _(method):
+            method.response_model: Dict[str, Any] = {
+               'response_model': response_model,
+               'response_model_include': response_model_include,
+               'response_model_exclude': response_model_exclude,
+               'response_model_by_alias': response_model_by_alias,
+               'response_model_exclude_unset': response_model_exclude_unset,
+               'response_model_exclude_defaults': response_model_exclude_defaults,
+               'response_model_exclude_none': response_model_exclude_none,
+            }
             return method
         return _
 
@@ -36,17 +94,21 @@ class Route:
 
 
 class Router(APIRouter):
+    def __init__(
+        self,
+        *args,
+        endpoint_options: Optional[Dict[str, Any]] = {},
+        **kwargs
+    ) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.endpoint_options: Dict[str, Any] = endpoint_options
+
     def Route(
         self,
         path: str,
-        default_options: Optional[Dict[str, Any]] = None
     ) -> Callable[..., Any]:
         assert path.startswith('/'), "Path must start with '/'"
-
-        if default_options is None:
-            default_options = {
-                'response_class': ORJSONResponse
-            }
 
         def _(cls: Route) -> Route:
             assert isinstance(cls, Route.__class__), 'Route must be inherit route class'
@@ -55,8 +117,10 @@ class Router(APIRouter):
 
             for method, endpoint in endpoints.items():
                 kwargs: Dict[str, Any] = {
-                    **default_options,
-                    **getattr(endpoint, 'options', {})
+                    **self.endpoint_options,
+                    **getattr(endpoint, 'options', {}),
+                    **getattr(endpoint, 'doc_options', {}),
+                    **getattr(endpoint, 'response_model', {})
                 }
 
                 kwargs['methods'] = [method.upper()]
