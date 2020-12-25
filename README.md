@@ -47,11 +47,15 @@ router = Router()
 )  # This decorator add route into router
 class Item(Route):
   def get(item_id: int) -> Any:
-    return f'item_id = {item_id}'
+    return f'item_id = {item_id}', 200  # You can set status code like this
 
   @Route.option(dependencies=[])  # Set FastAPI endpoints argument, More infos on below example
   def post(item_id: int) -> Any:
-    return f'item_id = {item_id}'
+    return ORJSONResponse(f'item_id = {item_id}', status_code=201)  # Also, you can use FastAPI Response Class
+
+  @Route.option(default_status_code=403)  # Or setting on option
+  def post(item_id: int) -> Any:
+    return '403 Forbidden'
 
 router.Route('/foo/{item_id}')(Item)  # Or you can add route like this
 router += '/bar/{item_id}', Item  # Or this
@@ -70,10 +74,10 @@ router.join(
 
 #### Route
 ##### > Route.option
-arguments : name, dependencies, operation_id, response_class, route_class_override, callbacks
+arguments : name, default_status_code(=status_code), dependencies, operation_id, response_class, route_class_override, callbacks
 
 ##### > Route.doc_option
-arguments : enable(=include_in_schema), status_code, tags, summary, description, response_description, responses, deprecated
+arguments : enable(=include_in_schema), tags, summary, description, response_description, responses, deprecated
 
 ##### > Route.doc_option
 arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none

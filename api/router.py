@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-from fastapi.responses import ORJSONResponse
+from fastapi import APIRouter, status
+from fastapi.responses import Response, ORJSONResponse
 from functools import wraps
 from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -15,7 +15,6 @@ class Route:
     def doc_option(
         cls,
         enable: bool = True,
-        status_code: int = 200,
         tags: Optional[List[str]] = None,
         summary: Optional[str] = None,
         description: Optional[str] = None,
@@ -26,7 +25,6 @@ class Route:
         def _(method):
             method.doc_options: Dict[str, Any] = {
                 'include_in_schema': enable,
-                'status_code': status_code,
                 'tags': tags,
                 'summary': summary,
                 'description': description,
@@ -41,15 +39,17 @@ class Route:
     def option(
         cls,
         name: Optional[str] = None,
+        default_status_code: int = 200,
         dependencies: Optional[List['Depends']] = None,
         operation_id: Optional[str] = None,
-        response_class: Union['Response'] = ORJSONResponse,
+        response_class: Response = ORJSONResponse,
         route_class_override: Optional['APIRoute'] = None,
         callbacks: Optional[List['BaseRoute']] = None
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def _(method):
-            method.options: Dict[str, Any] = {
+            method.endpoint_options: Dict[str, Any] = {
                 'dependencies': dependencies,
+                'status_code': default_status_code,
                 'operation_id': operation_id,
                 'response_class': response_class,
                 'name': name,
@@ -122,15 +122,17 @@ class Router(APIRouter):
                 kwargs: Dict[str, Any] = {
                     **cls._endpoint_options,
                     **self.endpoint_options,
-                    **getattr(endpoint, 'options', {}),
+                    **getattr(endpoint, 'endpoint_options', {}),
                     **getattr(endpoint, 'doc_options', {}),
                     **getattr(endpoint, 'response_model', {})
                 }
 
                 kwargs['methods'] = [method.upper()]
+
+                endpoint.options: Dict[str, Any] = kwargs
                 endpoint: Callable[..., 'Response'] = self._endpoint_wrapper(endpoint)
 
-                self.add_api_route(*(path, endpoint), **kwargs)
+                self.add_api_route(*(path, endpoint), **endpoint.options)
 
         return _
 
@@ -140,6 +142,12 @@ class Router(APIRouter):
     ) -> Any:
         @wraps(method)
         async def _(*args, **kwargs):
+            response: Any = None
+            status_code: int = method.options.get(
+                'status_code',
+                status.HTTP_200_OK
+            )
+
             if not hasattr(method, 'is_coroutine'):
                 method.is_coroutine: bool = iscoroutinefunction(method)
 
@@ -147,6 +155,19 @@ class Router(APIRouter):
                 response: Any = await method(*args, **kwargs)
             else:
                 response: Any = method(*args, **kwargs)
+
+            if isinstance(response, tuple):
+                assert len(response) == 2, 'Response must be Tuple[response, status_code]'
+
+                response, status_code = response
+
+            assert isinstance(status_code, int), 'Status code must be integer type'
+
+            if isinstance(response, Response):
+                response.status_code = status_code
+            else:
+                response_class = method.options.get('response_class', ORJSONResponse)
+                response = response_class(response, status_code=status_code)
 
             return response
 
