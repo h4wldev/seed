@@ -1,12 +1,10 @@
 from typing import Any, Callable, Optional, Tuple, Union
 
-from utils.http import HTTPStatusCode
-
 
 def exception_wrapper(
         exc: 'HTTPException',
         excs: Tuple[Exception] = (),
-        status_code: Union[int, HTTPStatusCode] = 400,
+        status_code: int = 400,
         message_handler: Optional[Callable[[Exception], str]] = None
 ) -> Callable[..., Callable[..., Any]]:
     def decorator(method: Callable[..., Any]) -> Callable[..., Any]:

@@ -2,11 +2,18 @@ from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from utils.http import HTTPMethod
-
 
 class Route:
-    _available_methods: List[str] = [m.value for m in HTTPMethod]
+    _available_methods: List[str] = [
+        'get', 'head', 'post', 'put', 'delete', 'options', 'trace', 'patch'
+    ]
+
+    @classmethod
+    def docs(cls, **options):
+        def _(method):
+            method.options: Dict[str, Any] = options
+            return method
+        return _
 
     @classmethod
     def option(cls, **options):
