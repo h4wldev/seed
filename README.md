@@ -68,6 +68,14 @@ from depends.jwt import JWT
 @router.get('/jwt_required')
 def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
   return jwt.user.email  # h4wldev@gmail.com
+
+@router.get('/jwt_optional')
+def jwt_optional(jwt: JWT() = Depends()) -> Any:
+  return jwt.user is not None  # bool
+
+@router.get('/jwt_refresh_token')
+def jwt_refresh_token(jwt: JWT(token_type='refresh') = Depends()) -> Any:
+  return jwt.claims.type  # refresh
 ```
 
 #### JWT(required, token_type, user_loader, user_cache)
@@ -82,6 +90,12 @@ You can setting jwt expires time, algorithm on [here](settings/settings.toml), a
 
 ##### > JWT.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
+
+##### > JWT.claims -> Dict[str, Any]  @property
+JWT Token's claims after token loaded
+
+##### > JWT.payload -> Dict[str, Any]  @property
+JWT Token's payload after token loaded
 
 ##### > JWT.load_token(credential: str)
 Load token with credential (jwt token string)
