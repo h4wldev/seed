@@ -120,8 +120,8 @@ class Router(APIRouter):
 
             for method, endpoint in endpoints.items():
                 kwargs: Dict[str, Any] = {
-                    **cls._endpoint_options,
                     **self.endpoint_options,
+                    **cls._endpoint_options,
                     **getattr(endpoint, 'endpoint_options', {}),
                     **getattr(endpoint, 'doc_options', {}),
                     **getattr(endpoint, 'response_model', {})

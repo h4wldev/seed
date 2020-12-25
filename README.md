@@ -37,15 +37,23 @@ from fastapi.responses import ORJSONResponse
 
 from api.router import Router, Route
 
-router = Router()
+router = Router(
+  endpoint_options
+)
 
 @router.Route(
   '/{item_id}',
-  default_options={
+  endpoint_options={
     'response_class': ORJSONResponse
   }  # You can set default endpoint options
 )  # This decorator add route into router
 class Item(Route):
+  _endpoint_options: Dict[str, Any] = {
+    'status_code': 404
+  }
+  # Also you can setting default endpoint options in here
+  # Option Priority : on Router -> on Route -> on Endpoint
+
   def get(item_id: int) -> Any:
     return f'item_id = {item_id}', 200  # You can set status code like this
 
