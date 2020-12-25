@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
+from functools import wraps
+from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
@@ -7,6 +9,7 @@ class Route:
     _available_methods: List[str] = [
         'get', 'head', 'post', 'put', 'delete', 'options', 'trace', 'patch'
     ]
+    _endpoint_options: Dict[str, Any] = {}
 
     @classmethod
     def doc_option(
@@ -22,14 +25,14 @@ class Route:
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def _(method):
             method.doc_options: Dict[str, Any] = {
-               'include_in_schema': enable,
-               'status_code': status_code,
-               'tags': tags,
-               'summary': summary,
-               'description': description,
-               'response_description': response_description,
-               'responses': responses,
-               'deprecated': deprecated
+                'include_in_schema': enable,
+                'status_code': status_code,
+                'tags': tags,
+                'summary': summary,
+                'description': description,
+                'response_description': response_description,
+                'responses': responses,
+                'deprecated': deprecated,
             }
             return method
         return _
@@ -46,12 +49,12 @@ class Route:
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def _(method):
             method.options: Dict[str, Any] = {
-               'dependencies': dependencies,
-               'operation_id': operation_id,
-               'response_class': response_class,
-               'name': name,
-               'route_class_override': route_class_override,
-               'callbacks': callbacks
+                'dependencies': dependencies,
+                'operation_id': operation_id,
+                'response_class': response_class,
+                'name': name,
+                'route_class_override': route_class_override,
+                'callbacks': callbacks,
             }
             return method
         return _
@@ -69,13 +72,13 @@ class Route:
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def _(method):
             method.response_model: Dict[str, Any] = {
-               'response_model': response_model,
-               'response_model_include': response_model_include,
-               'response_model_exclude': response_model_exclude,
-               'response_model_by_alias': response_model_by_alias,
-               'response_model_exclude_unset': response_model_exclude_unset,
-               'response_model_exclude_defaults': response_model_exclude_defaults,
-               'response_model_exclude_none': response_model_exclude_none,
+                'response_model': response_model,
+                'response_model_include': response_model_include,
+                'response_model_exclude': response_model_exclude,
+                'response_model_by_alias': response_model_by_alias,
+                'response_model_exclude_unset': response_model_exclude_unset,
+                'response_model_exclude_defaults': response_model_exclude_defaults,
+                'response_model_exclude_none': response_model_exclude_none,
             }
             return method
         return _
@@ -117,6 +120,7 @@ class Router(APIRouter):
 
             for method, endpoint in endpoints.items():
                 kwargs: Dict[str, Any] = {
+                    **cls._endpoint_options,
                     **self.endpoint_options,
                     **getattr(endpoint, 'options', {}),
                     **getattr(endpoint, 'doc_options', {}),
@@ -124,8 +128,27 @@ class Router(APIRouter):
                 }
 
                 kwargs['methods'] = [method.upper()]
+                endpoint: Callable[..., 'Response'] = self._endpoint_wrapper(endpoint)
 
                 self.add_api_route(*(path, endpoint), **kwargs)
+
+        return _
+
+    @staticmethod
+    def _endpoint_wrapper(
+        method: Callable[..., Any]
+    ) -> Any:
+        @wraps(method)
+        async def _(*args, **kwargs):
+            if not hasattr(method, 'is_coroutine'):
+                method.is_coroutine: bool = iscoroutinefunction(method)
+
+            if method.is_coroutine:
+                response: Any = await method(*args, **kwargs)
+            else:
+                response: Any = method(*args, **kwargs)
+
+            return response
 
         return _
 
@@ -146,9 +169,10 @@ class Router(APIRouter):
     def add(
         self,
         path: str,
-        route_class: 'Route'
+        route_class: 'Route',
+        endpoint_options: Optional[Dict[str, Any]] = {},
     ) -> None:
-        self.Route(path)(route_class)
+        self.Route(path)(route_class, endpoint_options=endpoint_options)
 
     def join(self, router: 'Router', **kwargs) -> None:
         assert issubclass(
