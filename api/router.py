@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from typing import Any, Callable, Dict, List, Tuple
+from fastapi.responses import ORJSONResponse
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from utils.http import HTTPMethod
 
@@ -28,8 +29,17 @@ class Route:
 
 
 class Router(APIRouter):
-    def Route(self, path: str) -> Callable[..., Any]:
+    def Route(
+        self,
+        path: str,
+        default_options: Optional[Dict[str, Any]] = None
+    ) -> Callable[..., Any]:
         assert path.startswith('/'), "Path must start with '/'"
+
+        if default_options is None:
+            default_options = {
+                'response_class': ORJSONResponse
+            }
 
         def _(cls: Route) -> Route:
             assert isinstance(cls, Route.__class__), 'Route must be inherit route class'
@@ -37,7 +47,10 @@ class Router(APIRouter):
             endpoints: Dict[str, Callable[..., Any]] = cls._get_endpoints()
 
             for method, endpoint in endpoints.items():
-                kwargs: Dict[str, Any] = getattr(endpoint, 'options', {})
+                kwargs: Dict[str, Any] = {
+                    **default_options,
+                    **getattr(endpoint, 'options', {})
+                }
 
                 kwargs['methods'] = [method.upper()]
 
@@ -68,7 +81,7 @@ class Router(APIRouter):
 
     def join(self, router: 'Router', **kwargs) -> None:
         assert issubclass(
-            router.__class__, APIRouter.__class__
+            router.__class__, APIRouter
         ), "Router must be 'Router' or 'APIRouter' class"
 
         self.include_router(router, **kwargs)

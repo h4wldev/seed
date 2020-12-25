@@ -33,11 +33,18 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 seed's `Router` is inherit [fastapi.APIRouter](https://github.com/tiangolo/fastapi/blob/master/fastapi/routing.py#L408), So you can use all the methods in `APIRouter`
 
 ```python
+from fastapi.responses import ORJSONResponse
+
 from api.router import Router, Route
 
 router = Router()
 
-@router.Route('/{item_id}')  # This decorator add route into router
+@router.Route(
+  '/{item_id}',
+  default_options={
+    'response_class': ORJSONResponse
+  }  # You can set default endpoint options
+)  # This decorator add route into router
 class Item(Route):
   def get(item_id: int) -> Any:
     return f'item_id = {item_id}'
