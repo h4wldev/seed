@@ -1,9 +1,21 @@
 [default]
 debug = true
 api_prefix = ''
-allowed_origins = []
 
 timezone = 'Asia/Seoul'
+
+    [default.cors]
+    allowed_origins = ['*']
+    allow_credentials = true
+    allow_methods = ['*']
+    allow_headers = ['*']
+
+    [default.middleware]
+        [default.middleware.sentry]
+        enable = true
+        dsn = 'https://2e61e53dbf794523b00a4af4c2e74440@o496287.ingest.sentry.io/5570418'
+
+        [default.middleware.sentry.options]
 
     [default.depend]
         [default.depend.role]
@@ -27,12 +39,8 @@ timezone = 'Asia/Seoul'
     dbms = 'sqlite'
     host = ''
     user = ''
-    password = ''
     database = 'seed.db'
     charset = 'utf8'
-
-    [default.password]
-    database_password = ''
 
     [default.sqlalchemy]
     commit_on_exit = true
@@ -44,8 +52,3 @@ timezone = 'Asia/Seoul'
         [default.sqlalchemy.engine_args]
             [default.sqlalchemy.engine_args.connect_args]
             check_same_thread = false
-
-[development]
-
-[production]
-debug = false

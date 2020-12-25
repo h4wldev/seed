@@ -32,15 +32,21 @@ class Application:
 
         self.app.add_middleware(
             CORSMiddleware,
-            allow_origins=self.setting.allowed_origins or ['*'],
-            allow_credentials=True,
-            allow_methods=['*'],
-            allow_headers=['*'],
+            allow_origins=self.setting.cors.allowed_origins,
+            allow_credentials=self.setting.cors.allow_credentials,
+            allow_methods=self.setting.cors.allow_methods,
+            allow_headers=self.setting.cors.allow_headers,
         )
+
+        database_setting: Dict[str, str] = {
+            **self.setting.database,
+            **{'password': self.setting.password.database_password}
+        }
+
         self.app.add_middleware(
             DBSessionMiddleware,
             db_url=make_database_uri(**{
-                k.lower(): v for k, v in setting.database.items()
+                k.lower(): v for k, v in database_setting.items()
             }),
             commit_on_exit=self.setting.sqlalchemy.commit_on_exit,
             session_args=self.setting.sqlalchemy.session_args,

@@ -19,8 +19,8 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 #### 1. Pull this Repo
 
 #### 2. Configuration
-1. Remove `.example` extension from [.secrets.settings.toml.example](.secrets.settings.toml.example) 
-2. Change content of `file from step 1` and [settings.toml](settings/settings.toml)
+1. Remove `.example` extension, change env on filename & content from [.secrets.<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<env>.toml.example](settings/setting.<env>.toml.example) 
+2. Uncomment or add on [setting.py](setting.py), setting files
 
 #### 3. Just Run!
 ```bash
