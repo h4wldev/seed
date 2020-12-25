@@ -33,18 +33,37 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 seed's `Router` is inherit [fastapi.APIRouter](https://github.com/tiangolo/fastapi/blob/master/fastapi/routing.py#L408), So you can use all the methods in `APIRouter`
 
 ```python
+from fastapi.responses import ORJSONResponse
+
 from api.router import Router, Route
 
-router = Router()
+router = Router(
+  endpoint_options
+)
 
-@router.Route('/{item_id}')  # This decorator add route into router
+@router.Route(
+  '/{item_id}',
+  endpoint_options={
+    'response_class': ORJSONResponse
+  }  # You can set default endpoint options
+)  # This decorator add route into router
 class Item(Route):
-  def get(item_id: int) -> Any:
-    return f'item_id = {item_id}'
+  _endpoint_options: Dict[str, Any] = {
+    'status_code': 404
+  }
+  # Also you can setting default endpoint options in here
+  # Option Priority : on Router -> on Route -> on Endpoint
 
-  @Route.option(tags=['Item'], summary='it is post!')  # You can use FastAPI options like this
+  def get(item_id: int) -> Any:
+    return f'item_id = {item_id}', 200  # You can set status code like this
+
+  @Route.option(dependencies=[])  # Set FastAPI endpoints argument, More infos on below example
   def post(item_id: int) -> Any:
-    return f'item_id = {item_id}'
+    return ORJSONResponse(f'item_id = {item_id}', status_code=201)  # Also, you can use FastAPI Response Class
+
+  @Route.option(default_status_code=403)  # Or setting on option
+  def post(item_id: int) -> Any:
+    return '403 Forbidden'
 
 router.Route('/foo/{item_id}')(Item)  # Or you can add route like this
 router += '/bar/{item_id}', Item  # Or this
@@ -61,6 +80,17 @@ router.join(
 )  # Also, Support fastapi options!
 ```
 
+#### Route
+##### > Route.option
+arguments : name, default_status_code(=status_code), dependencies, operation_id, response_class, route_class_override, callbacks
+
+##### > Route.doc_option
+arguments : enable(=include_in_schema), tags, summary, description, response_description, responses, deprecated
+
+##### > Route.doc_option
+arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none
+
+
 ### JWT Depend
 ```python
 from depends.jwt import JWT
@@ -68,6 +98,14 @@ from depends.jwt import JWT
 @router.get('/jwt_required')
 def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
   return jwt.user.email  # h4wldev@gmail.com
+
+@router.get('/jwt_optional')
+def jwt_optional(jwt: JWT() = Depends()) -> Any:
+  return jwt.user is not None  # bool
+
+@router.get('/jwt_refresh_token')
+def jwt_refresh_token(jwt: JWT(token_type='refresh') = Depends()) -> Any:
+  return jwt.claims.type  # refresh
 ```
 
 #### JWT(required, token_type, user_loader, user_cache)
@@ -82,6 +120,12 @@ You can setting jwt expires time, algorithm on [here](settings/settings.toml), a
 
 ##### > JWT.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
+
+##### > JWT.claims -> Dict[str, Any]  @property
+JWT Token's claims after token loaded
+
+##### > JWT.payload -> Dict[str, Any]  @property
+JWT Token's payload after token loaded
 
 ##### > JWT.load_token(credential: str)
 Load token with credential (jwt token string)
@@ -187,6 +231,7 @@ Initialize with bitfield. detail on example.
 ## TODO
 - [ ] API endpoints
 - [ ] Custom OAuth2 Authorization
+- [ ] Add unittest testcases
 
 ## Requirements
 You can see [Here](requirements.txt)!
