@@ -10,12 +10,12 @@ timezone = 'Asia/Seoul'
     allow_methods = ['*']
     allow_headers = ['*']
 
-    [default.middleware]
-        [default.middleware.sentry]
-        enable = true
-        dsn = 'https://2e61e53dbf794523b00a4af4c2e74440@o496287.ingest.sentry.io/5570418'
+    [default.integrate]
+        [default.integrate.sentry]
+        enable = false
+        dsn = ''
 
-        [default.middleware.sentry.options]
+        [default.integrate.sentry.options]
 
     [default.depend]
         [default.depend.role]

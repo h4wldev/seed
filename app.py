@@ -53,14 +53,14 @@ class Application:
             engine_args=self.setting.sqlalchemy.engine_args
         )
 
-        if self.setting.middleware.sentry.enable:
+        if self.setting.integrate.sentry.enable:
             import sentry_sdk
 
             from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
             sentry_sdk.init(
-                self.setting.middleware.sentry.dsn,
-                **self.setting.middleware.sentry.options
+                self.setting.integrate.sentry.dsn,
+                **self.setting.integrate.sentry.options
             )
 
             self.app.add_middleware(SentryAsgiMiddleware)
