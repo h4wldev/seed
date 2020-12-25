@@ -8,8 +8,8 @@ class HTTPException(FastAPIHTTPException):
 
     def __init__(
         self,
-        status_code: Optional[int] = None,
         detail: Any = None,
+        status_code: Optional[int] = None,
         headers: Optional[Dict[str, Any]] = None
     ) -> None:
         if status_code is None:
