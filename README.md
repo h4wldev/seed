@@ -12,6 +12,7 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 - __[Model]__ User and User related(meta, profile, ...) models
 - __[Depend]__ JWT(Json Web Token) based authorize
 - __[Depend]__ Integer(Bitfield) based role, permission
+- __[Depend]__ User specific id with UUID
 - __[Integrate]__ Integrate with Sentry
 - And support all features of fastapi
 
@@ -164,6 +165,16 @@ def need_roles(
 
 ##### > Role.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data on JWT Depend
+
+
+### UUID Depend
+```python
+from depends.uuid import UUID
+
+@router.get('/uuid')
+def jwt_required(uuid: UUID = Depends()) -> Any:
+  return uuid  # 01dbd65e-1b46-35aa-9928-51333fe20858
+```
 
 
 ### Bitfield based Role, Permission
