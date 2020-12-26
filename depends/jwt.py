@@ -53,9 +53,7 @@ class JWT:
     ) -> None:
         if authorization is None:
             if self.required:
-                raise JWTHTTPException(
-                    detail="'Authorization' must not be empty"
-                )
+                raise JWTHTTPException("'Authorization' must not be empty")
 
             return self
 
@@ -63,9 +61,7 @@ class JWT:
         self.load_token(credential)
 
         if 'type' not in self.claims or self.claims['type'] != self.token_type:
-            raise JWTHTTPException(
-                detail=f"Token type must be '{self.token_type}'"
-            )
+            raise JWTHTTPException(f"Token type must be '{self.token_type}'")
 
         return self
 
@@ -75,9 +71,7 @@ class JWT:
             return None
 
         if 'sub' not in self.claims:
-            raise JWTHTTPException(
-                detail="'sub' must be in token claims"
-            )
+            raise JWTHTTPException("'sub' must be in token claims")
 
         if self.user_cache and self.cached_user is not None:
             return self.cached_user
@@ -111,17 +105,13 @@ class JWT:
         tokens: List[str] = authorization.split(' ')
 
         if len(tokens) != 2:
-            raise JWTHTTPException(
-                detail="Authorization header must like 'Bearer <credentials>'"
-            )
+            raise JWTHTTPException("Authorization header must like 'Bearer <credentials>'")
 
         type_: str = tokens[0]
         credential: str = tokens[1]
 
         if type_ != 'Bearer':
-            raise JWTHTTPException(
-                detail="Authorization token type must be 'Bearer'",
-            )
+            raise JWTHTTPException("Authorization token type must be 'Bearer'")
 
         return credential
 
