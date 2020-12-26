@@ -176,6 +176,9 @@ def jwt_required(uuid: UUID = Depends()) -> Any:
   return uuid  # 01dbd65e-1b46-35aa-9928-51333fe20858
 ```
 
+##### > UUID.get_uuid(request: Request)
+Get uuid with fastapi request
+
 
 ### Bitfield based Role, Permission
 ```diff

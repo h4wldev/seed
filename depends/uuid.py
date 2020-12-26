@@ -11,6 +11,14 @@ class UUID:
         self,
         request: Request
     ) -> str:
+        return self.get_uuid(request)
+
+    @staticmethod
+    def get_uuid(request: Request) -> str:
+        assert isinstance(
+            request, Request
+        ), "request arg must be 'fastapi.Request' type"
+
         accept_language: str = request.headers.get('accept-language', '')
         user_agent: str = request.headers.get('user-agent', '')
         user_ip: str = request.client.host
