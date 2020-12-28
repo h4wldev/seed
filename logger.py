@@ -7,7 +7,7 @@ from typing import List
 from setting import setting
 
 
-class LogHandler(logging.Handler):
+class InterceptHandler(logging.Handler):
     loglevel_mapping = {
         50: 'CRITICAL',
         40: 'ERROR',
@@ -37,6 +37,13 @@ class LogHandler(logging.Handler):
 
 
 def logger_configure(log_level: int = logging.DEBUG) -> None:
+    logger.configure(**{
+        'extra': {
+            'uuid': None,
+            'user_id': None,
+        },
+    })
+
     if setting.integrate.logstash.enable:
         logger.add(AsynchronousLogstashHandler(
             setting.integrate.logstash.host,
@@ -53,5 +60,5 @@ def intercept_loggers(
     for logger_name in logger_names:
         logging_logger = logging.getLogger(logger_name)
 
-        logging_logger.handlers = [LogHandler(level=log_level)]
+        logging_logger.handlers = [InterceptHandler(level=log_level)]
         logging_logger.propagate = False
