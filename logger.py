@@ -2,10 +2,13 @@ import sys
 import logging
 
 from loguru import logger
-from typing import List
+from logstash_async.handler import AsynchronousLogstashHandler
+from typing import Callable, List
+
+from setting import setting
 
 
-class InterceptHandler(logging.Handler):
+class LogHandler(logging.Handler):
     loglevel_mapping = {
         50: 'CRITICAL',
         40: 'ERROR',
@@ -35,9 +38,13 @@ class InterceptHandler(logging.Handler):
 
 
 def logger_configure(log_level: int = logging.DEBUG) -> None:
-    logging.getLogger().handlers = [InterceptHandler()]
-
-    logger.configure(handlers=[{'sink': sys.stderr, 'level': log_level}])
+    if setting.integrate.logstash.enable:
+        logger.add(AsynchronousLogstashHandler(
+            setting.integrate.logstash.host,
+            setting.integrate.logstash.port,
+            setting.integrate.logstash.database_path,
+            **setting.integrate.logstash.options,
+        ))
 
 
 def intercept_loggers(
@@ -47,5 +54,5 @@ def intercept_loggers(
     for logger_name in logger_names:
         logging_logger = logging.getLogger(logger_name)
 
-        logging_logger.handlers = [InterceptHandler(level=log_level)]
+        logging_logger.handlers = [LogHandler(level=log_level)]
         logging_logger.propagate = False

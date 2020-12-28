@@ -15,11 +15,26 @@ timezone = 'Asia/Seoul'
         enable = false
         dsn = ''
 
-        [default.integrate.sentry.options]
+            [default.integrate.sentry.options]
+
+        [default.integrate.logstash]
+        enable = false
+        host = '127.0.0.1'
+        port = 5959
+        database_path = 'logstash.db'
+
+            [default.integrate.logstash.options]
+            transport = 'logstash_async.transport.TcpTransport'
+            ssl_enable = false
+            ssl_verify = true
+            keyfile = ''
+            certfile = ''
+            ca_certs = ''
+            encoding = 'utf-8'
 
     [default.depend]
         [default.depend.role]
-        permissions = ['auth']
+        permissions = ['']
         roles = ['']
 
         [default.depend.jwt]

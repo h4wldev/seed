@@ -13,7 +13,7 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 - __[Depend]__ JWT(Json Web Token) based authorize
 - __[Depend]__ Integer(Bitfield) based role, permission
 - __[Depend]__ User specific id with UUID
-- __[Integrate]__ Integrate with Sentry
+- __[Integrate]__ Integrate with Sentry, Logstash
 - And support all features of fastapi
 
 
@@ -249,8 +249,27 @@ Initialize with bitfield. detail on example.
 Change or add setting `<env>.integrate.sentry`
 ```toml
 [<env>.integrate.sentry]
-    enable = true
-    dsn = '<set_your_sentry_dsn'
+enable = true
+dsn = '<set_your_sentry_dsn'
+```
+
+### Logstash
+Change or add setting `<env>.integrate.logstash`
+```toml
+[default.integrate.logstash]
+enable = true
+host = '127.0.0.1'
+port = 5959
+database_path = 'logstash.db'
+
+    [default.integrate.logstash.options]
+    transport = 'logstash_async.transport.TcpTransport'
+    ssl_enable = false
+    ssl_verify = true
+    keyfile = ''
+    certfile = ''
+    ca_certs = ''
+    encoding = 'utf-8'
 ```
 
 
