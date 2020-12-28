@@ -1,9 +1,8 @@
-import sys
 import logging
 
 from loguru import logger
 from logstash_async.handler import AsynchronousLogstashHandler
-from typing import Callable, List
+from typing import List
 
 from setting import setting
 
