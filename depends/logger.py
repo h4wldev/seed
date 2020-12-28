@@ -1,4 +1,5 @@
 from fastapi import Depends
+from typing import Optional
 
 from logger import logger
 
@@ -15,4 +16,12 @@ class Logger:
         uuid: UUID = Depends(),
         jwt: JWT() = Depends()
     ) -> 'Logger':
-        return logger.bind(uuid=uuid, user=jwt.user)
+        user_id: Optional[int] = None
+
+        if jwt.user:
+            user_id = jwt.user.id
+
+        return logger.bind(
+            uuid=uuid,
+            user_id=user_id,
+        )
