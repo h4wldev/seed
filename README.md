@@ -146,7 +146,7 @@ Create refresh token with payload. subject must be set unique data and payload m
 > This depend include JWT depend, and jwt required<br>
 
 ```python
-from depends.role import Role
+from depends.role.depend import Role
 
 @router.get('/need_roles')
 def need_roles(
