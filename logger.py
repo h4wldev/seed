@@ -1,3 +1,4 @@
+import sys
 import logging
 
 from loguru import logger
@@ -5,44 +6,25 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from typing import List
 
 from setting import setting
-
-
-class InterceptHandler(logging.Handler):
-    loglevel_mapping = {
-        50: 'CRITICAL',
-        40: 'ERROR',
-        30: 'WARNING',
-        20: 'INFO',
-        10: 'DEBUG',
-        0: 'NOTSET',
-    }
-
-    def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover
-        try:
-            level: str = logger.level(record.levelname).name
-        except ValueError:
-            level: str = self.loglevel_mapping[record.levelno]
-
-        frame: 'Frame' = logging.currentframe()
-        depth: int = 2
-
-        while frame.f_code.co_filename == logging.__file__:  # noqa: WPS609
-            frame = frame.f_back
-            depth += 1
-
-        logger.opt(depth=depth, exception=record.exc_info).log(
-            level,
-            record.getMessage(),
-        )
+from utils.logger import LoggerConfigure
+from utils.logger.formatter import Formatter
+from utils.logger.handlers import InterceptHandler
 
 
 def logger_configure(log_level: int = logging.DEBUG) -> None:
+    formatter: Formatter = Formatter()
+
     logger.configure(**{
+        'handlers': [
+            {'sink': sys.stdout, 'colorize': True, 'format': formatter.stdout_format},
+        ],
         'extra': {
+            'headers': '',
             'uuid': None,
-            'user_id': None,
         },
     })
+
+    LoggerConfigure.add_levels()
 
     if setting.integrate.logstash.enable:
         logger.add(AsynchronousLogstashHandler(

@@ -179,6 +179,20 @@ def jwt_required(uuid: UUID = Depends()) -> Any:
 ##### > UUID.get_uuid(request: Request)
 Get uuid with fastapi request
 
+### Logger Depend
+> This depend include UUID depend, same usage with just logger<br>
+
+```python
+from logger import logger as default_logger
+from depends.logger import JWT
+
+
+@router.get('/logger_with_uuid')
+def logger_with_uuid(logger: Logger = Depends()) -> Any:
+  default_logger.info('not show uuid!')  # not show uuid on stdout log
+  logger.info('show uuid!')  # show uuid on stdout log
+  return None
+```
 
 ### Bitfield based Role, Permission
 ```diff

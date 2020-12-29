@@ -49,6 +49,7 @@ timezone = 'Asia/Seoul'
         'uvicorn.error',
         'fastapi'
     ]
+    format = '<lk>[{time:YYYY-MM-DD HH:mm:ss.SSS}][{name}:{line}]{extra[headers]} › </lk><level>{level.icon} <underline>{level.name}</underline></level>  {message}'
 
     [default.database]
     dbms = 'sqlite'
