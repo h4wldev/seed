@@ -13,6 +13,7 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 - __[Depend]__ JWT(Json Web Token) based authorize
 - __[Depend]__ Integer(Bitfield) based role, permission
 - __[Depend]__ User specific id with UUID
+- __[Depend]__ Logger with UUID
 - __[Integrate]__ Integrate with Sentry, Logstash
 - And support all features of fastapi
 
