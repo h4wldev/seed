@@ -1,0 +1,70 @@
+[default]
+debug = true
+api_prefix = ''
+
+timezone = 'Asia/Seoul'
+
+    [default.cors]
+    allowed_origins = ['*']
+    allow_credentials = true
+    allow_methods = ['*']
+    allow_headers = ['*']
+
+    [default.integrate]
+        [default.integrate.sentry]
+        enable = false
+        dsn = ''
+
+            [default.integrate.sentry.options]
+
+        [default.integrate.logstash]
+        enable = false
+        host = '127.0.0.1'
+        port = 5959
+        database_path = 'logstash.db'
+
+            [default.integrate.logstash.options]
+            transport = 'logstash_async.transport.TcpTransport'
+            ssl_enable = false
+            ssl_verify = true
+            keyfile = ''
+            certfile = ''
+            ca_certs = ''
+            encoding = 'utf-8'
+
+    [default.depend]
+        [default.depend.role]
+        permissions = ['']
+        roles = ['']
+
+        [default.depend.jwt]
+        algorithm = 'HS256'
+        access_token_expires = '3h'
+        refresh_token_expires = '1d'
+
+    [default.logging]
+    intercept_loggers = [
+        'uvicorn',
+        'uvicorn.access',
+        'uvicorn.error',
+        'fastapi'
+    ]
+    format = '<lk>[{time:YYYY-MM-DD HH:mm:ss.SSS}][{name}:{line}]{extra[headers]} › </lk><level>{level.icon} <underline>{level.name}</underline></level>  {message}'
+
+    [default.database]
+    dbms = 'sqlite'
+    host = ''
+    user = ''
+    database = 'seed.db'
+    charset = 'utf8'
+
+    [default.sqlalchemy]
+    commit_on_exit = true
+
+        [default.sqlalchemy.session_args]
+        expire_on_commit = false
+        autoflush = false
+
+        [default.sqlalchemy.engine_args]
+            [default.sqlalchemy.engine_args.connect_args]
+            check_same_thread = false

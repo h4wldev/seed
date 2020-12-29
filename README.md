@@ -12,6 +12,8 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 - __[Model]__ User and User related(meta, profile, ...) models
 - __[Depend]__ JWT(Json Web Token) based authorize
 - __[Depend]__ Integer(Bitfield) based role, permission
+- __[Depend]__ User specific id with UUID
+- __[Integrate]__ Integrate with Sentry, Logstash
 - And support all features of fastapi
 
 
@@ -19,8 +21,8 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 #### 1. Pull this Repo
 
 #### 2. Configuration
-1. Remove `.example` extension from [.secrets.settings.toml.example](.secrets.settings.toml.example) 
-2. Change content of `file from step 1` and [settings.toml](settings/settings.toml)
+1. Remove `.example` extension, change env on filename & content from [.secrets.<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<env>.toml.example](settings/setting.<env>.toml.example) 
+2. Uncomment or add on [setting.py](setting.py), setting files
 
 #### 3. Just Run!
 ```bash
@@ -144,7 +146,7 @@ Create refresh token with payload. subject must be set unique data and payload m
 > This depend include JWT depend, and jwt required<br>
 
 ```python
-from depends.role import Role
+from depends.role.depend import Role
 
 @router.get('/need_roles')
 def need_roles(
@@ -164,6 +166,33 @@ def need_roles(
 ##### > Role.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data on JWT Depend
 
+
+### UUID Depend
+```python
+from depends.uuid import UUID
+
+@router.get('/uuid')
+def jwt_required(uuid: UUID = Depends()) -> Any:
+  return uuid  # 01dbd65e-1b46-35aa-9928-51333fe20858
+```
+
+##### > UUID.get_uuid(request: Request)
+Get uuid with fastapi request
+
+### Logger Depend
+> This depend include UUID depend, same usage with just logger<br>
+
+```python
+from logger import logger as default_logger
+from depends.logger import JWT
+
+
+@router.get('/logger_with_uuid')
+def logger_with_uuid(logger: Logger = Depends()) -> Any:
+  default_logger.info('not show uuid!')  # not show uuid on stdout log
+  logger.info('show uuid!')  # show uuid on stdout log
+  return None
+```
 
 ### Bitfield based Role, Permission
 ```diff
@@ -227,6 +256,36 @@ Set value on role/permission
 
 ##### > Role.from_bitfield(value: List[bool], mapping: List[str])  @classmethod
 Initialize with bitfield. detail on example.
+
+
+## Integrate
+### Sentry
+Change or add setting `<env>.integrate.sentry`
+```toml
+[<env>.integrate.sentry]
+enable = true
+dsn = '<set_your_sentry_dsn'
+```
+
+### Logstash
+Change or add setting `<env>.integrate.logstash`
+```toml
+[default.integrate.logstash]
+enable = true
+host = '127.0.0.1'
+port = 5959
+database_path = 'logstash.db'
+
+    [default.integrate.logstash.options]
+    transport = 'logstash_async.transport.TcpTransport'
+    ssl_enable = false
+    ssl_verify = true
+    keyfile = ''
+    certfile = ''
+    ca_certs = ''
+    encoding = 'utf-8'
+```
+
 
 ## TODO
 - [ ] API endpoints
