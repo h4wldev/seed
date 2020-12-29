@@ -1,8 +1,13 @@
-# 🌾 seed
-![Lint](https://github.com/h4wldev/seed/workflows/Lint/badge.svg)
-
-Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/fastapi)
-
+<p align="center">
+ <img alt="Header" src="https://user-images.githubusercontent.com/14465407/103291172-8083bb80-4a2e-11eb-8687-f9c748593f7d.png" height="180px">
+</p>
+<h1 align="center">🌾 seed</h1>
+<p align="center">
+ Boilerplate for restful API with <a href="https://github.com/tiangolo/fastapi">tiangolo/fastapi</a>
+</p>
+<p align="center">
+ <img src="https://github.com/h4wldev/seed/workflows/Lint/badge.svg">
+</p>
 
 ## Features
 - __[Endpoints]__ Auth, Sign up, Withdrawal, ... routes included *(In Progress)*
@@ -90,7 +95,7 @@ arguments : name, default_status_code(=status_code), dependencies, operation_id,
 ##### > Route.doc_option
 arguments : enable(=include_in_schema), tags, summary, description, response_description, responses, deprecated
 
-##### > Route.doc_option
+##### > Route.response_model
 arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none
 
 
