@@ -3,8 +3,10 @@ import datetime
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
+from typing import Any
 
 from depends.role.column_types import MutableRole, Role, Permission
+from setting import setting
 
 from . import Base, ModelMixin
 from .user_profile_model import UserProfileModel  # noqa: F401
@@ -47,6 +49,10 @@ class UserModel(Base, ModelMixin):
         backref='user',
         cascade='all,delete',
     )
+
+    @property
+    def key_field(self) -> Any:
+        return getattr(self, setting.user_key_field)
 
 
 User = sqlalchemy_to_pydantic(UserModel)
