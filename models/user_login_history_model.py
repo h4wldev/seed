@@ -15,6 +15,7 @@ class UserLoginHistoryModel(Base, ModelMixin):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     success = Column(Boolean, default=False)
     ip = Column(String, nullable=False)
+    provider = Column(String)
     device = Column(String)
     os = Column(String)
     browser = Column(String)
