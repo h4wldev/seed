@@ -92,7 +92,7 @@ class JWT:
         subject: str
     ) -> Optional[UserModel]:
         user = db.session.query(UserModel)\
-            .filter(UserModel.email == subject)\
+            .filter(getattr(UserModel, setting.user_key_field) == subject)\
             .first()
 
         return user

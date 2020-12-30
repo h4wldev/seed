@@ -4,6 +4,8 @@ api_prefix = ''
 
 timezone = 'Asia/Seoul'
 
+user_key_field = 'username'
+
     [default.cors]
     allowed_origins = ['*']
     allow_credentials = true
