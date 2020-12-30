@@ -27,7 +27,7 @@
 #### 1. Pull this Repo
 
 #### 2. Configuration
-1. Remove `.example` extension, change env on filename & content from [.secrets.<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<env>.toml.example](settings/setting.<env>.toml.example) 
+1. Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example) 
 2. Uncomment or add on [setting.py](setting.py), setting files
 
 #### 3. Just Run!
@@ -185,18 +185,18 @@ def jwt_required(uuid: UUID = Depends()) -> Any:
 ##### > UUID.get_uuid(request: Request)
 Get uuid with fastapi request
 
-### Logger Depend
+### Context Logger Depend
 > This depend include UUID depend, same usage with just logger<br>
 
 ```python
 from logger import logger as default_logger
-from depends.logger import JWT
+from depends.context_logger import ContextLogger
 
 
 @router.get('/logger_with_uuid')
-def logger_with_uuid(logger: Logger = Depends()) -> Any:
+def logger_with_uuid(context_logger: ContextLogger = Depends()) -> Any:
   default_logger.info('not show uuid!')  # not show uuid on stdout log
-  logger.info('show uuid!')  # show uuid on stdout log
+  context_logger.info('show uuid!')  # show uuid on stdout log
   return None
 ```
 
