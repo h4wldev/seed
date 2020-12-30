@@ -1,3 +1,4 @@
+import user_agents
 import uuid
 
 from fastapi import Request
@@ -20,8 +21,10 @@ class UUID:
         ), "request arg must be 'fastapi.Request' type"
 
         accept_language: str = request.headers.get('accept-language', '')
-        user_agent: str = request.headers.get('user-agent', '')
         user_ip: str = request.client.host
+        user_agent: 'UserAgent' = user_agents.parse(
+            request.headers.get('user-agent', '')
+        )
 
         payload: str = f'{user_ip}${accept_language}${user_agent}'
         payload = ''.join(filter(str.isalnum, payload))
