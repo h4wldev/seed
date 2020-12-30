@@ -9,8 +9,9 @@ from depends.role.column_types import MutableRole, Role, Permission
 from setting import setting
 
 from . import Base, ModelMixin
-from .user_profile_model import UserProfileModel  # noqa: F401
+from .user_login_history_model import UserLoginHistoryModel  # noqa: F401
 from .user_meta_model import UserMetaModel  # noqa: F401
+from .user_profile_model import UserProfileModel  # noqa: F401
 from .user_social_account_model import UserSocialAccountModel  # noqa: F401
 
 
@@ -46,6 +47,12 @@ class UserModel(Base, ModelMixin):
 
     social_accounts = relationship(
         'UserSocialAccountModel',
+        backref='user',
+        cascade='all,delete',
+    )
+
+    login_histories = relationship(
+        'UserLoginHistoryModel',
         backref='user',
         cascade='all,delete',
     )
