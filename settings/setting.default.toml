@@ -4,7 +4,7 @@ api_prefix = ''
 
 timezone = 'Asia/Seoul'
 
-user_key_field = 'username'
+user_key_field = 'email'
 
     [default.cors]
     allowed_origins = ['*']
@@ -41,8 +41,14 @@ user_key_field = 'username'
 
         [default.depend.jwt]
         algorithm = 'HS256'
-        access_token_expires = '3h'
+        access_token_expires = '30m'
         refresh_token_expires = '1d'
+
+            [default.depend.jwt.httponly_cookie]
+            enable = true
+            domains = []
+            access_token_cookie_key = 'access_token'
+            refresh_token_cookie_key = 'refresh_token'
 
     [default.logging]
     intercept_loggers = [

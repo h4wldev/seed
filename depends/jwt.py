@@ -41,6 +41,7 @@ class JWT:
 
         self.cached_user: Optional[UserModel] = None
 
+        self.httponly: bool = self.setting.httponly_cookie.enable
         self.required: bool = required
         self.token_type: str = token_type
         self.token_loaded: bool = False
@@ -48,22 +49,28 @@ class JWT:
     def __call__(
         self,
         request: Request,
-        response: Response,
         authorization: Optional[str] = Header(None)
     ) -> None:
-        if authorization is None:
-            if self.required:
-                raise JWTHTTPException("'Authorization' must not be empty")
+        credential: Optional[str] = None
+
+        try:
+            if self.httponly:
+                credential = self.get_credential_from_cookie(request)
+            else:
+                credential = self.get_credential_from_header(authorization)
+
+            if credential is None:
+                raise JWTHTTPException('Credential must not be empty')
+
+            self.load_token(credential)
+
+            if 'type' not in self.claims or self.claims['type'] != self.token_type:
+                raise JWTHTTPException(f"Token type must be '{self.token_type}'")
 
             return self
-
-        credential: str = self.get_credential_from_header(authorization)
-        self.load_token(credential)
-
-        if 'type' not in self.claims or self.claims['type'] != self.token_type:
-            raise JWTHTTPException(f"Token type must be '{self.token_type}'")
-
-        return self
+        except JWTHTTPException as e:
+            if self.required:
+                raise e
 
     @property
     def user(self) -> Any:
@@ -98,11 +105,25 @@ class JWT:
         return user
 
     @classmethod
+    def get_credential_from_cookie(
+        cls,
+        request: Request
+    ) -> str:
+        credential: Optional[str] = request.cookies.get(
+            cls.setting.httponly_cookie.access_token_cookie_key, None
+        )
+
+        return credential
+
+    @classmethod
     def get_credential_from_header(
         cls,
-        authorization: str
-    ) -> Dict[str, Any]:
-        tokens: List[str] = authorization.split(' ')
+        authorization: Optional[str]
+    ) -> str:
+        if authorization is None:
+            return authorization
+
+        tokens: List[str] = str(authorization).split(' ')
 
         if len(tokens) != 2:
             raise JWTHTTPException("Authorization header must like 'Bearer <credentials>'")
@@ -155,6 +176,36 @@ class JWT:
             token_type='refresh',
             expires=cls.setting.refresh_token_expires
         )
+
+    @classmethod
+    def set_token_on_cookie(
+        cls,
+        response: 'Response',
+        subject: str,
+        payload: Dict[str, Any] = {}
+    ) -> 'Response':
+        access_token: str = cls.create_access_token(subject, payload)
+        refresh_token: str = cls.create_refresh_token(subject, payload)
+        domain: Optional[str] = ','.join(cls.setting.httponly_cookie.domains)
+
+        if domain == '':
+            domain = None
+
+        response.set_cookie(
+            key=cls.setting.httponly_cookie.access_token_cookie_key,
+            value=access_token,
+            domain=domain,
+            max_age=units2seconds(cls.setting.access_token_expires),
+        )
+
+        response.set_cookie(
+            key=cls.setting.httponly_cookie.refresh_token_cookie_key,
+            value=refresh_token,
+            domain=domain,
+            max_age=units2seconds(cls.setting.refresh_token_expires),
+        )
+
+        return response
 
     @classmethod
     @exception_wrapper(
