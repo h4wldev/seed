@@ -4,8 +4,7 @@ import uuid
 
 from fastapi import (
     Header,
-    Request,
-    Response
+    Request
 )
 from fastapi.responses import ORJSONResponse
 from typing import Any, Dict, Callable, Optional
