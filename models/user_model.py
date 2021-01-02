@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 from typing import Any
 
-from depends.role.column_types import MutableRole, Role, Permission
+from seed.depends.role.column_types import MutableRole, Role, Permission
 from setting import setting
 
 from . import Base, ModelMixin

@@ -101,7 +101,7 @@ arguments : response_model, response_model_include, response_model_exclude, resp
 
 ### JWT Depend
 ```python
-from depends.jwt import JWT
+from seed.depends.jwt import JWT
 
 @router.get('/jwt_required')
 def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
@@ -177,7 +177,7 @@ def from_httponly_cookie(jwt: JWT(httponly_cookie_mode=True) = Depends()) -> str
 > This depend include JWT depend, and jwt required<br>
 
 ```python
-from depends.role.depend import Role
+from seed.depends.role.depend import Role
 
 @router.get('/need_roles')
 def need_roles(
@@ -200,7 +200,7 @@ User data property, after load token and user data on JWT Depend
 
 ### UUID Depend
 ```python
-from depends.uuid import UUID
+from seed.depends.uuid import UUID
 
 @router.get('/uuid')
 def jwt_required(uuid: UUID = Depends()) -> Any:
@@ -215,7 +215,7 @@ Get uuid with fastapi request
 
 ```python
 from logger import logger as default_logger
-from depends.context_logger import ContextLogger
+from seed.depends.context_logger import ContextLogger
 
 
 @router.get('/logger_with_uuid')
@@ -232,7 +232,7 @@ def logger_with_uuid(context_logger: ContextLogger = Depends()) -> Any:
 
 ```python
 # Same usage with Role and Permission
-from depends.role.types import Role, Permission
+from seed.depends.role.types import Role, Permission
 
 mapping: List[str] = ['super-admin', 'admin', 'writer', 'reader']
 

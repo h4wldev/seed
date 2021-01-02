@@ -11,10 +11,10 @@ from typing import Any, Dict, Callable, Optional
 
 from db import db
 from exceptions import JWTHTTPException
+from seed.utils.convert import units2seconds
+from seed.utils.exception import exception_wrapper
 from setting import setting
 from models.user_model import UserModel
-from utils.convert import units2seconds
-from utils.exception import exception_wrapper
 
 
 __version__ = '0.0.1'

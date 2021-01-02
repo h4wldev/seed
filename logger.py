@@ -5,10 +5,10 @@ from loguru import logger
 from logstash_async.handler import AsynchronousLogstashHandler
 from typing import List
 
+from seed.utils.logger import LoggerConfigure
+from seed.utils.logger.formatter import Formatter
+from seed.utils.logger.handlers import InterceptHandler
 from setting import setting
-from utils.logger import LoggerConfigure
-from utils.logger.formatter import Formatter
-from utils.logger.handlers import InterceptHandler
 
 
 def logger_configure(log_level: int = logging.DEBUG) -> None:

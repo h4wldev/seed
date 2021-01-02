@@ -6,7 +6,7 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime
 from typing import Optional
 
-from utils.geoip import GeoIP
+from seed.utils.geoip import GeoIP
 
 from . import Base, ModelMixin
 
