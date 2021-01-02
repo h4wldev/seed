@@ -10,7 +10,6 @@ from fastapi import (
 from fastapi.responses import ORJSONResponse
 from typing import Any, Dict, Callable, Optional
 
-from api.router import status
 from db import db
 from exceptions import JWTHTTPException
 from seed.utils.convert import units2seconds
@@ -202,8 +201,7 @@ class JWT:
             content={
                 'access_token': access_token,
                 'refresh_token': refresh_token,
-            },
-            status_code=status.HTTP_201_CREATED
+            }
         )
 
         if cls.setting.httponly_cookie.enable:

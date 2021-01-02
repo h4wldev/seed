@@ -12,6 +12,13 @@ user_key_field = 'email'
     allow_methods = ['*']
     allow_headers = ['*']
 
+    [default.oauth]
+    providers = ['kakao', 'naver']
+
+        [default.oauth.kakao]
+        redirect_uri = '/oauth/kakao'
+        handler = 'seed.oauth.kakao.KakaoOAuthHandler'
+
     [default.integrate]
         [default.integrate.sentry]
         enable = false

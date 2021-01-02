@@ -1,4 +1,7 @@
-from fastapi import APIRouter
+from api.router import Router
+
+from .oauth import OAuth
 
 
-router = APIRouter()
+router = Router()
+router += '/ouath', OAuth

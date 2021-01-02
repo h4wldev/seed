@@ -14,7 +14,7 @@ class UserSocialAccountModel(Base, ModelMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    social_id = Column(Integer, nullable=False)
+    social_id = Column(String, nullable=False)
     provider = Column(String, nullable=False)
     access_token = Column(String)
     updated_at = Column(DateTime)
