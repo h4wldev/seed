@@ -15,7 +15,7 @@
 - __[Config]__ `.toml` based config system, support environments
 - __[Authorize]__ Support custom OAuth2 authorization *(In Progress)*
 - __[Model]__ User and User related(meta, profile, ...) models
-- __[Depend]__ JWT(Json Web Token) based authorize
+- __[Depend]__ JWT(Json Web Token) based authorize, support httponly cookie mode
 - __[Depend]__ Integer(Bitfield) based role, permission
 - __[Depend]__ User specific id with UUID
 - __[Depend]__ Logger with UUID
@@ -116,15 +116,16 @@ def jwt_refresh_token(jwt: JWT(token_type='refresh') = Depends()) -> Any:
   return jwt.claims.type  # refresh
 ```
 
-#### JWT(required, token_type, user_loader, user_cache)
+#### JWT(required, token_type, user_loader, user_cache, httponly_cookie_mode)
 You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
 
-| argument    | type                 | description                                                                                          | default             |
-|-------------|----------------------|------------------------------------------------------------------------------------------------------|---------------------|
-| required    | bool                 | token required or not                                                                                | False               |
-| token_type  | str                  | select token's type (access, refresh)                                                                | 'access'            |
-| user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
-| user_cache  | bool                 | caching user data when loaded or not                                                                  | True                |
+| argument             | type                 | description                                                                        | default             |
+|----------------------|----------------------|------------------------------------------------------------------------------------|---------------------|
+| required             | bool                 | token required or not                                                              | False               |
+| token_type           | str                  | select token's type (access, refresh)                                              | 'access'            |
+| user_loader          | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
+| user_cache           | bool                 | caching user data when loaded or not                                               | True                |
+| httponly_cookie_mode | bool                 | get credential on httponly cookie                                                  | (on setting)        |
 
 ##### > JWT.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
@@ -163,11 +164,13 @@ Change setting `<env>.depend.jwt.httponly_cookie.enable` to `true`
 
 ```python
 def get(jwt: JWT() = Depends()) -> str:
-  response: Response = jwt.set_token_on_cookie(response, 'h4wldev@gmail.com', {})
+  response: Response = jwt.set_token_on_cookie(response, 'h4wldev@gmail.com', {})  # Using this for httponly cookie on response
 
   return response, 201
+
+def from_httponly_cookie(jwt: JWT(httponly_cookie_mode=True) = Depends()) -> str:
+  return jwt.claims, 200
 ```
-Using `jwt.set_token_on_cookie` for httponly cookie on response
 
 
 ### Role Depend

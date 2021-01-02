@@ -28,7 +28,8 @@ class JWT:
         required: bool = False,
         token_type: str = 'access',
         user_loader: Optional[Callable[[str], Any]] = None,
-        user_cache: bool = True
+        user_cache: bool = True,
+        httponly_cookie_mode: Optional[bool] = None
     ) -> None:
         self.claims: Dict[str, Any] = {}
         self.payload: Dict[str, Any] = {}
@@ -40,8 +41,11 @@ class JWT:
         self.user_cache: bool = user_cache
 
         self.cached_user: Optional[UserModel] = None
-
+        
         self.httponly: bool = self.setting.httponly_cookie.enable
+        if httponly_cookie_mode is not None:
+            self.httponly = httponly_cookie_mode
+
         self.required: bool = required
         self.token_type: str = token_type
         self.token_loaded: bool = False
