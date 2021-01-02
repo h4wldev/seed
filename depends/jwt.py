@@ -41,7 +41,7 @@ class JWT:
         self.user_cache: bool = user_cache
 
         self.cached_user: Optional[UserModel] = None
-        
+
         self.httponly: bool = self.setting.httponly_cookie.enable
         if httponly_cookie_mode is not None:
             self.httponly = httponly_cookie_mode
