@@ -114,6 +114,10 @@ def jwt_optional(jwt: JWT() = Depends()) -> Any:
 @router.get('/jwt_refresh_token')
 def jwt_refresh_token(jwt: JWT(token_type='refresh') = Depends()) -> Any:
   return jwt.claims.type  # refresh
+  
+def create(jwt: JWT() = Depends()) -> str:
+  response: Response = jwt.get_jwt_token_response('h4wldev@gmail.com', {})  # Support httponly cookie mode
+  return response
 ```
 
 #### JWT(required, token_type, user_loader, user_cache, httponly_cookie_mode)
@@ -148,8 +152,8 @@ Create access token with payload. subject must be set unique data
 ##### > JWT.create_refresh_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create refresh token with payload. subject must be set unique data and payload must be same with access token
 
-##### > JWT.set_token_on_cookie(response: 'Response', subject: str, payload: Dict[str, Any] = {}) -> 'Response'  @staticmethod
-Create access, refresh token. and return response what set httponly cookie
+##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}) -> 'Response'  @staticmethod
+Create access, refresh token Response
 
 
 ### JWT httponly cookie mode
@@ -163,11 +167,6 @@ refresh_token_cookie_key = 'refresh_token'
 Change setting `<env>.depend.jwt.httponly_cookie.enable` to `true`
 
 ```python
-def get(jwt: JWT() = Depends()) -> str:
-  response: Response = jwt.set_token_on_cookie(response, 'h4wldev@gmail.com', {})  # Using this for httponly cookie on response
-
-  return response, 201
-
 def from_httponly_cookie(jwt: JWT(httponly_cookie_mode=True) = Depends()) -> str:
   return jwt.claims, 200
 ```

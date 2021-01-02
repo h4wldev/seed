@@ -7,8 +7,10 @@ from fastapi import (
     Request,
     Response
 )
+from fastapi.responses import ORJSONResponse
 from typing import Any, Dict, Callable, Optional
 
+from api.router import status
 from db import db
 from exceptions import JWTHTTPException
 from seed.utils.convert import units2seconds
@@ -188,32 +190,41 @@ class JWT:
         )
 
     @classmethod
-    def set_token_on_cookie(
+    def get_jwt_token_response(
         cls,
-        response: 'Response',
         subject: str,
         payload: Dict[str, Any] = {}
-    ) -> 'Response':
+    ) -> ORJSONResponse:
         access_token: str = cls.create_access_token(subject, payload)
         refresh_token: str = cls.create_refresh_token(subject, payload)
-        domain: Optional[str] = ','.join(cls.setting.httponly_cookie.domains)
 
-        if domain == '':
-            domain = None
-
-        response.set_cookie(
-            key=cls.setting.httponly_cookie.access_token_cookie_key,
-            value=access_token,
-            domain=domain,
-            max_age=units2seconds(cls.setting.access_token_expires),
+        response: ORJSONResponse = ORJSONResponse(
+            content={
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+            },
+            status_code=status.HTTP_201_CREATED
         )
 
-        response.set_cookie(
-            key=cls.setting.httponly_cookie.refresh_token_cookie_key,
-            value=refresh_token,
-            domain=domain,
-            max_age=units2seconds(cls.setting.refresh_token_expires),
-        )
+        if cls.setting.httponly_cookie.enable:
+            domain: Optional[str] = ','.join(cls.setting.httponly_cookie.domains)
+
+            if domain == '':
+                domain = None
+
+            response.set_cookie(
+                key=cls.setting.httponly_cookie.access_token_cookie_key,
+                value=access_token,
+                domain=domain,
+                max_age=units2seconds(cls.setting.access_token_expires),
+            )
+
+            response.set_cookie(
+                key=cls.setting.httponly_cookie.refresh_token_cookie_key,
+                value=refresh_token,
+                domain=domain,
+                max_age=units2seconds(cls.setting.refresh_token_expires),
+            )
 
         return response
 
