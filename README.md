@@ -147,6 +147,28 @@ Create access token with payload. subject must be set unique data
 ##### > JWT.create_refresh_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create refresh token with payload. subject must be set unique data and payload must be same with access token
 
+##### > JWT.set_token_on_cookie(response: 'Response', subject: str, payload: Dict[str, Any] = {}) -> 'Response'  @staticmethod
+Create access, refresh token. and return response what set httponly cookie
+
+
+### JWT httponly cookie mode
+```toml
+[<env>.depend.jwt.httponly_cookie]
+enable = true
+domains = []
+access_token_cookie_key = 'access_token'
+refresh_token_cookie_key = 'refresh_token'
+```
+Change setting `<env>.depend.jwt.httponly_cookie.enable` to `true`
+
+```python
+def get(jwt: JWT() = Depends()) -> str:
+  response: Response = jwt.set_token_on_cookie(response, 'h4wldev@gmail.com', {})
+
+  return response, 201
+```
+Using `jwt.set_token_on_cookie` for httponly cookie on response
+
 
 ### Role Depend
 > This depend include JWT depend, and jwt required<br>

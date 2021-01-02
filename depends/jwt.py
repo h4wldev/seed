@@ -66,11 +66,11 @@ class JWT:
 
             if 'type' not in self.claims or self.claims['type'] != self.token_type:
                 raise JWTHTTPException(f"Token type must be '{self.token_type}'")
-
-            return self
         except JWTHTTPException as e:
             if self.required:
                 raise e
+
+        return self
 
     @property
     def user(self) -> Any:
@@ -107,10 +107,16 @@ class JWT:
     @classmethod
     def get_credential_from_cookie(
         cls,
-        request: Request
+        request: Request,
+        token_type: str = 'access'
     ) -> str:
+        cookie_key: str = cls.setting.httponly_cookie.access_token_cookie_key
+
+        if token_type == 'refresh':
+            cookie_key = cls.setting.httponly_cookie.refresh_token_cookie_key
+
         credential: Optional[str] = request.cookies.get(
-            cls.setting.httponly_cookie.access_token_cookie_key, None
+            cookie_key, None
         )
 
         return credential
