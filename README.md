@@ -336,7 +336,6 @@ database_path = 'logstash.db'
 
 ## TODO
 - [ ] API endpoints
-- [ ] Custom OAuth2 Authorization
 - [ ] Add unittest testcases
 
 ## Requirements
