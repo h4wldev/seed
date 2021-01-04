@@ -22,6 +22,37 @@ class OAuthCode(BaseModel):
 
 
 class OAuth(Route):
+    @Route.option(
+        name='OAuth',
+        default_status_code=201
+    )
+    @Route.doc_option(
+        tags=['auth'],
+        description='Using OAuth for Authentication',
+        responses={
+            201: {
+                'description': 'Return jwt access, refresh tokens',
+                'content': {
+                    'application/json': {
+                        'example': {
+                            'access_token': '<jwt_access_token>',
+                            'refresh_token': '<jwt_refresh_token>'
+                        }
+                    }
+                }
+            },
+            404: {
+                'description': 'That social user not exists',
+                'content': {
+                    'application/json': {
+                        'example': {
+                            'code': '<aes_string>'
+                        }
+                    }
+                }
+            }
+        }
+    )
     async def post(
         request: Request,
         oauth_code: OAuthCode
