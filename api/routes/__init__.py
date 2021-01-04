@@ -4,4 +4,4 @@ from .oauth import OAuth
 
 
 router = Router()
-router += '/ouath', OAuth
+router += '/oauth', OAuth

@@ -5,7 +5,7 @@ fastapi_sqlalchemy
 flake8
 loguru
 orjson
-pycrypto
+pycryptodome
 pydantic
 pydantic_sqlalchemy
 PyJWT

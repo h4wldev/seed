@@ -21,7 +21,7 @@ class AESCipher:
         encrypted: str = cipher.encrypt(self._pad(message).encode())
         encoded: str = base64.b64encode(iv + encrypted)
 
-        return encoded
+        return encoded.decode('utf-8')
 
     def decrypt(self, message: str) -> str:
         decoded: str = base64.b64decode(message)
@@ -40,4 +40,4 @@ class AESCipher:
         return s + (self.bs - len(s) % self.bs) * chr(self.bs - len(s) % self.bs)
 
     def _unpad(self, s: str) -> str:
-        return s[:-ord(s[len(s)-1:])]
+        return s[:-ord(s[len(s) - 1:])]

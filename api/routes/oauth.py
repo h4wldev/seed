@@ -1,3 +1,4 @@
+import orjson
 import importlib
 
 from pydantic import BaseModel
@@ -8,6 +9,7 @@ from db import db
 from exceptions import HTTPException
 from models.user_social_account_model import UserSocialAccountModel
 from seed.depends.jwt import JWT
+from seed.utils.crypto import AESCipher
 from setting import setting
 
 
@@ -39,8 +41,16 @@ class OAuth(Route):
             .first()
 
         if user_social_account is None:
-            # TODO signup
-            assert False, 'Not implemented signup'
+            aes_cipher: AESCipher = AESCipher()
+
+            payload: str = orjson.dumps({
+                'provider': 'kakao',
+                'user_social_id': user_id
+            }).decode('utf-8')
+
+            return {
+                'code': aes_cipher.encrypt(payload),
+            }, status.HTTP_404_NOT_FOUND
 
         return JWT.get_jwt_token_response(
             user_social_account.user.key_field, {}
