@@ -8,7 +8,7 @@ from .uuid import UUID
 __version__ = '0.0.1'
 
 
-class Logger:
+class ContextLogger:
     def __new__(
         self,
         uuid: UUID = Depends()

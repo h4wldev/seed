@@ -4,17 +4,17 @@ import uuid
 
 from fastapi import (
     Header,
-    Request,
-    Response
+    Request
 )
+from fastapi.responses import ORJSONResponse
 from typing import Any, Dict, Callable, Optional
 
 from db import db
 from exceptions import JWTHTTPException
+from seed.utils.convert import units2seconds
+from seed.utils.exception import exception_wrapper
 from setting import setting
 from models.user_model import UserModel
-from utils.convert import units2seconds
-from utils.exception import exception_wrapper
 
 
 __version__ = '0.0.1'
@@ -28,7 +28,8 @@ class JWT:
         required: bool = False,
         token_type: str = 'access',
         user_loader: Optional[Callable[[str], Any]] = None,
-        user_cache: bool = True
+        user_cache: bool = True,
+        httponly_cookie_mode: Optional[bool] = None
     ) -> None:
         self.claims: Dict[str, Any] = {}
         self.payload: Dict[str, Any] = {}
@@ -41,6 +42,10 @@ class JWT:
 
         self.cached_user: Optional[UserModel] = None
 
+        self.httponly: bool = self.setting.httponly_cookie.enable
+        if httponly_cookie_mode is not None:
+            self.httponly = httponly_cookie_mode
+
         self.required: bool = required
         self.token_type: str = token_type
         self.token_loaded: bool = False
@@ -48,20 +53,26 @@ class JWT:
     def __call__(
         self,
         request: Request,
-        response: Response,
         authorization: Optional[str] = Header(None)
     ) -> None:
-        if authorization is None:
+        credential: Optional[str] = None
+
+        try:
+            if self.httponly:
+                credential = self.get_credential_from_cookie(request)
+            else:
+                credential = self.get_credential_from_header(authorization)
+
+            if credential is None:
+                raise JWTHTTPException('Credential must not be empty')
+
+            self.load_token(credential)
+
+            if 'type' not in self.claims or self.claims['type'] != self.token_type:
+                raise JWTHTTPException(f"Token type must be '{self.token_type}'")
+        except JWTHTTPException as e:
             if self.required:
-                raise JWTHTTPException("'Authorization' must not be empty")
-
-            return self
-
-        credential: str = self.get_credential_from_header(authorization)
-        self.load_token(credential)
-
-        if 'type' not in self.claims or self.claims['type'] != self.token_type:
-            raise JWTHTTPException(f"Token type must be '{self.token_type}'")
+                raise e
 
         return self
 
@@ -92,17 +103,37 @@ class JWT:
         subject: str
     ) -> Optional[UserModel]:
         user = db.session.query(UserModel)\
-            .filter(UserModel.email == subject)\
+            .filter(getattr(UserModel, setting.user_key_field) == subject)\
             .first()
 
         return user
 
     @classmethod
+    def get_credential_from_cookie(
+        cls,
+        request: Request,
+        token_type: str = 'access'
+    ) -> str:
+        cookie_key: str = cls.setting.httponly_cookie.access_token_cookie_key
+
+        if token_type == 'refresh':
+            cookie_key = cls.setting.httponly_cookie.refresh_token_cookie_key
+
+        credential: Optional[str] = request.cookies.get(
+            cookie_key, None
+        )
+
+        return credential
+
+    @classmethod
     def get_credential_from_header(
         cls,
-        authorization: str
-    ) -> Dict[str, Any]:
-        tokens: List[str] = authorization.split(' ')
+        authorization: Optional[str]
+    ) -> str:
+        if authorization is None:
+            return authorization
+
+        tokens: List[str] = str(authorization).split(' ')
 
         if len(tokens) != 2:
             raise JWTHTTPException("Authorization header must like 'Bearer <credentials>'")
@@ -155,6 +186,44 @@ class JWT:
             token_type='refresh',
             expires=cls.setting.refresh_token_expires
         )
+
+    @classmethod
+    def get_jwt_token_response(
+        cls,
+        subject: str,
+        payload: Dict[str, Any] = {}
+    ) -> ORJSONResponse:
+        access_token: str = cls.create_access_token(subject, payload)
+        refresh_token: str = cls.create_refresh_token(subject, payload)
+
+        response: ORJSONResponse = ORJSONResponse(
+            content={
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+            }
+        )
+
+        if cls.setting.httponly_cookie.enable:
+            domain: Optional[str] = ','.join(cls.setting.httponly_cookie.domains)
+
+            if domain == '':
+                domain = None
+
+            response.set_cookie(
+                key=cls.setting.httponly_cookie.access_token_cookie_key,
+                value=access_token,
+                domain=domain,
+                max_age=units2seconds(cls.setting.access_token_expires),
+            )
+
+            response.set_cookie(
+                key=cls.setting.httponly_cookie.refresh_token_cookie_key,
+                value=refresh_token,
+                domain=domain,
+                max_age=units2seconds(cls.setting.refresh_token_expires),
+            )
+
+        return response
 
     @classmethod
     @exception_wrapper(

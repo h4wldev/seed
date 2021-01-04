@@ -1,18 +1,24 @@
-# 🌾 seed
-![Lint](https://github.com/h4wldev/seed/workflows/Lint/badge.svg)
-
-Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/fastapi)
-
+<p align="center">
+ <img alt="Header" src="https://user-images.githubusercontent.com/14465407/103291172-8083bb80-4a2e-11eb-8687-f9c748593f7d.png" height="180px">
+</p>
+<h1 align="center">🌾 seed</h1>
+<p align="center">
+ Boilerplate for restful API with <a href="https://github.com/tiangolo/fastapi">tiangolo/fastapi</a>
+</p>
+<p align="center">
+ <img src="https://github.com/h4wldev/seed/workflows/Lint/badge.svg">
+</p>
 
 ## Features
 - __[Endpoints]__ Auth, Sign up, Withdrawal, ... routes included *(In Progress)*
 - __[Router]__ Support class based Route
 - __[Config]__ `.toml` based config system, support environments
-- __[Authorize]__ Support custom OAuth2 authorization *(In Progress)*
+- __[Authorize]__ Support custom OAuth2 authorization ([Kakao](seed/oauth/kakao.py))
 - __[Model]__ User and User related(meta, profile, ...) models
-- __[Depend]__ JWT(Json Web Token) based authorize
+- __[Depend]__ JWT(Json Web Token) based authorize, support httponly cookie mode
 - __[Depend]__ Integer(Bitfield) based role, permission
 - __[Depend]__ User specific id with UUID
+- __[Depend]__ Logger with UUID
 - __[Integrate]__ Integrate with Sentry, Logstash
 - And support all features of fastapi
 
@@ -21,7 +27,7 @@ Boilerplate for restful API with [tiangolo/fastapi](https://github.com/tiangolo/
 #### 1. Pull this Repo
 
 #### 2. Configuration
-1. Remove `.example` extension, change env on filename & content from [.secrets.<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<env>.toml.example](settings/setting.<env>.toml.example) 
+1. Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example) 
 2. Uncomment or add on [setting.py](setting.py), setting files
 
 #### 3. Just Run!
@@ -89,13 +95,13 @@ arguments : name, default_status_code(=status_code), dependencies, operation_id,
 ##### > Route.doc_option
 arguments : enable(=include_in_schema), tags, summary, description, response_description, responses, deprecated
 
-##### > Route.doc_option
+##### > Route.response_model
 arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none
 
 
 ### JWT Depend
 ```python
-from depends.jwt import JWT
+from seed.depends.jwt import JWT
 
 @router.get('/jwt_required')
 def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
@@ -108,17 +114,22 @@ def jwt_optional(jwt: JWT() = Depends()) -> Any:
 @router.get('/jwt_refresh_token')
 def jwt_refresh_token(jwt: JWT(token_type='refresh') = Depends()) -> Any:
   return jwt.claims.type  # refresh
+  
+def create(jwt: JWT() = Depends()) -> str:
+  response: Response = jwt.get_jwt_token_response('h4wldev@gmail.com', {})  # Support httponly cookie mode
+  return response
 ```
 
-#### JWT(required, token_type, user_loader, user_cache)
+#### JWT(required, token_type, user_loader, user_cache, httponly_cookie_mode)
 You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
 
-| argument    | type                 | description                                                                                          | default             |
-|-------------|----------------------|------------------------------------------------------------------------------------------------------|---------------------|
-| required    | bool                 | token required or not                                                                                | False               |
-| token_type  | str                  | select token's type (access, refresh)                                                                | 'access'            |
-| user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
-| user_cache  | bool                 | caching user data when loaded or not                                                                  | True                |
+| argument             | type                 | description                                                                        | default             |
+|----------------------|----------------------|------------------------------------------------------------------------------------|---------------------|
+| required             | bool                 | token required or not                                                              | False               |
+| token_type           | str                  | select token's type (access, refresh)                                              | 'access'            |
+| user_loader          | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
+| user_cache           | bool                 | caching user data when loaded or not                                               | True                |
+| httponly_cookie_mode | bool                 | get credential on httponly cookie                                                  | (on setting)        |
 
 ##### > JWT.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
@@ -141,12 +152,31 @@ Create access token with payload. subject must be set unique data
 ##### > JWT.create_refresh_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create refresh token with payload. subject must be set unique data and payload must be same with access token
 
+##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}) -> 'Response'  @staticmethod
+Create access, refresh token Response
+
+
+### JWT httponly cookie mode
+```toml
+[<env>.depend.jwt.httponly_cookie]
+enable = true
+domains = []
+access_token_cookie_key = 'access_token'
+refresh_token_cookie_key = 'refresh_token'
+```
+Change setting `<env>.depend.jwt.httponly_cookie.enable` to `true`
+
+```python
+def from_httponly_cookie(jwt: JWT(httponly_cookie_mode=True) = Depends()) -> str:
+  return jwt.claims, 200
+```
+
 
 ### Role Depend
 > This depend include JWT depend, and jwt required<br>
 
 ```python
-from depends.role.depend import Role
+from seed.depends.role.depend import Role
 
 @router.get('/need_roles')
 def need_roles(
@@ -169,7 +199,7 @@ User data property, after load token and user data on JWT Depend
 
 ### UUID Depend
 ```python
-from depends.uuid import UUID
+from seed.depends.uuid import UUID
 
 @router.get('/uuid')
 def jwt_required(uuid: UUID = Depends()) -> Any:
@@ -179,18 +209,18 @@ def jwt_required(uuid: UUID = Depends()) -> Any:
 ##### > UUID.get_uuid(request: Request)
 Get uuid with fastapi request
 
-### Logger Depend
+### Context Logger Depend
 > This depend include UUID depend, same usage with just logger<br>
 
 ```python
 from logger import logger as default_logger
-from depends.logger import JWT
+from seed.depends.context_logger import ContextLogger
 
 
 @router.get('/logger_with_uuid')
-def logger_with_uuid(logger: Logger = Depends()) -> Any:
+def logger_with_uuid(context_logger: ContextLogger = Depends()) -> Any:
   default_logger.info('not show uuid!')  # not show uuid on stdout log
-  logger.info('show uuid!')  # show uuid on stdout log
+  context_logger.info('show uuid!')  # show uuid on stdout log
   return None
 ```
 
@@ -201,7 +231,7 @@ def logger_with_uuid(logger: Logger = Depends()) -> Any:
 
 ```python
 # Same usage with Role and Permission
-from depends.role.types import Role, Permission
+from seed.depends.role.types import Role, Permission
 
 mapping: List[str] = ['super-admin', 'admin', 'writer', 'reader']
 
@@ -258,6 +288,23 @@ Set value on role/permission
 Initialize with bitfield. detail on example.
 
 
+## How to custom OAuth handler
+#### 1. Configuration
+```toml
+[<env>.oauth]
+    providers = ['kakao']
+```
+1. Add your OAuth provider's name on `<env>.oauth.providers`
+```toml
+[<env>.oauth.<provider>]
+  handler = 'seed.oauth.<provider>.<provider>OAuthHandler'
+```
+2. Add provider's setting on `<env>.oauth.<provider>`
+
+#### 2. Make handler
+Make handler reference from [Base Handler](seed/oauth/__init__.py) and [Kakao Handler](seed/oauth/kakao.py)
+
+
 ## Integrate
 ### Sentry
 Change or add setting `<env>.integrate.sentry`
@@ -289,7 +336,6 @@ database_path = 'logstash.db'
 
 ## TODO
 - [ ] API endpoints
-- [ ] Custom OAuth2 Authorization
 - [ ] Add unittest testcases
 
 ## Requirements

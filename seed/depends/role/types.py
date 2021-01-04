@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple, Union
 
-from utils.convert import (
+from seed.utils.convert import (
     int2bitfield,
     bitfield2int,
 )
