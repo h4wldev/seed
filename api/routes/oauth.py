@@ -2,12 +2,14 @@ import datetime
 import orjson
 import importlib
 
+from fastapi import Request
 from pydantic import BaseModel
 from typing import Any, Optional, List, Tuple
 
 from api.router import Route, status
 from db import db
 from exceptions import HTTPException
+from models.user_login_history_model import UserLoginHistoryModel
 from models.user_social_account_model import UserSocialAccountModel
 from seed.depends.jwt import JWT
 from seed.utils.crypto import AESCipher
@@ -21,6 +23,7 @@ class OAuthCode(BaseModel):
 
 class OAuth(Route):
     async def post(
+        request: Request,
         oauth_code: OAuthCode
     ) -> Tuple[Any, int]:
         if oauth_code.provider not in setting.oauth.providers:
@@ -57,6 +60,14 @@ class OAuth(Route):
         user_social_account.refresh_token = refresh_token
         user_social_account.updated_at = datetime.datetime.now()
 
+        login_history = UserLoginHistoryModel.from_request(
+            user_id=user_social_account.user_id,
+            request=request,
+            success=True,
+            provider=oauth_code.provider
+        )
+
+        db.session.add(login_history)
         db.session.commit()
 
         return JWT.get_jwt_token_response(
