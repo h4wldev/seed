@@ -13,7 +13,7 @@
 - __[Endpoints]__ Auth, Sign up, Withdrawal, ... routes included *(In Progress)*
 - __[Router]__ Support class based Route
 - __[Config]__ `.toml` based config system, support environments
-- __[Authorize]__ Support custom OAuth2 authorization *(In Progress)*
+- __[Authorize]__ Support custom OAuth2 authorization ([Kakao](seed/oauth/kakao.py))
 - __[Model]__ User and User related(meta, profile, ...) models
 - __[Depend]__ JWT(Json Web Token) based authorize, support httponly cookie mode
 - __[Depend]__ Integer(Bitfield) based role, permission
@@ -288,6 +288,23 @@ Set value on role/permission
 Initialize with bitfield. detail on example.
 
 
+## How to custom OAuth handler
+#### 1. Configuration
+```toml
+[<env>.oauth]
+    providers = ['kakao']
+```
+1. Add your OAuth provider's name on `<env>.oauth.providers`
+```toml
+[<env>.oauth.<provider>]
+  handler = 'seed.oauth.<provider>.<provider>OAuthHandler'
+```
+2. Add provider's setting on `<env>.oauth.<provider>`
+
+#### 2. Make handler
+Make handler reference from [Base Handler](seed/oauth/__init__.py) and [Kakao Handler](seed/oauth/kakao.py)
+
+
 ## Integrate
 ### Sentry
 Change or add setting `<env>.integrate.sentry`
@@ -319,7 +336,6 @@ database_path = 'logstash.db'
 
 ## TODO
 - [ ] API endpoints
-- [ ] Custom OAuth2 Authorization
 - [ ] Add unittest testcases
 
 ## Requirements
