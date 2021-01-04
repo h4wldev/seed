@@ -1,1 +1,3 @@
 .secrets.*.toml
+setting.*.toml
+!setting.default.toml

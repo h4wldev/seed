@@ -23,5 +23,9 @@ class JWTHTTPException(HTTPException):
     pass
 
 
+class OAuthHTTPException(HTTPException):
+    pass
+
+
 class RoleHTTPException(HTTPException):
     _default_status_code: int = status.HTTP_403_FORBIDDEN

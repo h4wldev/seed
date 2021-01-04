@@ -17,6 +17,7 @@ class UserSocialAccountModel(Base, ModelMixin):
     social_id = Column(String, nullable=False)
     provider = Column(String, nullable=False)
     access_token = Column(String)
+    refresh_token = Column(String)
     updated_at = Column(DateTime)
 
 

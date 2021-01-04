@@ -6,6 +6,10 @@ timezone = 'Asia/Seoul'
 
 user_key_field = 'email'
 
+    [default.base_url]
+    api = 'http://localhost/api'
+    web = 'http://localhost'
+
     [default.cors]
     allowed_origins = ['*']
     allow_credentials = true
@@ -18,6 +22,9 @@ user_key_field = 'email'
         [default.oauth.kakao]
         redirect_uri = '/oauth/kakao'
         handler = 'seed.oauth.kakao.KakaoOAuthHandler'
+
+        api_url = 'https://kapi.kakao.com'
+        auth_api_url = 'https://kauth.kakao.com'
 
     [default.integrate]
         [default.integrate.sentry]

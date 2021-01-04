@@ -1,3 +1,4 @@
+import datetime
 import orjson
 import importlib
 
@@ -32,7 +33,7 @@ class OAuth(Route):
         handler_path: str = handler_setting.get('handler', 'seed.oauth.OAuthHandler')
         handler: 'OAuthHandler' = OAuth.get_handler_class(handler_path)(handler_setting)
 
-        access_token: str = handler.get_access_token(oauth_code.code)
+        access_token, refresh_token = handler.get_tokens(oauth_code.code)
         user_id: str = handler.get_user_id(access_token)
 
         user_social_account = db.session.query(UserSocialAccountModel)\
@@ -51,6 +52,12 @@ class OAuth(Route):
             return {
                 'code': aes_cipher.encrypt(payload),
             }, status.HTTP_404_NOT_FOUND
+
+        user_social_account.access_token = access_token
+        user_social_account.refresh_token = refresh_token
+        user_social_account.updated_at = datetime.datetime.now()
+
+        db.session.commit()
 
         return JWT.get_jwt_token_response(
             user_social_account.user.key_field, {}

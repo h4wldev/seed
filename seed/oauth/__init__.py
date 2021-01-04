@@ -1,15 +1,45 @@
+import requests
+
+from typing import Any, Callable, Dict, Optional, Tuple
+
 
 class OAuthHandler:
+    setting: Optional['Dynaconf'] = None
+
     def __init__(
         self,
-        handler_setting: 'Dynaconf'
+        setting: Optional['Dynaconf'] = None
     ) -> None:
-        self.handler_setting: 'Dynaconf' = handler_setting
+        if setting is not None:
+            self.setting: 'Dynaconf' = setting
 
-    def get_access_token(
+    def api_call(
+        self,
+        api_url: str,
+        path: str,
+        method: str = 'get',
+        data: dict = {},
+        params: dict = {},
+        headers: dict = {},
+        json: bool = False
+    ) -> Tuple[int, Any]:
+        uri: str = f'{api_url}{path}'
+        method: Callable[..., Any] = getattr(requests, method, requests.get)
+
+        kwargs: Dict[str, Any] = {
+            'headers': headers,
+            'params': params
+        }
+        kwargs['json' if json else 'data'] = data
+
+        response: 'Response' = method(uri, **kwargs)
+
+        return response.status_code, response
+
+    def get_tokens(
         self,
         code: str
-    ) -> str:
+    ) -> Tuple['access_token', 'refresh_token']:
         assert False, 'Not implemented get_access_token method'
 
     def get_user_id(
@@ -17,3 +47,15 @@ class OAuthHandler:
         access_token: str
     ) -> str:
         assert False, 'Not implemented get_user_id method'
+
+    def get_token_by_refresh_token(
+        self,
+        refresh_token: str
+    ) -> Tuple['access_token', 'refresh_token']:
+        assert False, 'Not implemented get_token_by_refresh_token method'
+
+    def unlink(
+        self,
+        access_token: str
+    ) -> bool:
+        assert False, 'Not implemented unlink method'
