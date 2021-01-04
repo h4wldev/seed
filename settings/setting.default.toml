@@ -17,7 +17,7 @@ user_key_field = 'email'
     allow_headers = ['*']
 
     [default.oauth]
-    providers = ['kakao', 'naver']
+    providers = ['kakao']
 
         [default.oauth.kakao]
         redirect_uri = '/oauth/kakao'
