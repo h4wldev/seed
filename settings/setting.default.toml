@@ -23,8 +23,8 @@ user_key_field = 'email'
         redirect_uri = '/oauth/kakao'
         handler = 'seed.oauth.kakao.KakaoOAuthHandler'
 
-        api_url = 'http://kapi.kakao.com'
-        auth_api_url = 'http://kauth.kakao.com'
+        api_url = 'https://kapi.kakao.com'
+        auth_api_url = 'https://kauth.kakao.com'
 
     [default.integrate]
         [default.integrate.sentry]
