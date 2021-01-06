@@ -7,7 +7,7 @@ from fastapi import (
     Request
 )
 from fastapi.responses import ORJSONResponse
-from typing import Any, Dict, Callable, Optional, Union
+from typing import Any, Dict, Callable, Optional, Union, List, Set
 
 from db import db
 from exceptions import JWTHTTPException
@@ -63,12 +63,15 @@ class JWT:
 
         for m in methods:
             method: Callable[..., str] = getattr(self, f'get_credential_from_{m}')
-            arg: Union[str, Request] = request
+            arg: Union[str, Request] = (authorization,)
 
-            if m == 'header':
-                arg = authorization
+            if m == 'cookie':
+                arg = (request, self.token_type)
 
-            credential = method(arg)
+            _credential: Optional[str] = method(*arg)
+
+            if _credential is not None:
+                credential = _credential
 
         if self.required and credential is None:
             raise JWTHTTPException('JWT credential required')
@@ -121,11 +124,10 @@ class JWT:
         request: Request,
         token_type: str = 'access'
     ) -> str:
-        cookie_key: str = cls.setting.httponly_cookie.access_token_cookie_key
-
-        if token_type == 'refresh':
-            cookie_key = cls.setting.httponly_cookie.refresh_token_cookie_key
-
+        cookie_key: str = getattr(
+            cls.setting.httponly_cookie,
+            f'{token_type}_token_cookie_key'
+        )
         credential: Optional[str] = request.cookies.get(
             cookie_key, None
         )
@@ -197,39 +199,40 @@ class JWT:
     def get_jwt_token_response(
         self,
         subject: str,
-        payload: Dict[str, Any] = {}
+        payload: Dict[str, Any] = {},
+        token_types: List[str] = ['access', 'refresh']
     ) -> ORJSONResponse:
-        access_token: str = self.create_access_token(subject, payload)
-        refresh_token: str = self.create_refresh_token(subject, payload)
+        token_response: Dict[str, Any] = {}
+        token_types: Set[str] = set(filter(
+            lambda t: t in ('access', 'refresh'), token_types
+        ))
+
+        if len(token_types) < 0:
+            token_types = {'access'}
+
+        for t in token_types:
+            token_response[f'{t}_token'] = getattr(
+                self, f'create_{t}_token',
+            )(subject, payload)
+
+            token_response[f'{t}_token_expires_in'] = units2seconds(
+                getattr(self.setting, f'{t}_token_expires'),
+            )
 
         response: ORJSONResponse = ORJSONResponse(
-            content={
-                'access_token': access_token,
-                'access_token_expires_in': units2seconds(self.setting.access_token_expires),
-                'refresh_token': refresh_token,
-                'refresh_token_expires_in': units2seconds(self.setting.refresh_token_expires)
-            }
+            content=token_response,
         )
 
         if self.mode in ('both', 'cookie'):
             domain: Optional[str] = ','.join(self.setting.httponly_cookie.domains)
 
-            if domain == '':
-                domain = None
-
-            response.set_cookie(
-                key=self.setting.httponly_cookie.access_token_cookie_key,
-                value=access_token,
-                domain=domain,
-                max_age=units2seconds(self.setting.access_token_expires),
-            )
-
-            response.set_cookie(
-                key=self.setting.httponly_cookie.refresh_token_cookie_key,
-                value=refresh_token,
-                domain=domain,
-                max_age=units2seconds(self.setting.refresh_token_expires),
-            )
+            for t in token_types:
+                response.set_cookie(
+                    key=getattr(self.setting.httponly_cookie, f'{t}_token_cookie_key'),
+                    value=token_response.get(f'{t}_token'),
+                    domain=domain,
+                    max_age=token_response.get(f'{t}_token_expires_in'),
+                )
 
         return response
 

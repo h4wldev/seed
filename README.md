@@ -143,7 +143,7 @@ JWT Token's payload after token loaded
 ##### > JWT.load_token(credential: Optional[str])
 Load token with credential (jwt token string)
 
-##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}) -> 'Response'
+##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}, token_types: List[str] = ['access', 'refresh']) -> 'Response'
 Create access, refresh token Response
 
 ##### > JWT.decode_token(token: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
