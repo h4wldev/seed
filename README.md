@@ -143,6 +143,9 @@ JWT Token's payload after token loaded
 ##### > JWT.load_token(credential: Optional[str])
 Load token with credential (jwt token string)
 
+##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}) -> 'Response'
+Create access, refresh token Response
+
 ##### > JWT.decode_token(token: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
 Decode token with algorithm
 
@@ -151,9 +154,6 @@ Create access token with payload. subject must be set unique data
 
 ##### > JWT.create_refresh_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create refresh token with payload. subject must be set unique data and payload must be same with access token
-
-##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}) -> 'Response'  @staticmethod
-Create access, refresh token Response
 
 
 ### JWT httponly cookie mode

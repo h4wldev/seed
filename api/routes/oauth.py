@@ -36,7 +36,9 @@ class OAuth(Route):
                     'application/json': {
                         'example': {
                             'access_token': '<jwt_access_token>',
-                            'refresh_token': '<jwt_refresh_token>'
+                            'access_token_expires_in': 1800,
+                            'refresh_token': '<jwt_refresh_token>',
+                            'refresh_token_expires_in': 86400
                         }
                     }
                 }
@@ -101,7 +103,7 @@ class OAuth(Route):
         db.session.add(login_history)
         db.session.commit()
 
-        return JWT.get_jwt_token_response(
+        return JWT(mode='both').get_jwt_token_response(
             user_social_account.user.key_field, {}
         ), status.HTTP_201_CREATED
 

@@ -205,7 +205,9 @@ class JWT:
         response: ORJSONResponse = ORJSONResponse(
             content={
                 'access_token': access_token,
+                'access_token_expires_in': units2seconds(self.setting.access_token_expires),
                 'refresh_token': refresh_token,
+                'refresh_token_expires_in': units2seconds(self.setting.refresh_token_expires)
             }
         )
 
