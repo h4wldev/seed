@@ -1,14 +1,14 @@
 [default]
 debug = true
-api_prefix = ''
+api_prefix = '/api'
 
 timezone = 'Asia/Seoul'
 
 user_key_field = 'email'
 
     [default.base_url]
-    api = 'http://dev.hawl.kim:8000'
-    web = 'http://dev.hawl.kim:8080'
+    api = 'https://seed-dev.hawl.kim/api'
+    web = 'https://seed-dev.hawl.kim'
 
     [default.cors]
     allowed_origins = ['*']
