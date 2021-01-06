@@ -7,8 +7,8 @@ timezone = 'Asia/Seoul'
 user_key_field = 'email'
 
     [default.base_url]
-    api = 'http://localhost/api'
-    web = 'http://localhost'
+    api = 'http://dev.hawl.kim:8000'
+    web = 'http://dev.hawl.kim:8080'
 
     [default.cors]
     allowed_origins = ['*']
@@ -59,7 +59,6 @@ user_key_field = 'email'
         refresh_token_expires = '1d'
 
             [default.depend.jwt.httponly_cookie]
-            enable = true
             domains = []
             access_token_cookie_key = 'access_token'
             refresh_token_cookie_key = 'refresh_token'

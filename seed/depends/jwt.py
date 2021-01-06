@@ -7,7 +7,7 @@ from fastapi import (
     Request
 )
 from fastapi.responses import ORJSONResponse
-from typing import Any, Dict, Callable, Optional
+from typing import Any, Dict, Callable, Optional, Union
 
 from db import db
 from exceptions import JWTHTTPException
@@ -26,10 +26,10 @@ class JWT:
     def __init__(
         self,
         required: bool = False,
+        mode: str = 'both',
         token_type: str = 'access',
         user_loader: Optional[Callable[[str], Any]] = None,
-        user_cache: bool = True,
-        httponly_cookie_mode: Optional[bool] = None
+        user_cache: bool = True
     ) -> None:
         self.claims: Dict[str, Any] = {}
         self.payload: Dict[str, Any] = {}
@@ -42,9 +42,9 @@ class JWT:
 
         self.cached_user: Optional[UserModel] = None
 
-        self.httponly: bool = self.setting.httponly_cookie.enable
-        if httponly_cookie_mode is not None:
-            self.httponly = httponly_cookie_mode
+        self.mode: str = mode
+        if self.mode not in ('both', 'header', 'cookie'):
+            self.mode = 'both'
 
         self.required: bool = required
         self.token_type: str = token_type
@@ -56,23 +56,27 @@ class JWT:
         authorization: Optional[str] = Header(None)
     ) -> None:
         credential: Optional[str] = None
+        methods: List[str] = ['cookie', 'header']
 
-        try:
-            if self.httponly:
-                credential = self.get_credential_from_cookie(request)
-            else:
-                credential = self.get_credential_from_header(authorization)
+        if self.mode != 'both':
+            methods = [self.mode]
 
-            if credential is None:
-                raise JWTHTTPException('Credential must not be empty')
+        for m in methods:
+            method: Callable[..., str] = getattr(self, f'get_credential_from_{m}')
+            arg: Union[str, Request] = request
 
-            self.load_token(credential)
+            if m == 'header':
+                arg = authorization
 
-            if 'type' not in self.claims or self.claims['type'] != self.token_type:
-                raise JWTHTTPException(f"Token type must be '{self.token_type}'")
-        except JWTHTTPException as e:
-            if self.required:
-                raise e
+            credential = method(arg)
+
+        if self.required and credential is None:
+            raise JWTHTTPException('JWT credential required')
+
+        self.load_token(credential)
+
+        if self.token_loaded and self.claims.get('type', None) != self.token_type:
+            raise JWTHTTPException(f"Token type must be '{self.token_type}'")
 
         return self
 
@@ -91,8 +95,11 @@ class JWT:
 
     def load_token(
         self,
-        credential: str
+        credential: Optional[str] = None
     ) -> None:
+        if credential is None:
+            return
+
         self.token_loaded = True
 
         self.claims = self.decode_token(credential)
@@ -187,14 +194,13 @@ class JWT:
             expires=cls.setting.refresh_token_expires
         )
 
-    @classmethod
     def get_jwt_token_response(
-        cls,
+        self,
         subject: str,
         payload: Dict[str, Any] = {}
     ) -> ORJSONResponse:
-        access_token: str = cls.create_access_token(subject, payload)
-        refresh_token: str = cls.create_refresh_token(subject, payload)
+        access_token: str = self.create_access_token(subject, payload)
+        refresh_token: str = self.create_refresh_token(subject, payload)
 
         response: ORJSONResponse = ORJSONResponse(
             content={
@@ -203,24 +209,24 @@ class JWT:
             }
         )
 
-        if cls.setting.httponly_cookie.enable:
-            domain: Optional[str] = ','.join(cls.setting.httponly_cookie.domains)
+        if self.mode in ('both', 'cookie'):
+            domain: Optional[str] = ','.join(self.setting.httponly_cookie.domains)
 
             if domain == '':
                 domain = None
 
             response.set_cookie(
-                key=cls.setting.httponly_cookie.access_token_cookie_key,
+                key=self.setting.httponly_cookie.access_token_cookie_key,
                 value=access_token,
                 domain=domain,
-                max_age=units2seconds(cls.setting.access_token_expires),
+                max_age=units2seconds(self.setting.access_token_expires),
             )
 
             response.set_cookie(
-                key=cls.setting.httponly_cookie.refresh_token_cookie_key,
+                key=self.setting.httponly_cookie.refresh_token_cookie_key,
                 value=refresh_token,
                 domain=domain,
-                max_age=units2seconds(cls.setting.refresh_token_expires),
+                max_age=units2seconds(self.setting.refresh_token_expires),
             )
 
         return response
