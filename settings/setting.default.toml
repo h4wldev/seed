@@ -7,8 +7,8 @@ timezone = 'Asia/Seoul'
 user_key_field = 'email'
 
     [default.base_url]
-    api = 'https://seed-dev.hawl.kim/api'
-    web = 'https://seed-dev.hawl.kim'
+    api = 'http://seed-dev.hawl.kim:8080/api'
+    web = 'http://seed-dev.hawl.kim:8080'
 
     [default.cors]
     allowed_origins = ['*']
@@ -23,8 +23,8 @@ user_key_field = 'email'
         redirect_uri = '/oauth/kakao'
         handler = 'seed.oauth.kakao.KakaoOAuthHandler'
 
-        api_url = 'https://kapi.kakao.com'
-        auth_api_url = 'https://kauth.kakao.com'
+        api_url = 'http://kapi.kakao.com'
+        auth_api_url = 'http://kauth.kakao.com'
 
     [default.integrate]
         [default.integrate.sentry]
