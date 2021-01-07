@@ -12,7 +12,8 @@ class RedisContextManager:
         self.connection: 'Redis' = redis.Redis(
             host=self.setting.host,
             port=self.setting.port,
-            db=0
+            db=0,
+            encoding=self.setting.encoding
         )
 
     def __enter__(self) -> 'Redis':
