@@ -7,7 +7,7 @@ from fastapi import (
     Request
 )
 from fastapi.responses import ORJSONResponse
-from typing import Any, Dict, Callable, Optional, Union, List, Set
+from typing import Any, Dict, Callable, Optional, Union, List, Set, Tuple
 
 from db import db
 from exceptions import JWTHTTPException
@@ -33,6 +33,7 @@ class JWT:
     ) -> None:
         self.claims: Dict[str, Any] = {}
         self.payload: Dict[str, Any] = {}
+        self.jti: Optional[str] = None
 
         if user_loader is None:
             user_loader = self._default_user_loader
@@ -106,6 +107,7 @@ class JWT:
         self.token_loaded = True
 
         self.claims = self.decode_token(credential)
+        self.jti = self.claims.get('jti', None)
         self.payload = self.claims.get('payload', {})
 
     def _default_user_loader(
@@ -200,8 +202,10 @@ class JWT:
         self,
         subject: str,
         payload: Dict[str, Any] = {},
-        token_types: List[str] = ['access', 'refresh']
-    ) -> ORJSONResponse:
+        token_types: List[str] = ['access', 'refresh'],
+        response_type: 'Response' = ORJSONResponse,
+        return_tokens: bool = False
+    ) -> Tuple[ORJSONResponse, Dict[str, Any]]:
         token_response: Dict[str, Any] = {}
         token_types: Set[str] = set(filter(
             lambda t: t in ('access', 'refresh'), token_types
@@ -219,7 +223,7 @@ class JWT:
                 getattr(self.setting, f'{t}_token_expires'),
             )
 
-        response: ORJSONResponse = ORJSONResponse(
+        response: response_type = response_type(
             content=token_response,
         )
 
@@ -233,6 +237,9 @@ class JWT:
                     domain=domain,
                     max_age=token_response.get(f'{t}_token_expires_in'),
                 )
+
+        if return_tokens:
+            return response, token_response
 
         return response
 
