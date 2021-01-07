@@ -79,6 +79,10 @@ user_key_field = 'email'
     database = 'seed.db'
     charset = 'utf8'
 
+    [default.redis]
+    host = '127.0.0.1'
+    port = 6379
+
     [default.sqlalchemy]
     commit_on_exit = true
 
