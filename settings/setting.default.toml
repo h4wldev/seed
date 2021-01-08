@@ -21,7 +21,7 @@ user_key_field = 'email'
     algorithm = 'HS256'
     access_token_expires = '30m'
     refresh_token_expires = '7d'
-    refresh_token_renewal_before_expire = '7d'  # Renewal refresh token before expiration
+    refresh_token_renewal_before_expire = '1d'  # Renewal refresh token before expiration
 
         [default.jwt.redis]
         enable = true
