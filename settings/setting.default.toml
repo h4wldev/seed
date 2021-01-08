@@ -20,7 +20,11 @@ user_key_field = 'email'
     mode = 'both'
     algorithm = 'HS256'
     access_token_expires = '30m'
-    refresh_token_expires = '1d'
+    refresh_token_expires = '7d'
+    refresh_token_renewal_before_expire = '7d'  # Renewal refresh token before expiration
+
+        [default.jwt.redis]
+        enable = true
 
     [default.oauth]
     providers = ['kakao']

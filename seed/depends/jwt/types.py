@@ -35,6 +35,7 @@ class JWTToken(JWTTokenType):
             algorithm=algorithm
         )
 
+        self.id: str = self.claims['jti']
         self.subject: str = self.claims['sub']
         self.payload: Dict[str, Any] = self.claims['payload']
         self.token_type: str = self.claims['type']

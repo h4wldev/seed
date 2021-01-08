@@ -6,14 +6,12 @@ from setting import setting
 
 
 class RedisContextManager:
-    setting: 'Dynaconf' = setting.redis
-
     def __init__(self) -> None:
         self.connection: 'Redis' = redis.Redis(
-            host=self.setting.host,
-            port=self.setting.port,
+            host=setting.redis.host,
+            port=setting.redis.port,
             db=0,
-            encoding=self.setting.encoding
+            encoding=setting.redis.encoding
         )
 
     def __enter__(self) -> 'Redis':

@@ -103,13 +103,10 @@ class OAuth(Route):
         db.session.add(login_history)
         db.session.commit()
 
-        token_response, _ = JWT(mode=setting.jwt.mode).get_response(
+        return JWT(mode=setting.jwt.mode).get_create_response(
             subject=user_social_account.user.key_field,
-            payload={},
-            return_tokens=True
-        )
-
-        return token_response, status.HTTP_201_CREATED
+            payload={}
+        ), status.HTTP_201_CREATED
 
     @staticmethod
     def get_handler_class(
