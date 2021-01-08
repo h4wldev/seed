@@ -2,7 +2,7 @@ from fastapi import Depends
 from typing import Any, Tuple
 
 from api.router import Route
-from seed.depends.jwt import JWT
+from seed.depends.jwt.depend import JWT
 
 
 class TokenRefresh(Route):
@@ -29,8 +29,11 @@ class TokenRefresh(Route):
     async def post(
         jwt: JWT(required=True, token_type='refresh') = Depends()
     ) -> Tuple[Any, int]:
-        return jwt.get_jwt_token_response(
-            subject=jwt.claims['sub'],
-            payload=jwt.payload,
+        response_token, _ = jwt.get_response(
+            subject=jwt.token.claims['sub'],
+            payload=jwt.token.payload,
             token_types=['access'],
+            return_tokens=True
         )
+
+        return response_token

@@ -16,6 +16,12 @@ user_key_field = 'email'
     allow_methods = ['*']
     allow_headers = ['*']
 
+    [default.jwt]
+    mode = 'both'
+    algorithm = 'HS256'
+    access_token_expires = '30m'
+    refresh_token_expires = '1d'
+
     [default.oauth]
     providers = ['kakao']
 
@@ -54,10 +60,6 @@ user_key_field = 'email'
         roles = ['']
 
         [default.depend.jwt]
-        algorithm = 'HS256'
-        access_token_expires = '30m'
-        refresh_token_expires = '1d'
-
             [default.depend.jwt.httponly_cookie]
             domains = []
             access_token_cookie_key = 'access_token'

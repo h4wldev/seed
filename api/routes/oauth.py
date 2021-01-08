@@ -11,7 +11,7 @@ from db import db
 from exceptions import HTTPException
 from models.user_login_history_model import UserLoginHistoryModel
 from models.user_social_account_model import UserSocialAccountModel
-from seed.depends.jwt import JWT
+from seed.depends.jwt.depend import JWT
 from seed.utils.crypto import AESCipher
 from setting import setting
 
@@ -103,9 +103,13 @@ class OAuth(Route):
         db.session.add(login_history)
         db.session.commit()
 
-        return JWT(mode='both').get_jwt_token_response(
-            user_social_account.user.key_field, {}
-        ), status.HTTP_201_CREATED
+        token_response, _ = JWT(mode=setting.jwt.mode).get_response(
+            subject=user_social_account.user.key_field,
+            payload={},
+            return_tokens=True
+        )
+
+        return token_response, status.HTTP_201_CREATED
 
     @staticmethod
     def get_handler_class(
