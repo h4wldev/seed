@@ -1,9 +1,7 @@
 from api.router import Router
 
-from .oauth import OAuth
-from .token_refresh import TokenRefresh
+from .auth import router as auth_router
 
 
 router = Router()
-router += '/oauth', OAuth
-router += '/token/refresh', TokenRefresh
+router.join(auth_router)

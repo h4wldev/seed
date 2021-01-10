@@ -12,6 +12,8 @@ PyJWT
 pytest
 pytest-flake8
 python-logstash-async
+redis
+requests
 SQLAlchemy
 user-agents
 uuid
