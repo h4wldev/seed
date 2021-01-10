@@ -1,3 +1,7 @@
 .secrets.*.toml
 setting.*.toml
 !setting.default.toml
+
+# for testing, coverage
+!setting.testing.toml
+!.secrets.testing.toml
