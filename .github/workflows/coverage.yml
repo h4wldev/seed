@@ -26,33 +26,9 @@ jobs:
           ${{ runner.os }}-pip-
           ${{ runner.os }}-
     - name: Install Python dependencies
-      uses: BSFishy/pip-action@v1
-      with:
-        packages: |
-          arrow
-          dynaconf
-          fastapi
-          fastapi_sqlalchemy
-          flake8
-          loguru
-          orjson
-          pycryptodome
-          pydantic
-          pydantic_sqlalchemy
-          PyJWT
-          pytest
-          pytest-asyncio
-          pytest-cov
-          pytest-flake8
-          python-logstash-async
-          redis
-          requests
-          SQLAlchemy
-          user-agents
-          uuid
-          uvicorn
+      run: |
+        pip install -r requirements.txt
     - name: Run Tests And Generate coverage report
-      working-directory: ./
       run: |
         ENV=testing pytest --flake8 --cov-report=xml --cov=seed tests/
     - name: Upload coverage to Codecov
