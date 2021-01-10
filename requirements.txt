@@ -10,6 +10,8 @@ pydantic
 pydantic_sqlalchemy
 PyJWT
 pytest
+pytest-asyncio
+pytest-cov
 pytest-flake8
 python-logstash-async
 redis

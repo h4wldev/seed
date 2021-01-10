@@ -1,0 +1,27 @@
+name: Coverage
+
+on:
+  push:
+    paths:
+      - '*.py'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Tests And Generate coverage report
+      run: |
+        ENV=testing pytest --flake8 --cov-report=xml --cov=seed tests/
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        files: ./coverage.xml
+        flags: unittests

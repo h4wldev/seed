@@ -1,7 +1,7 @@
 from fastapi import Depends
 from typing import Any, Tuple
 
-from api.router import Route
+from seed.api.router import Route
 from seed.depends.jwt.depend import JWT
 
 

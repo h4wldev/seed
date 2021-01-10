@@ -46,7 +46,7 @@ class UserLoginHistoryModel(Base, ModelMixin):
         geoip: GeoIP = GeoIP(self.ip)
 
         if geoip.country and geoip.city:
-            self.location = f"{geoip.country['iso_code']}{geoip.city['names']['en']}"
+            self.location = f"{geoip.country['iso_code']}/{geoip.city['names']['en']}"
 
     @classmethod
     def from_request(

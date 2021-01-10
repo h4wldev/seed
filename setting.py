@@ -1,7 +1,10 @@
+import os
+
 from dynaconf import Dynaconf
 
 
 setting: Dynaconf = Dynaconf(
+    env=os.environ.get('ENV', 'development').lower(),
     envvar_prefix='SEED',
     environments=True,
     settings_files=[
