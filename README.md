@@ -102,7 +102,7 @@ arguments : response_model, response_model_include, response_model_exclude, resp
 
 ### JWT Depend
 ```python
-from seed.depends.jwt import JWT
+from seed.depends.jwt.depend import JWT
 
 @router.get('/jwt_required')
 def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
@@ -129,7 +129,6 @@ You can setting jwt expires time, algorithm on [here](settings/settings.toml), a
 | required    | bool                 | token required or not                                                              | False               |
 | token_type  | str                  | select token's type (access, refresh)                                              | 'access'            |
 | user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
-| user_cache  | bool                 | caching user data when loaded or not                                               | True                |
 | mode        | str                  | jwt mode ('header', 'cookie', 'both') / both get from 1. cookie and 2. header      | 'both'              |
 
 ##### > JWT.user -> Union[UserModel, Any]  @property
@@ -144,11 +143,11 @@ JWT Token's payload after token loaded
 ##### > JWT.load_token(credential: Optional[str])
 Load token with credential (jwt token string)
 
-##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}, token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, return_tokens: bool = False) -> Tuple[response_type, Dict[str, Any]]'
+##### > JWT.get_create_response(subject: str, payload: Dict[str, Any] = {}, token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, response_headers: Dict[str, Any] = {}, return_tokens: bool = False) -> Tuple[response_type, Dict[str, Any]]'
 Create access, refresh token Response
 
-##### > JWT.decode_token(token: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
-Decode token with algorithm
+##### > JWT.get_expire_response(token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, response_headers: Dict[str, Any] = {}) -> response_type
+Create access, refresh token expire response
 
 ##### > JWT.create_access_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create access token with payload. subject must be set unique data
