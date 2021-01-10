@@ -30,17 +30,17 @@ class MutableRole(Mutable, FlagType):
     ) -> 'MutableRole':
         return MutableRole(value)
 
-    def set(self, *args, **kwargs) -> None:
+    def set(self, *args, **kwargs) -> None:  # pragma: no cover
         self.changed()
 
         return super().set(*args, **kwargs)
 
-    def _set_bitfield(self, *args, **kwargs) -> List[bool]:
+    def _set_bitfield(self, *args, **kwargs) -> List[bool]:  # pragma: no cover
         self.changed()
 
         return super()._set_bitfield(*args, **kwargs)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return self._class.__repr__()
 
 
