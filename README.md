@@ -43,7 +43,7 @@ seed's `Router` is inherit [fastapi.APIRouter](https://github.com/tiangolo/fasta
 ```python
 from fastapi.responses import ORJSONResponse
 
-from api.router import Router, Route
+from seed.api.router import Router, Route
 
 router = Router(
   endpoint_options

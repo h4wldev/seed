@@ -1,4 +1,4 @@
-from api.router import Router
+from seed.api.router import Router
 
 from .oauth import OAuth
 from .token_refresh import TokenRefresh

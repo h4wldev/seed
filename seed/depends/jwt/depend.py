@@ -7,7 +7,7 @@ from typing import Any, Dict, Callable, List, Optional, Tuple, Union
 
 from db import db
 from exceptions import JWTHTTPException
-from models.user_model import UserModel
+from seed.models.user_model import UserModel
 from seed.depends.redis import RedisContextManager
 from setting import setting
 

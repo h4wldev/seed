@@ -3,7 +3,7 @@ import arrow
 from fastapi import Depends
 from typing import Any, Tuple
 
-from api.router import Route
+from seed.api.router import Route
 from seed.depends.jwt.depend import JWT
 from seed.utils.convert import units2seconds
 from setting import setting

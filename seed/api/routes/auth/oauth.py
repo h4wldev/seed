@@ -6,11 +6,11 @@ from fastapi import Request
 from pydantic import BaseModel
 from typing import Any, Optional, List, Tuple
 
-from api.router import Route, status
+from seed.api.router import Route, status
 from db import db
 from exceptions import HTTPException
-from models.user_login_history_model import UserLoginHistoryModel
-from models.user_social_account_model import UserSocialAccountModel
+from seed.models.user_login_history_model import UserLoginHistoryModel
+from seed.models.user_social_account_model import UserSocialAccountModel
 from seed.depends.jwt.depend import JWT
 from seed.utils.crypto import AESCipher
 from setting import setting
