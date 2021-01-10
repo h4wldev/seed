@@ -31,7 +31,9 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests And Generate coverage report
       run: |
-        ENV=testing pytest --flake8 --cov-report=xml --cov=seed tests/
+        pytest --flake8 --cov-report=xml --cov=seed tests/
+      env:
+        ENV: testing
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
