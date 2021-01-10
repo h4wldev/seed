@@ -4,6 +4,8 @@ fastapi==0.63.0
 FastAPI-SQLAlchemy==0.2.1
 flake8==3.8.4
 loguru==0.5.3
+maxminddb==2.0.3
+maxminddb-geolite2==2018.703
 orjson==3.4.6
 pycryptodome==3.9.9
 pydantic==1.7.3
@@ -14,7 +16,6 @@ pytest-asyncio==0.14.0
 pytest-cov==2.10.1
 pytest-flake8==1.0.7
 python-figures==1.1
-python-geoip-geolite2==2015.303
 python-logstash-async==2.2.0
 redis==3.5.3
 requests==2.25.1
