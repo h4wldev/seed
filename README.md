@@ -7,6 +7,7 @@
 </p>
 <p align="center">
  <img src="https://github.com/h4wldev/seed/workflows/Lint/badge.svg">
+ <a href="https://codecov.io/gh/h4wldev/seed"><img src="https://codecov.io/gh/h4wldev/seed/branch/develop/graph/badge.svg?token=56FGFR91EX"></a>
 </p>
 
 ## Features
