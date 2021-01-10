@@ -46,7 +46,7 @@ jobs:
           uvicorn
     - name: Run Tests And Generate coverage report
       run: |
-        ENV=testing pytest --flake8 --cov-report=xml --cov=seed tests/
+        ENV=testing pytest --flake8 --cov-report=xml --cov=seed
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
