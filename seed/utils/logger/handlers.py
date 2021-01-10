@@ -6,7 +6,7 @@ from typing import Dict
 from .types import LOG_LEVELS
 
 
-class InterceptHandler(logging.Handler):
+class InterceptHandler(logging.Handler):  # pragma: no cover
     loglevel_mapping: Dict[int, str] = {
         log.level: log.name for log in LOG_LEVELS
     }
