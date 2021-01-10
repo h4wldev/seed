@@ -4,6 +4,7 @@ from typing import Any, Tuple
 from api.router import Route
 from seed.depends.jwt.depend import JWT
 
+
 class Logout(Route):
     @Route.option(
         name='Logout'
