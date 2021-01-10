@@ -110,6 +110,7 @@ class Router(APIRouter):
     def Route(
         self,
         path: str,
+        endpoint_options: Optional[Dict[str, Any]] = {}
     ) -> Callable[..., Any]:
         assert path.startswith('/'), "Path must start with '/'"
 
@@ -122,6 +123,7 @@ class Router(APIRouter):
                 kwargs: Dict[str, Any] = {
                     **self.endpoint_options,
                     **cls._endpoint_options,
+                    **endpoint_options,
                     **getattr(endpoint, 'endpoint_options', {}),
                     **getattr(endpoint, 'doc_options', {}),
                     **getattr(endpoint, 'response_model', {})
@@ -143,7 +145,14 @@ class Router(APIRouter):
         @wraps(method)
         async def _(*args, **kwargs):
             response: Any = None
-            status_code: int = method.options.get(
+            method_options: Dict[str, Any] = {}
+
+            try:
+                method_options = method.options
+            except AttributeError:
+                pass
+
+            status_code: int = method_options.get(
                 'status_code',
                 status.HTTP_200_OK
             )
@@ -166,7 +175,7 @@ class Router(APIRouter):
             if isinstance(response, Response):
                 response.status_code = status_code
             else:
-                response_class = method.options.get('response_class', ORJSONResponse)
+                response_class = method_options.get('response_class', ORJSONResponse)
                 response = response_class(response, status_code=status_code)
 
             return response
@@ -193,7 +202,7 @@ class Router(APIRouter):
         route_class: 'Route',
         endpoint_options: Optional[Dict[str, Any]] = {},
     ) -> None:
-        self.Route(path)(route_class, endpoint_options=endpoint_options)
+        self.Route(path, endpoint_options=endpoint_options)(route_class)
 
     def join(self, router: 'Router', **kwargs) -> None:
         assert issubclass(
