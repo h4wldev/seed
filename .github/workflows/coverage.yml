@@ -28,9 +28,7 @@ jobs:
           ${{ runner.os }}-
     - name: Install Dependencies
       run: |
-        python -m venv ./.venv && . ./.venv/bin/activate
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        python -m venv ./.venv && . ./.venv/bin/activate && pip install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
     - name: Run Tests And Generate coverage report
       run: |
