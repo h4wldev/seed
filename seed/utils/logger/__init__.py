@@ -5,7 +5,7 @@ from typing import Any, Callable, List
 from .types import LogLevel, LOG_LEVELS
 
 
-class LoggerConfigure:
+class LoggerConfigure:  # pragma: no cover
     @staticmethod
     def add_levels(levels: List[LogLevel] = LOG_LEVELS) -> None:
         for level in levels:

@@ -3,7 +3,7 @@ import requests
 from typing import Any, Callable, Dict, Optional, Tuple
 
 
-class OAuthHandler:
+class OAuthHandler:  # pragma: no cover
     setting: Optional['Dynaconf'] = None
 
     def __init__(
@@ -22,7 +22,7 @@ class OAuthHandler:
         params: dict = {},
         headers: dict = {},
         json: bool = False
-    ) -> Tuple[int, Any]:
+    ) -> Tuple[int, Any]:  # pragma: no cover
         uri: str = f'{api_url}{path}'
         method: Callable[..., Any] = getattr(requests, method, requests.get)
 

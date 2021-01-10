@@ -48,8 +48,9 @@ class Role(atypes.TypeDecorator):
     impl: atypes.TypeEngine = atypes.Integer
     type_: FlagType = RoleType
 
+    @classmethod
     def process_bind_param(
-        self,
+        cls,
         value: Any,
         dialect: 'SQLAlchemyDialect'
     ) -> int:
@@ -60,13 +61,14 @@ class Role(atypes.TypeDecorator):
 
         return value
 
+    @classmethod
     def process_result_value(
-        self,
+        cls,
         value: int,
         dialect: 'SQLAlchemyDialect'
     ) -> FlagType:
         if isinstance(value, int):
-            return self.type_(value)
+            return cls.type_(value)
 
         return value
 

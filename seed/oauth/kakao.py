@@ -7,7 +7,7 @@ from setting import setting
 from . import OAuthHandler
 
 
-class KakaoOAuthHandler(OAuthHandler):
+class KakaoOAuthHandler(OAuthHandler):  # pragma: no cover
     api_key: str = setting.api_key.kakao_api_key
 
     setting: 'Dynaconf' = setting.oauth.kakao
