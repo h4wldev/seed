@@ -30,7 +30,12 @@
 1. Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example) 
 2. Uncomment or add on [setting.py](setting.py), setting files
 
-#### 3. Just Run!
+#### 3. DB Migration
+```bash
+ $ alembic upgrade head
+```
+
+#### 4. Just Run!
 ```bash
  $ uvicorn app:app
 ```
