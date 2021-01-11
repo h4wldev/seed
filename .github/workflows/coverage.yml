@@ -30,7 +30,7 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - name: Run Tests And Generate coverage report
       run: |
-        pytest --flake8 --cov-report=xml --cov=seed tests/
+        pytest --cov-report=xml
       env:
         ENV: testing
     - name: Upload coverage to Codecov

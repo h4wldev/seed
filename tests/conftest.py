@@ -17,7 +17,7 @@ def get_test_client():
     return lambda app: TestClient(app)
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def app():
     return application
 
