@@ -8,7 +8,7 @@ from fastapi_sqlalchemy import DBSessionMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from seed.api.routes import router
-from db import make_database_uri
+from db import make_database_url
 from setting import setting
 
 
@@ -45,7 +45,7 @@ class Application:
 
         self.app.add_middleware(
             DBSessionMiddleware,
-            db_url=make_database_uri(**{
+            db_url=make_database_url(**{
                 k.lower(): v for k, v in database_setting.items()
             }),
             commit_on_exit=self.setting.sqlalchemy.commit_on_exit,

@@ -1,7 +1,7 @@
 from fastapi_sqlalchemy import db  # noqa: F401
 
 
-def make_database_uri(
+def make_database_url(
     dbms: str,
     host: str,
     user: str,
