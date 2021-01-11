@@ -19,11 +19,11 @@ class UserLoginHistoryModel(Base, ModelMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     success = Column(Boolean, default=False)
-    ip = Column(String, nullable=False)
-    location = Column(String)
-    provider = Column(String)
-    device = Column(String)
-    os = Column(String)
+    ip = Column(String(20), nullable=False)
+    location = Column(String(30))
+    provider = Column(String(15))
+    device = Column(String(20))
+    os = Column(String(20))
     created_at = Column(DateTime, default=datetime.datetime.now)
 
     def __init__(

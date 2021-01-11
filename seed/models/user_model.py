@@ -1,7 +1,7 @@
 import datetime
 
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
-from sqlalchemy import Column, Integer, String, DateTime, Index
+from sqlalchemy import text, Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 from typing import Any
 
@@ -24,11 +24,11 @@ class UserModel(Base, ModelMixin):
     _repr_attrs = ('id', 'email', 'username')
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String, unique=True, nullable=False)
-    username = Column(String, unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
     role = Column(MutableRole.as_mutable(Role), default=0, nullable=False)
     permission = Column(MutableRole.as_mutable(Permission), default=0, nullable=False)
-    updated_at = Column(DateTime)
+    updated_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
     created_at = Column(DateTime, default=datetime.datetime.now)
 
     profile = relationship(

@@ -7,6 +7,7 @@ flake8==3.8.4
 loguru==0.5.3
 maxminddb==2.0.3
 maxminddb-geolite2==2018.703
+mysqlclient==2.0.3
 orjson==3.4.6
 pycryptodome==3.9.9
 pydantic==1.7.3

@@ -1,5 +1,5 @@
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Index
+from sqlalchemy import text, Column, ForeignKey, Integer, String, DateTime, Index
 
 from . import Base, ModelMixin
 
@@ -14,8 +14,8 @@ class UserProfileModel(Base, ModelMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    display_name = Column(String, unique=True, nullable=False)
-    updated_at = Column(DateTime)
+    display_name = Column(String(50), unique=True, nullable=False)
+    updated_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 
 
 UserProfile = sqlalchemy_to_pydantic(UserProfileModel)
