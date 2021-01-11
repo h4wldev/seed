@@ -12,13 +12,13 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 )  # noqa: E501
 
-from db import make_database_url
 from seed.models import Base
 from seed.models.user_model import UserModel  # noqa: F401
 from seed.models.user_login_history_model import UserLoginHistoryModel  # noqa: F401
 from seed.models.user_meta_model import UserMetaModel  # noqa: F401
 from seed.models.user_profile_model import UserProfileModel  # noqa: F401
 from seed.models.user_social_account_model import UserSocialAccountModel  # noqa: F401
+from seed.utils.database import make_database_url
 from setting import setting
 
 

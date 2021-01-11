@@ -1,8 +1,9 @@
 from typing import Dict, Tuple
 
-from exceptions import OAuthHTTPException
 from logger import logger
 from setting import setting
+
+from seed.exceptions import OAuthHTTPException
 
 from . import OAuthHandler
 

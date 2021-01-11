@@ -4,7 +4,7 @@ import uuid
 
 from typing import Any, Dict, Union, Optional
 
-from exceptions import JWTHTTPException
+from seed.exceptions import JWTHTTPException
 from seed.utils.convert import units2seconds
 from seed.utils.exception import exception_wrapper
 from setting import setting

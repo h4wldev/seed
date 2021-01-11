@@ -8,7 +8,7 @@ from typing import Any, Optional, List, Tuple
 
 from seed.api.router import Route, status
 from db import db
-from exceptions import HTTPException
+from seed.exceptions import HTTPException
 from seed.models.user_login_history_model import UserLoginHistoryModel
 from seed.models.user_social_account_model import UserSocialAccountModel
 from seed.depends.jwt.depend import JWT

@@ -1,8 +1,7 @@
 import pytest
 
+from seed.exceptions import HTTPException
 from seed.utils.exception import exception_wrapper
-
-from exceptions import HTTPException
 
 
 def test_exception_wrapper():

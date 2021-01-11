@@ -6,7 +6,7 @@ from fastapi.responses import ORJSONResponse
 from typing import Any, Dict, Callable, List, Optional, Tuple, Union
 
 from db import db
-from exceptions import JWTHTTPException
+from seed.exceptions import JWTHTTPException
 from seed.models.user_model import UserModel
 from seed.depends.redis import RedisContextManager
 from setting import setting
