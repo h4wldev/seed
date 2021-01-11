@@ -1,7 +1,9 @@
 from typing import Dict, Tuple
 
-from exceptions import OAuthHTTPException
+from logger import logger
 from setting import setting
+
+from seed.exceptions import OAuthHTTPException
 
 from . import OAuthHandler
 
@@ -31,6 +33,8 @@ class KakaoOAuthHandler(OAuthHandler):
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
+            logger.error(response)
+
             raise OAuthHTTPException({
                 'provider': 'kakao',
                 'error': response.get('error', None),
@@ -56,6 +60,8 @@ class KakaoOAuthHandler(OAuthHandler):
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
+            logger.error(response)
+
             raise OAuthHTTPException({
                 'provider': 'kakao',
                 'error': response.get('error', None),
@@ -83,6 +89,8 @@ class KakaoOAuthHandler(OAuthHandler):
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
+            logger.error(response)
+
             raise OAuthHTTPException({
                 'provider': 'kakao',
                 'error': response.get('error', None),
@@ -108,6 +116,8 @@ class KakaoOAuthHandler(OAuthHandler):
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
+            logger.error(response)
+
             raise OAuthHTTPException({
                 'provider': 'kakao',
                 'error': response.get('error', None),

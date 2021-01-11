@@ -5,7 +5,7 @@ from fastapi import (
 )
 from typing import Any, Callable, List, Optional
 
-from exceptions import RoleHTTPException
+from seed.exceptions import RoleHTTPException
 from seed.depends.jwt import JWT
 
 

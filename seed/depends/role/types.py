@@ -29,8 +29,7 @@ class Flag:
 
     def has(
         self,
-        *roles: Tuple[Union[List[str], str]],
-        any_: bool = False
+        *roles: Tuple[Union[List[str], str]]
     ) -> bool:
         for role in roles:
             if isinstance(role, (list, tuple)):
@@ -112,13 +111,16 @@ class Flag:
         try:
             if issubclass(other.__class__, self.__class__):
                 return self.value == other.value
-        except Exception:
+        except Exception:  # pragma: no cover
             pass
+
+        if isinstance(other, int):
+            return self.value == other
 
         return False
 
 
-class Role(Flag):
+class Role(Flag):  # pragma: no cover
     _default_mapping: List[str] = setting.depend.role.roles
 
     def __init__(
@@ -132,5 +134,5 @@ class Role(Flag):
         super().__init__(value, mapping)
 
 
-class Permission(Role):
+class Permission(Role):  # pragma: no cover
     _default_mapping: List[str] = setting.depend.role.permissions

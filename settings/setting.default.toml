@@ -1,20 +1,30 @@
 [default]
 debug = true
-api_prefix = ''
+api_prefix = '/api'
 
 timezone = 'Asia/Seoul'
 
 user_key_field = 'email'
 
     [default.base_url]
-    api = 'http://localhost/api'
-    web = 'http://localhost'
+    api = 'http://seed-dev.hawl.kim:8080/api'
+    web = 'http://seed-dev.hawl.kim:8080'
 
     [default.cors]
     allowed_origins = ['*']
     allow_credentials = true
     allow_methods = ['*']
     allow_headers = ['*']
+
+    [default.jwt]
+    mode = 'both'
+    algorithm = 'HS256'
+    access_token_expires = '30m'
+    refresh_token_expires = '7d'
+    refresh_token_renewal_before_expire = '1d'  # Renewal refresh token before expiration
+
+        [default.jwt.redis]
+        enable = true
 
     [default.oauth]
     providers = ['kakao']
@@ -54,12 +64,7 @@ user_key_field = 'email'
         roles = ['']
 
         [default.depend.jwt]
-        algorithm = 'HS256'
-        access_token_expires = '30m'
-        refresh_token_expires = '1d'
-
             [default.depend.jwt.httponly_cookie]
-            enable = true
             domains = []
             access_token_cookie_key = 'access_token'
             refresh_token_cookie_key = 'refresh_token'
@@ -79,6 +84,11 @@ user_key_field = 'email'
     user = ''
     database = 'seed.db'
     charset = 'utf8'
+
+    [default.redis]
+    host = '127.0.0.1'
+    port = 6379
+    encoding = 'utf-8'
 
     [default.sqlalchemy]
     commit_on_exit = true

@@ -30,17 +30,17 @@ class MutableRole(Mutable, FlagType):
     ) -> 'MutableRole':
         return MutableRole(value)
 
-    def set(self, *args, **kwargs) -> None:
+    def set(self, *args, **kwargs) -> None:  # pragma: no cover
         self.changed()
 
         return super().set(*args, **kwargs)
 
-    def _set_bitfield(self, *args, **kwargs) -> List[bool]:
+    def _set_bitfield(self, *args, **kwargs) -> List[bool]:  # pragma: no cover
         self.changed()
 
         return super()._set_bitfield(*args, **kwargs)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return self._class.__repr__()
 
 
@@ -48,8 +48,9 @@ class Role(atypes.TypeDecorator):
     impl: atypes.TypeEngine = atypes.Integer
     type_: FlagType = RoleType
 
+    @classmethod
     def process_bind_param(
-        self,
+        cls,
         value: Any,
         dialect: 'SQLAlchemyDialect'
     ) -> int:
@@ -60,13 +61,14 @@ class Role(atypes.TypeDecorator):
 
         return value
 
+    @classmethod
     def process_result_value(
-        self,
+        cls,
         value: int,
         dialect: 'SQLAlchemyDialect'
     ) -> FlagType:
         if isinstance(value, int):
-            return self.type_(value)
+            return cls.type_(value)
 
         return value
 

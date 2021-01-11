@@ -2,14 +2,16 @@ import datetime
 import orjson
 import importlib
 
+from fastapi import Request
 from pydantic import BaseModel
 from typing import Any, Optional, List, Tuple
 
-from api.router import Route, status
+from seed.api.router import Route, status
 from db import db
-from exceptions import HTTPException
-from models.user_social_account_model import UserSocialAccountModel
-from seed.depends.jwt import JWT
+from seed.exceptions import HTTPException
+from seed.models.user_login_history_model import UserLoginHistoryModel
+from seed.models.user_social_account_model import UserSocialAccountModel
+from seed.depends.jwt.depend import JWT
 from seed.utils.crypto import AESCipher
 from setting import setting
 
@@ -20,7 +22,41 @@ class OAuthCode(BaseModel):
 
 
 class OAuth(Route):
+    @Route.option(
+        name='OAuth',
+        default_status_code=201
+    )
+    @Route.doc_option(
+        tags=['auth'],
+        description='Using OAuth for Authentication',
+        responses={
+            201: {
+                'description': 'Return jwt access, refresh tokens',
+                'content': {
+                    'application/json': {
+                        'example': {
+                            'access_token': '<jwt_access_token>',
+                            'access_token_expires_in': 1800,
+                            'refresh_token': '<jwt_refresh_token>',
+                            'refresh_token_expires_in': 86400
+                        }
+                    }
+                }
+            },
+            404: {
+                'description': 'That social user not exists',
+                'content': {
+                    'application/json': {
+                        'example': {
+                            'code': '<aes_string>'
+                        }
+                    }
+                }
+            }
+        }
+    )
     async def post(
+        request: Request,
         oauth_code: OAuthCode
     ) -> Tuple[Any, int]:
         if oauth_code.provider not in setting.oauth.providers:
@@ -57,10 +93,19 @@ class OAuth(Route):
         user_social_account.refresh_token = refresh_token
         user_social_account.updated_at = datetime.datetime.now()
 
+        login_history = UserLoginHistoryModel.from_request(
+            user_id=user_social_account.user_id,
+            request=request,
+            success=True,
+            provider=oauth_code.provider
+        )
+
+        db.session.add(login_history)
         db.session.commit()
 
-        return JWT.get_jwt_token_response(
-            user_social_account.user.key_field, {}
+        return JWT(mode=setting.jwt.mode).get_create_response(
+            subject=user_social_account.user.key_field,
+            payload={}
         ), status.HTTP_201_CREATED
 
     @staticmethod

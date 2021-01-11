@@ -6,7 +6,7 @@
  Boilerplate for restful API with <a href="https://github.com/tiangolo/fastapi">tiangolo/fastapi</a>
 </p>
 <p align="center">
- <img src="https://github.com/h4wldev/seed/workflows/Lint/badge.svg">
+ <a href="https://codecov.io/gh/h4wldev/seed"><img src="https://codecov.io/gh/h4wldev/seed/branch/develop/graph/badge.svg?token=56FGFR91EX"></a>
 </p>
 
 ## Features
@@ -30,7 +30,12 @@
 1. Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example) 
 2. Uncomment or add on [setting.py](setting.py), setting files
 
-#### 3. Just Run!
+#### 3. DB Migration
+```bash
+ $ alembic upgrade head
+```
+
+#### 4. Just Run!
 ```bash
  $ uvicorn app:app
 ```
@@ -43,7 +48,7 @@ seed's `Router` is inherit [fastapi.APIRouter](https://github.com/tiangolo/fasta
 ```python
 from fastapi.responses import ORJSONResponse
 
-from api.router import Router, Route
+from seed.api.router import Router, Route
 
 router = Router(
   endpoint_options
@@ -101,7 +106,7 @@ arguments : response_model, response_model_include, response_model_exclude, resp
 
 ### JWT Depend
 ```python
-from seed.depends.jwt import JWT
+from seed.depends.jwt.depend import JWT
 
 @router.get('/jwt_required')
 def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
@@ -123,13 +128,12 @@ def create(jwt: JWT() = Depends()) -> str:
 #### JWT(required, token_type, user_loader, user_cache, httponly_cookie_mode)
 You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
 
-| argument             | type                 | description                                                                        | default             |
-|----------------------|----------------------|------------------------------------------------------------------------------------|---------------------|
-| required             | bool                 | token required or not                                                              | False               |
-| token_type           | str                  | select token's type (access, refresh)                                              | 'access'            |
-| user_loader          | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
-| user_cache           | bool                 | caching user data when loaded or not                                               | True                |
-| httponly_cookie_mode | bool                 | get credential on httponly cookie                                                  | (on setting)        |
+| argument    | type                 | description                                                                        | default             |
+|-------------|----------------------|------------------------------------------------------------------------------------|---------------------|
+| required    | bool                 | token required or not                                                              | False               |
+| token_type  | str                  | select token's type (access, refresh)                                              | 'access'            |
+| user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
+| mode        | str                  | jwt mode ('header', 'cookie', 'both') / both get from 1. cookie and 2. header      | 'both'              |
 
 ##### > JWT.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
@@ -140,11 +144,14 @@ JWT Token's claims after token loaded
 ##### > JWT.payload -> Dict[str, Any]  @property
 JWT Token's payload after token loaded
 
-##### > JWT.load_token(credential: str)
+##### > JWT.load_token(credential: Optional[str])
 Load token with credential (jwt token string)
 
-##### > JWT.decode_token(token: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
-Decode token with algorithm
+##### > JWT.get_create_response(subject: str, payload: Dict[str, Any] = {}, token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, response_headers: Dict[str, Any] = {}, return_tokens: bool = False) -> Tuple[response_type, Dict[str, Any]]'
+Create access, refresh token Response
+
+##### > JWT.get_expire_response(token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, response_headers: Dict[str, Any] = {}) -> response_type
+Create access, refresh token expire response
 
 ##### > JWT.create_access_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create access token with payload. subject must be set unique data
@@ -152,22 +159,17 @@ Create access token with payload. subject must be set unique data
 ##### > JWT.create_refresh_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
 Create refresh token with payload. subject must be set unique data and payload must be same with access token
 
-##### > JWT.get_jwt_token_response(subject: str, payload: Dict[str, Any] = {}) -> 'Response'  @staticmethod
-Create access, refresh token Response
-
 
 ### JWT httponly cookie mode
 ```toml
 [<env>.depend.jwt.httponly_cookie]
-enable = true
 domains = []
 access_token_cookie_key = 'access_token'
 refresh_token_cookie_key = 'refresh_token'
 ```
-Change setting `<env>.depend.jwt.httponly_cookie.enable` to `true`
 
 ```python
-def from_httponly_cookie(jwt: JWT(httponly_cookie_mode=True) = Depends()) -> str:
+def from_httponly_cookie(jwt: JWT(mode='cookie') = Depends()) -> str:  # or mode='both'
   return jwt.claims, 200
 ```
 

@@ -6,7 +6,7 @@ from setting import setting
 
 
 class Formatter:
-    def stdout_format(self, record: logging.LogRecord) -> str:
+    def stdout_format(self, record: logging.LogRecord) -> str:  # pragma: no cover
         extra_headers: Dict[str, str] = {}
 
         if record['extra'].get('uuid', None):

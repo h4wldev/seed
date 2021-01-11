@@ -1,0 +1,44 @@
+name: Coverage
+
+on:
+  push:
+    paths:
+      - '*.py'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.extract_branch.outputs.branch }}
+    - name: Setup Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 4
+    - uses: syphar/restore-virtualenv@v1
+      id: cache-virtualenv
+      with:
+        requirement_files: requirements.txt
+    - uses: syphar/restore-pip-download-cache@v1
+      if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+    - run: pip install -r requirements.txt
+      if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+    - name: Run Tests And Generate coverage report
+      run: |
+        pytest --cov-report=xml
+      env:
+        ENV: testing
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        files: ./coverage.xml
+        flags: unittests

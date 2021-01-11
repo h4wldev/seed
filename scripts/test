@@ -1,0 +1,2 @@
+# !/usr/bin/zsh
+ENV='testing' pytest -s --cov-report html
