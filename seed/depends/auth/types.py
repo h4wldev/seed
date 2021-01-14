@@ -53,9 +53,8 @@ class JWTToken(JWTTokenType):
                 key=self.token_type,
             )
 
-            return stored_uuid and (
+            return stored_uuid is not None and \
                 self.id == stored_uuid.decode()
-            )
 
     @classmethod
     @exception_wrapper(
