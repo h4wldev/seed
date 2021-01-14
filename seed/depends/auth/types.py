@@ -83,7 +83,7 @@ class JWTToken(JWTTokenType):
         expires: Union[int, str] = None,
         algorithm: Optional[str] = None
     ) -> str:
-        token_type: str = token_type or self.ACCESS_TOKEN
+        token_type: str = token_type or JWTTokenType.ACCESS_TOKEN
         algorithm: str = algorithm or setting.jwt.algorithm
         expires: Union[int, str] = expires or (
             setting.jwt.get(f'{token_type}_token_expires', None)
@@ -118,10 +118,10 @@ class JWTToken(JWTTokenType):
                 value=uuid_,
             )
 
-            if token_type == JWTTokenType.REFRESH_TOKEN:
+            if token_type == JWTTokenType.REFRESH_TOKEN:  # pragma: no cover
                 r.expire(
                     name=f'token:{subject}',
-                    time=claims['exp'],
+                    time=claims['exp_in'],
                 )
 
         return cls(

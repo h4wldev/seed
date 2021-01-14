@@ -39,6 +39,6 @@ class AuthUtil:
     def token_type_filter(
         token_types: List[str]
     ) -> List[str]:
-        return list(filter(
+        return set(filter(
             lambda t: t in ('access', 'refresh'), token_types
         ))
