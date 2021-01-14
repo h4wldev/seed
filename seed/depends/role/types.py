@@ -121,7 +121,7 @@ class Flag:
 
 
 class Role(Flag):  # pragma: no cover
-    _default_mapping: List[str] = setting.depend.role.roles
+    _default_mapping: List[str] = setting.role.roles
 
     def __init__(
         self,
@@ -135,4 +135,4 @@ class Role(Flag):  # pragma: no cover
 
 
 class Permission(Role):  # pragma: no cover
-    _default_mapping: List[str] = setting.depend.role.permissions
+    _default_mapping: List[str] = setting.role.permissions

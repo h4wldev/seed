@@ -2,12 +2,17 @@ from typing import Tuple
 
 from sqlalchemy.ext.declarative import declarative_base
 
+from db import db
+
+from .utils.query import Query
+
 
 Base = declarative_base()
 
 
-class ModelMixin:
+class ModelMixin(Query):
     _repr_attrs: Tuple[str] = ()
+    db: 'DBSessionMeta' = db
 
     def __repr__(self) -> str:
         attr_string: str = ''

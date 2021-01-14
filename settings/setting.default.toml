@@ -16,15 +16,23 @@ user_key_field = 'email'
     allow_methods = ['*']
     allow_headers = ['*']
 
+    [default.role]
+    permissions = ['']
+    roles = ['']
+
     [default.jwt]
-    mode = 'both'
     algorithm = 'HS256'
     access_token_expires = '30m'
     refresh_token_expires = '7d'
     refresh_token_renewal_before_expire = '1d'  # Renewal refresh token before expiration
 
-        [default.jwt.redis]
-        enable = true
+        [default.jwt.cookie]
+        httponly = true
+        domains = []
+        
+        [default.jwt.cookie.key]
+        access = 'access_token'
+        refresh = 'refresh_token'
 
     [default.oauth]
     providers = ['kakao']
@@ -57,17 +65,6 @@ user_key_field = 'email'
             certfile = ''
             ca_certs = ''
             encoding = 'utf-8'
-
-    [default.depend]
-        [default.depend.role]
-        permissions = ['']
-        roles = ['']
-
-        [default.depend.jwt]
-            [default.depend.jwt.httponly_cookie]
-            domains = []
-            access_token_cookie_key = 'access_token'
-            refresh_token_cookie_key = 'refresh_token'
 
     [default.logging]
     intercept_loggers = [

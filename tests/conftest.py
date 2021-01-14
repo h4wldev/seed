@@ -2,6 +2,7 @@ import os
 import pytest
 import sys
 
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 
@@ -25,6 +26,11 @@ def app():
 @pytest.fixture
 def client(app):
     return TestClient(app)
+
+
+@pytest.fixture(scope='function')
+def empty_app():
+    return FastAPI()
 
 
 @pytest.fixture
