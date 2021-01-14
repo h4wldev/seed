@@ -15,8 +15,7 @@
 - __[Config]__ `.toml` based config system, support environments
 - __[Authorize]__ Support custom OAuth2 authorization ([Kakao](seed/oauth/kakao.py))
 - __[Model]__ User and User related(meta, profile, ...) models
-- __[Depend]__ JWT(Json Web Token) based authorize, support httponly cookie mode
-- __[Depend]__ Integer(Bitfield) based role, permission
+- __[Depend]__ JWT(Json Web Token) based authorize, support cookie
 - __[Depend]__ User specific id with UUID
 - __[Depend]__ Logger with UUID
 - __[Integrate]__ Integrate with Sentry, Logstash
@@ -104,12 +103,69 @@ arguments : enable(=include_in_schema), tags, summary, description, response_des
 arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none
 
 
+### Auth Depend
+```python
+from seed.depends.auth import Auth
+
+@router.get('/auth_required')
+def auth_required(auth: Auth(required=True) = Depends()) -> Any:
+  return auth.user
+
+@router.get('/auth_optional')
+def auth_required(auth: Auth() = Depends()) -> Any:
+  return auth.user
+
+@router.get('/auth_refresh_token')
+def auth_required(auth: Auth(token_type='refresh') = Depends()) -> Any:
+  return auth.user
+```
+
+#### Auth(required, token_type, user_loader)
+You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
+
+| argument    | type                 | description                                                                          | default             |
+|-------------|----------------------|--------------------------------------------------------------------------------------|---------------------|
+| required    | bool                 | token required or not                                                                | False               |
+| token_type  | str                  | select token's type (access, refresh)                                                | 'access'            |
+| user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/auth/depend.py#L112) | load from UserModel |
+
+##### > Auth.user -> Union[UserModel, Any]  @property
+User data property, after load token and user data
+
+##### > JWT.token -> Optional[JWTToken] @property
+Get token data with [JWTToken](depends/auth/types.py#L22)
+
+#### JWTToken(credential, algorithm, claims)
+
+| argument   | type                     | description                               | default |
+|------------|--------------------------|-------------------------------------------|---------|
+| credential | str                      | JWT token string                          |         |
+| algorithm  | str                      | JWT token algorithm                       | 'HS256' |
+| claims     | Optional[Dict[str, Any]] | JWT Token claims (using on create method) | None    |
+
+#### JWTToken.verify() -> bool
+Verify with redis stored data
+
+#### JWTToken.create(subject: str, payload: Dict[str, Any] = {}, , secrets: Dict[str, Any] = {}, token_type: str = 'access', expires: Union[int, str] = setting, algorithm: str = 'HS256') -> Dict[str, Any]  @classmethod
+
+#### JWTToken.decode(credential: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
+
+#### JWTToken.id -> str  @property
+#### JWTToken.subject -> str  @property
+#### JWTToken.payload -> Dict[str, Any]  @property
+#### JWTToken.secrets -> Dict[str, Any]  @property
+#### JWTToken.token_type -> str  @property
+#### JWTToken.expires -> Arrow  @property
+#### JWTToken.expires_in -> int  @property
+#### JWTToken.created_at -> Arrow  @property
+
+
 ### UUID Depend
 ```python
 from seed.depends.uuid import UUID
 
 @router.get('/uuid')
-def jwt_required(uuid: UUID = Depends()) -> Any:
+def uuid(uuid: UUID = Depends()) -> Any:
   return uuid  # 01dbd65e-1b46-35aa-9928-51333fe20858
 ```
 

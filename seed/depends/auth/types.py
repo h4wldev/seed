@@ -42,9 +42,9 @@ class JWTToken(JWTTokenType):
             self.claims['secrets']
         )
         self.token_type: str = self.claims['type']
-        self.expires: Optional[int] = self.claims.get('exp', None)
-        self.expires_in: Optional[int] = self.claims.get('exp_in', None)
-        self.created_at: int = self.claims['iat']
+        self.expires_in: int = self.claims['exp_in']
+        self.expires: 'Arrow' = arrow.get(self.claims['exp'])
+        self.created_at: 'Arrow' = arrow.get(self.claims['iat'])
 
     def verify(self) -> bool:
         with RedisContextManager() as r:
@@ -57,30 +57,14 @@ class JWTToken(JWTTokenType):
                 self.id == stored_uuid.decode()
 
     @classmethod
-    @exception_wrapper(
-        JWTHTTPException,
-        excs=(jwt.exceptions.PyJWTError),
-    )
-    def decode(
-        cls,
-        credential: str,
-        algorithm: str = 'HS256'
-    ) -> Dict[str, Any]:
-        return jwt.decode(
-            credential,
-            setting.secret_key.jwt_secret_key,
-            algorithms=algorithm
-        )
-
-    @classmethod
     def create(
         cls,
         subject: str,
         payload: Dict[str, Any] = {},
         secrets: Dict[str, Any] = {},
-        token_type: Optional[str] = None,
+        token_type: Optional[str] = 'access',
         expires: Union[int, str] = None,
-        algorithm: Optional[str] = None
+        algorithm: Optional[str] = 'HS256'
     ) -> str:
         token_type: str = token_type or JWTTokenType.ACCESS_TOKEN
         algorithm: str = algorithm or setting.jwt.algorithm
@@ -132,4 +116,19 @@ class JWTToken(JWTTokenType):
             ),
             algorithm=algorithm,
             claims=claims,
+        )
+
+    @staticmethod
+    @exception_wrapper(
+        JWTHTTPException,
+        excs=(jwt.exceptions.PyJWTError),
+    )
+    def decode(
+        credential: str,
+        algorithm: str = 'HS256'
+    ) -> Dict[str, Any]:
+        return jwt.decode(
+            credential,
+            setting.secret_key.jwt_secret_key,
+            algorithms=algorithm
         )
