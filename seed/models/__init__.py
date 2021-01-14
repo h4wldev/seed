@@ -2,7 +2,7 @@ from typing import Tuple
 
 from sqlalchemy.ext.declarative import declarative_base
 
-from db import db
+from db import db as db_
 
 from .utils.query import Query
 
@@ -12,7 +12,7 @@ Base = declarative_base()
 
 class ModelMixin(Query):
     _repr_attrs: Tuple[str] = ()
-    db: 'DBSessionMeta' = db
+    db: 'DBSessionMeta' = db_
 
     def __repr__(self) -> str:
         attr_string: str = ''

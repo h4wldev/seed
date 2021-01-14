@@ -2,8 +2,7 @@ from fastapi import (
     Header,
     Request
 )
-from fastapi.responses import ORJSONResponse
-from typing import Any, Dict, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 from db import db
 from seed.exceptions import JWTHTTPException
@@ -11,10 +10,10 @@ from seed.models.user_model import UserModel
 from setting import setting
 
 from .types import JWTToken, JWTTokenType
-from .util import JWTUtil
+from .util import AuthUtil
 
 
-class JWT(JWTTokenType, JWTUtil):
+class Auth(AuthUtil, JWTTokenType):
     token: Optional[JWTToken] = None
 
     _user: Any = None
@@ -33,7 +32,7 @@ class JWT(JWTTokenType, JWTUtil):
         self,
         request: Request,
         authorization: Optional[str] = Header(None)
-    ) -> 'JWT':
+    ) -> 'Auth':
         credential: Optional[str] = self._get_credential(
             request=request,
             authorization=authorization

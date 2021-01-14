@@ -5,7 +5,7 @@ from .types import JWTToken
 from setting import setting
 
 
-class JWTUtil:
+class AuthUtil:
     @classmethod
     def bind_delete_cookie(
         cls,

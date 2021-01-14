@@ -104,101 +104,6 @@ arguments : enable(=include_in_schema), tags, summary, description, response_des
 arguments : response_model, response_model_include, response_model_exclude, response_model_by_alias, response_model_exclude_unset, response_model_exclude_defaults, response_model_exclude_none
 
 
-### JWT Depend
-```python
-from seed.depends.jwt.depend import JWT
-
-@router.get('/jwt_required')
-def jwt_required(jwt: JWT(required=True) = Depends()) -> Any:
-  return jwt.user.email  # h4wldev@gmail.com
-
-@router.get('/jwt_optional')
-def jwt_optional(jwt: JWT() = Depends()) -> Any:
-  return jwt.user is not None  # bool
-
-@router.get('/jwt_refresh_token')
-def jwt_refresh_token(jwt: JWT(token_type='refresh') = Depends()) -> Any:
-  return jwt.claims.type  # refresh
-  
-def create(jwt: JWT() = Depends()) -> str:
-  response: Response = jwt.get_jwt_token_response('h4wldev@gmail.com', {})  # Support httponly cookie mode
-  return response
-```
-
-#### JWT(required, token_type, user_loader, user_cache, httponly_cookie_mode)
-You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
-
-| argument    | type                 | description                                                                        | default             |
-|-------------|----------------------|------------------------------------------------------------------------------------|---------------------|
-| required    | bool                 | token required or not                                                              | False               |
-| token_type  | str                  | select token's type (access, refresh)                                              | 'access'            |
-| user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | load from UserModel |
-| mode        | str                  | jwt mode ('header', 'cookie', 'both') / both get from 1. cookie and 2. header      | 'both'              |
-
-##### > JWT.user -> Union[UserModel, Any]  @property
-User data property, after load token and user data
-
-##### > JWT.claims -> Dict[str, Any]  @property
-JWT Token's claims after token loaded
-
-##### > JWT.payload -> Dict[str, Any]  @property
-JWT Token's payload after token loaded
-
-##### > JWT.load_token(credential: Optional[str])
-Load token with credential (jwt token string)
-
-##### > JWT.get_create_response(subject: str, payload: Dict[str, Any] = {}, token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, response_headers: Dict[str, Any] = {}, return_tokens: bool = False) -> Tuple[response_type, Dict[str, Any]]'
-Create access, refresh token Response
-
-##### > JWT.get_expire_response(token_types: List[str] = ['access', 'refresh'], response_type: 'Response' = ORJSONResponse, response_headers: Dict[str, Any] = {}) -> response_type
-Create access, refresh token expire response
-
-##### > JWT.create_access_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
-Create access token with payload. subject must be set unique data
-
-##### > JWT.create_refresh_token(subject: str, payload: Dict[str, Any] = {}) -> str  @staticmethod
-Create refresh token with payload. subject must be set unique data and payload must be same with access token
-
-
-### JWT httponly cookie mode
-```toml
-[<env>.depend.jwt.httponly_cookie]
-domains = []
-access_token_cookie_key = 'access_token'
-refresh_token_cookie_key = 'refresh_token'
-```
-
-```python
-def from_httponly_cookie(jwt: JWT(mode='cookie') = Depends()) -> str:  # or mode='both'
-  return jwt.claims, 200
-```
-
-
-### Role Depend
-> This depend include JWT depend, and jwt required<br>
-
-```python
-from seed.depends.role.depend import Role
-
-@router.get('/need_roles')
-def need_roles(
-  role: Role(roles=[('admin', 'writer')], perms=['auth', 'write']
-) = Depends()) -> Any:
-  return role.user.email  # h4wldev@gmail.com
-```
-
-#### Role(roles, perms, user_loader, user_cache)
-| argument    | type                        | description                                                                        | default               |
-|-------------|-----------------------------|------------------------------------------------------------------------------------|-----------------------|
-| roles       | List[Union[List[str], str]] | role names to check, using `Role.has` method                                       | []                    |
-| perms       | List[Union[List[str], str]] | permission names to check, using `Role.has` method                                 | []                    |
-| user_loader | Callable[[str], Any]        | custom user loader (parameter : jwt token's subject) [example](depends/jwt.py#L96) | (load from UserModel) |
-| user_cache  | bool                        | caching user data when loaded or not                                               | True                  |
-
-##### > Role.user -> Union[UserModel, Any]  @property
-User data property, after load token and user data on JWT Depend
-
-
 ### UUID Depend
 ```python
 from seed.depends.uuid import UUID
@@ -210,6 +115,7 @@ def jwt_required(uuid: UUID = Depends()) -> Any:
 
 ##### > UUID.get_uuid(request: Request)
 Get uuid with fastapi request
+
 
 ### Context Logger Depend
 > This depend include UUID depend, same usage with just logger<br>
@@ -225,70 +131,6 @@ def logger_with_uuid(context_logger: ContextLogger = Depends()) -> Any:
   context_logger.info('show uuid!')  # show uuid on stdout log
   return None
 ```
-
-### Bitfield based Role, Permission
-```diff
-- [Caution] Working with mapping array index, Don't mess array element's order!
-```
-
-```python
-# Same usage with Role and Permission
-from seed.depends.role.types import Role, Permission
-
-mapping: List[str] = ['super-admin', 'admin', 'writer', 'reader']
-
-role = Role(0, mapping=mapping)  # diffrent from role depend class
-Role.from_bitfield([False, False, False, False], mapping=mapping)  # or initialize with bitfield
-
-role.get('admin')  # True
-role.get('super-admin')  # False
-role.get('undefined')  # False
-
-role.set('super-admin', True); role.get('super-admin')  # True
-role.set('super-admin', False); role.get('super-admin')  # False
-role.set('undefined', False)  # Raise Error!
-
-role.has('reader', ['admin', 'writer'])  # True : reader AND (admin OR writer)
-role.has('reader', 'super-admin')  # False : reader AND super-admin
-# Using list, tuple type to or operate
-
-role.get_all()  # {'super-admin': False, 'admin': True, ...}
-
-role.reset()
-```
-
-#### Role, Permission(value, mapping)
-You can setting mapping array on [here](settings/settings.toml)
-
-| argument | type      | description                           | default       |
-|----------|-----------|---------------------------------------|---------------|
-| value    | int       | integer value before convert bitfield | (Required)    |
-| mapping  | List[str] | mapping array                         | (on settings) |
-
-##### > Role.value -> int  @property
-Get integer value of role/permission
-
-##### > Role.bitfield -> List[bool]  @property
-Get bitfield of role/permission
-
-##### > Role.get(name: str) -> bool
-Get has role/permission on name
-
-##### > Role.has(*roles: Tuple[Union[List[str], str]]) -> bool
-Get has role/permission on roles, list is or operate. detail on example.
-
-##### > Role.get_all() -> Dict[str, bool]
-Get all of role/permission
-
-##### > Role.reset()
-Reset on role/permission
-
-##### > Role.set(name: str, value: bool)
-Set value on role/permission
-
-##### > Role.from_bitfield(value: List[bool], mapping: List[str])  @classmethod
-Initialize with bitfield. detail on example.
-
 
 ## How to custom OAuth handler
 #### 1. Configuration
