@@ -17,9 +17,9 @@ sys.path.insert(
 )
 
 from seed.models import Base
-from seed.models.authority_model import AuthorityModel
+from seed.models.ability_model import AbilityModel
 from seed.models.user_model import UserModel
-from seed.models.user_authority_model import UserAuthorityModel
+from seed.models.user_ability_model import UserAbilityModel
 from seed.models.user_login_history_model import UserLoginHistoryModel
 from seed.models.user_meta_model import UserMetaModel
 from seed.models.user_profile_model import UserProfileModel
@@ -72,9 +72,9 @@ def table_args(model: Base) -> None:
 
 
 models: List[Base] = [
-    AuthorityModel,
+    AbilityModel,
     UserModel,
-    UserAuthorityModel,
+    UserAbilityModel,
     UserLoginHistoryModel,
     UserMetaModel,
     UserProfileModel,

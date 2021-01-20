@@ -4,13 +4,13 @@ from sqlalchemy import text, Column, ForeignKey, Integer, String, DateTime, Inde
 from sqlalchemy.orm import relationship
 
 from . import Base, ModelMixin
-from .authority_model import AuthorityModel
+from .ability_model import AbilityModel
 
 
-class UserAuthorityModel(Base, ModelMixin):
-    __tablename__ = 'user_authorities'
+class UserAbilityModel(Base, ModelMixin):
+    __tablename__ = 'user_abilities'
     __table_args__ = (
-        Index('user_id'), Index('authority'),
+        Index('user_id'), Index('ability'),
     )
 
     _repr_attrs = ('id', 'user_id')
@@ -19,8 +19,8 @@ class UserAuthorityModel(Base, ModelMixin):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
-    authority = relationship(
-        'AuthorityModel',
+    ability = relationship(
+        'AbilityModel',
         back_populates='users',
         cascade='all,delete',
     )

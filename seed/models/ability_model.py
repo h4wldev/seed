@@ -5,11 +5,11 @@ from sqlalchemy import Column, Text, String, DateTime, Index
 from . import Base, ModelMixin
 
 
-class AuthorityModel(Base, ModelMixin):
-    __tablename__ = 'authorities'
+class AbilityModel(Base, ModelMixin):
+    __tablename__ = 'abilities'
 
-    _repr_attrs = ('authority')
+    _repr_attrs = ('ability')
 
-    authority = Column(String(20), primary_key=True)
+    ability = Column(String(20), primary_key=True)
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.datetime.now)
