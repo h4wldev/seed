@@ -132,7 +132,7 @@ You can setting jwt expires time, algorithm on [here](settings/settings.toml), a
 ##### > Auth.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
 
-##### > JWT.token -> Optional[JWTToken] @property
+##### > Auth.token -> Optional[JWTToken] @property
 Get token data with [JWTToken](depends/auth/types.py#L22)
 
 #### JWTToken(credential, algorithm, claims)
@@ -191,15 +191,10 @@ def logger_with_uuid(context_logger: ContextLogger = Depends()) -> Any:
 ## How to custom OAuth handler
 #### 1. Configuration
 ```toml
-[<env>.oauth]
-    providers = ['kakao']
-```
-1. Add your OAuth provider's name on `<env>.oauth.providers`
-```toml
 [<env>.oauth.<provider>]
   handler = 'seed.oauth.<provider>.<provider>OAuthHandler'
 ```
-2. Add provider's setting on `<env>.oauth.<provider>`
+Add provider's setting on `<env>.oauth.<provider>`
 
 #### 2. Make handler
 Make handler reference from [Base Handler](seed/oauth/__init__.py) and [Kakao Handler](seed/oauth/kakao.py)
