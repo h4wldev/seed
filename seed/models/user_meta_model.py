@@ -1,4 +1,3 @@
-from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import text, Column, ForeignKey, Integer, Boolean, DateTime, Index
 
 from . import Base, ModelMixin
@@ -18,6 +17,3 @@ class UserMetaModel(Base, ModelMixin):
     email_notification = Column(Boolean, default=False)
     is_certified = Column(Boolean, default=False)
     updated_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
-
-UserMeta = sqlalchemy_to_pydantic(UserMetaModel)

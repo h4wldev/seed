@@ -11,18 +11,19 @@ import sqlalchemy as sa
 
 from alembic import op
 from typing import Any, List, Dict
-from sqlalchemy import func
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 )
 
 from seed.models import Base
-from seed.models.user_model import UserModel  # noqa: F401
-from seed.models.user_login_history_model import UserLoginHistoryModel  # noqa: F401
-from seed.models.user_meta_model import UserMetaModel  # noqa: F401
-from seed.models.user_profile_model import UserProfileModel  # noqa: F401
-from seed.models.user_social_account_model import UserSocialAccountModel  # noqa: F401
+from seed.models.authority_model import AuthorityModel
+from seed.models.user_model import UserModel
+from seed.models.user_authority_model import UserAuthorityModel
+from seed.models.user_login_history_model import UserLoginHistoryModel
+from seed.models.user_meta_model import UserMetaModel
+from seed.models.user_profile_model import UserProfileModel
+from seed.models.user_social_account_model import UserSocialAccountModel
 
 
 revision = 'c6457970ac13'
@@ -71,7 +72,9 @@ def table_args(model: Base) -> None:
 
 
 models: List[Base] = [
+    AuthorityModel,
     UserModel,
+    UserAuthorityModel,
     UserLoginHistoryModel,
     UserMetaModel,
     UserProfileModel,

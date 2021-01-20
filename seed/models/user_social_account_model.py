@@ -1,4 +1,3 @@
-from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import text, Column, ForeignKey, Integer, String, Text, DateTime, Index
 
 from . import Base, ModelMixin
@@ -19,6 +18,3 @@ class UserSocialAccountModel(Base, ModelMixin):
     access_token = Column(Text)
     refresh_token = Column(Text)
     updated_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
-
-UserSocialAccount = sqlalchemy_to_pydantic(UserSocialAccountModel)
