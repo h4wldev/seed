@@ -39,3 +39,14 @@ def empty_endpoint():
         return {'foo': 'bar'}
 
     return endpoint
+
+
+@pytest.fixture
+def query_string():
+    def strip(s):
+        return s.replace('  ', '\t').strip('\t')
+
+    return lambda s: '\n'.join(map(
+        lambda s: f'{strip(s)} ',
+        s.split('\n')
+    )).strip()

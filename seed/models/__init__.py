@@ -1,6 +1,6 @@
-from typing import Tuple
+from typing import Any, Tuple
 
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import api, declarative_base
 
 from db import db as db_
 
@@ -10,8 +10,9 @@ from .utils.query import Query
 Base = declarative_base()
 
 
-class ModelMixin(Query):
+class ModelMixin:
     _repr_attrs: Tuple[str] = ()
+
     db: 'DBSessionMeta' = db_
 
     def __repr__(self) -> str:
@@ -29,3 +30,13 @@ class ModelMixin(Query):
             attr_string = f' {repr_attrs}'
 
         return f'<{self.__class__.__name__}{attr_string}>'
+
+    @classmethod
+    def q(
+        self,
+        *models: Tuple[Any]
+    ) -> None:
+        if issubclass(self.__class__, api.DeclarativeMeta):
+            models = (self,) + models
+
+        return Query(*models)
