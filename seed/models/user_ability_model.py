@@ -17,10 +17,9 @@ class UserAbilityModel(Base, ModelMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    ability_ = Column('ability', String(20), ForeignKey('abilities.ability'), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
     ability = relationship(
         'AbilityModel',
-        back_populates='users',
-        cascade='all,delete',
     )
