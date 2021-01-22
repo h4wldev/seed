@@ -10,7 +10,10 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 )  # noqa: E501
 
-from app import app as application
+from seed.application import Application
+
+
+application = Application(env='testing').create_app()
 
 
 @pytest.fixture
@@ -18,7 +21,7 @@ def get_test_client():
     return lambda app: TestClient(app)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def app():
     return application
 
