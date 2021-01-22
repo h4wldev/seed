@@ -94,4 +94,3 @@ user_key_field = 'email'
 
         [default.sqlalchemy.engine_args]
             [default.sqlalchemy.engine_args.connect_args]
-            check_same_thread = false
