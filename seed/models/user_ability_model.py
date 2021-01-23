@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy import text, Column, ForeignKey, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
-from . import Base, ModelMixin
+from .mixin import Base, ModelMixin
 from .ability_model import AbilityModel
 
 

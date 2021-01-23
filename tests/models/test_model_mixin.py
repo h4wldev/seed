@@ -1,5 +1,5 @@
-from seed.models import ModelMixin
-from seed.models.user_model import UserModel
+from seed.models import UserModel
+from seed.models.mixin import ModelMixin
 
 from db import db
 

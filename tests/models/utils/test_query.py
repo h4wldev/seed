@@ -1,5 +1,5 @@
+from seed.models import UserModel
 from seed.models.utils.query import Query
-from seed.models.user_model import UserModel
 
 from db import db
 
@@ -43,19 +43,12 @@ def test_query_paging(query_string):
         assert str(query) == query_string
 
 
-def test_query_exists(app):
+def test_query_exists(dummy_record):
     with db(commit_on_exit=False):
         assert not Query(UserModel).exists()
 
-        dummy_user = UserModel(email='test@foobar.com', username='foobar')
-
-        db.session.add(dummy_user)
-        db.session.commit()
-
-        assert Query(UserModel).exists()
-
-        db.session.delete(dummy_user)
-        db.session.commit()
+        with dummy_record(UserModel(email='test@foobar.com', username='foobar')):
+            assert Query(UserModel).exists()
 
 
 def test_query_getattribute_on_sa_query(app):

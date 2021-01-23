@@ -7,7 +7,7 @@ from typing import Optional
 
 from seed.utils.geoip import GeoIP
 
-from . import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class UserLoginHistoryModel(Base, ModelMixin):

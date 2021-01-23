@@ -6,7 +6,7 @@ from typing import Any
 
 from setting import setting
 
-from . import Base, ModelMixin
+from .mixin import Base, ModelMixin
 from .user_ability_model import UserAbilityModel  # noqa: F401
 from .user_login_history_model import UserLoginHistoryModel  # noqa: F401
 from .user_meta_model import UserMetaModel  # noqa: F401

@@ -1,6 +1,6 @@
 from sqlalchemy import text, Column, ForeignKey, Integer, String, Text, DateTime, Index
 
-from . import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class UserSocialAccountModel(Base, ModelMixin):
