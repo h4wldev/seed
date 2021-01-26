@@ -35,7 +35,7 @@ jobs:
       with:
         python-version: 3.7
     - name: Start MySQL
-      run:
+      run: |
         sudo apt-get install -y mysql-client libmysqlclient-dev
         mysql --host 127.0.0.1 --port 3306 -uroot -e "SHOW GRANTS FOR 'root'@'localhost'"
     - name: Start Redis
