@@ -5,7 +5,7 @@ from typing import Any
 from setting import setting
 
 
-class RedisContextManager:
+class RedisContextManager:  # pragma: no cover
     def __init__(self) -> None:
         self.connection: 'Redis' = redis.Redis(
             host=setting.redis.host,
@@ -26,6 +26,6 @@ class RedisContextManager:
         self.connection.close()
 
 
-class Redis:
+class Redis:  # pragma: no cover
     def __new__(self):
         return RedisContextManager

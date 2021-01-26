@@ -1,8 +1,10 @@
 from fastapi import Depends
+from fastapi.responses import ORJSONResponse
 from typing import Any, Tuple
 
 from seed.api.router import Route
-from seed.depends.jwt.depend import JWT
+from seed.depends.auth import Auth
+from seed.depends.redis import Redis
 
 
 class Logout(Route):
@@ -24,6 +26,17 @@ class Logout(Route):
         }
     )
     async def post(
-        jwt: JWT(required=True, token_type='access') = Depends()
+        auth: Auth(required=True) = Depends(),
+        redis: Redis() = Depends()
     ) -> Tuple[Any, int]:
-        return jwt.get_expire_response()
+        response: ORJSONResponse = ORJSONResponse()
+
+        auth.bind_delete_cookie(
+            response,
+            'access', 'refresh'
+        )
+
+        with redis as r:
+            r.delete(auth.token.redis_name)
+
+        return response

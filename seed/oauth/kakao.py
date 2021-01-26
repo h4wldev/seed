@@ -43,10 +43,10 @@ class KakaoOAuthHandler(OAuthHandler):
 
         return response['access_token'], response['refresh_token']
 
-    def get_user_id(
+    def get_user_info(
         self,
         access_token: str
-    ) -> str:
+    ) -> Tuple['user_id', 'email']:
         headers: Dict[str, str] = {
             'Authorization': f'Bearer {access_token}'
         }
@@ -65,10 +65,13 @@ class KakaoOAuthHandler(OAuthHandler):
             raise OAuthHTTPException({
                 'provider': 'kakao',
                 'error': response.get('error', None),
-                'on': 'get_user_id'
+                'on': 'get_user_info'
             })
 
-        return str(response['id'])
+        email: str = response['kakao_account'].get('email', None)
+        user_id: str = str(response['id'])
+
+        return user_id, email
 
     def get_token_by_refresh_token(
         self,

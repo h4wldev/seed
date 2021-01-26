@@ -1,13 +1,27 @@
-name: Coverage
+name: Unittest
 
 on:
   push:
-    paths:
-      - '*.py'
+      branches: [ main, develop ]
 
 jobs:
   run:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: seed_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+  
     steps:
     - name: Extract branch name
       shell: bash
@@ -20,6 +34,10 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
+    - name: Start MySQL
+      run: |
+        sudo apt-get install -y mysql-client libmysqlclient-dev
+        mysql --host 127.0.0.1 --port 3306 -uroot -e "SHOW GRANTS FOR 'root'@'localhost'"
     - name: Start Redis
       uses: supercharge/redis-github-action@1.2.0
       with:
@@ -32,6 +50,14 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - run: pip install -r requirements.txt
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+    - name: Create Table into Database with alembic
+      run: |
+        alembic upgrade head
+      env:
+        ENV: testing
+    - name: Add dummy data on Database
+      run: |
+        mysql --host 127.0.0.1 --port 3306 -uroot seed_test < tests/testdata.sql
     - name: Run Tests And Generate coverage report
       run: |
         pytest --cov-report=xml

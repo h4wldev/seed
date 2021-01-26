@@ -1,26 +1,9 @@
-from typing import Tuple
+from .ability_model import AbilityModel  # noqa: F401
+from .user_model import UserModel  # noqa: F401
+from .user_ability_model import UserAbilityModel  # noqa: F401
+from .user_login_history_model import UserLoginHistoryModel  # noqa: F401
+from .user_meta_model import UserMetaModel  # noqa: F401
+from .user_profile_model import UserProfileModel  # noqa: F401
+from .user_social_account_model import UserSocialAccountModel  # noqa: F401
 
-from sqlalchemy.ext.declarative import declarative_base
-
-
-Base = declarative_base()
-
-
-class ModelMixin:
-    _repr_attrs: Tuple[str] = ()
-
-    def __repr__(self) -> str:
-        attr_string: str = ''
-
-        if len(self._repr_attrs):
-            repr_attrs: Dict[str, any] = {
-                attr: getattr(self, attr, None) for attr in self._repr_attrs
-            }
-
-            repr_attrs = ', '.join(
-                '='.join((str(k), str(v))) for k, v in repr_attrs.items()
-            )
-
-            attr_string = f' {repr_attrs}'
-
-        return f'<{self.__class__.__name__}{attr_string}>'
+from .mixin import Base, ModelMixin  # noqa: F401

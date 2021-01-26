@@ -1,7 +1,6 @@
-from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import text, Column, ForeignKey, Integer, String, DateTime, Index
 
-from . import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class UserProfileModel(Base, ModelMixin):
@@ -16,6 +15,3 @@ class UserProfileModel(Base, ModelMixin):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     display_name = Column(String(50), unique=True, nullable=False)
     updated_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
-
-UserProfile = sqlalchemy_to_pydantic(UserProfileModel)

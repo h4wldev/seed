@@ -42,11 +42,11 @@ class OAuthHandler:
     ) -> Tuple['access_token', 'refresh_token']:
         assert False, 'Not implemented get_access_token method'
 
-    def get_user_id(
+    def get_user_info(
         self,
         access_token: str
-    ) -> str:
-        assert False, 'Not implemented get_user_id method'
+    ) -> Tuple['user_id', 'email']:
+        assert False, 'Not implemented get_user_info method'
 
     def get_token_by_refresh_token(
         self,

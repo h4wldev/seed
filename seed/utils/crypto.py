@@ -7,7 +7,7 @@ from Crypto.Cipher import AES
 from setting import setting
 
 
-class AESCipher:  # pragma: no cover
+class AESCipher:
     key: str = setting.secret_key.aes_secret_key
 
     def __init__(self, bs: int = 16) -> None:
