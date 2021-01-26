@@ -118,11 +118,14 @@ class OAuth(Route):
         return AESCipher().encrypt(payload)
 
     @staticmethod
-    def get_token_response(**kwargs) -> ORJSONResponse:
+    def get_token_response(
+        token_types: List[str] = ['access', 'refresh'],
+        **kwargs
+    ) -> ORJSONResponse:
         tokens: Dict[str, JWTToken] = {}
         content: Dict[str, Union[str, int]] = {}
 
-        for type_ in (Auth.ACCESS_TOKEN, Auth.REFRESH_TOKEN):
+        for type_ in token_types:
             kwargs['token_type']: str = type_
             kwargs['expires']: str = setting.jwt.get(f'{type_}_token_expires')
 
@@ -134,7 +137,7 @@ class OAuth(Route):
 
         response: ORJSONResponse = ORJSONResponse(content=content)
 
-        for type_ in (Auth.ACCESS_TOKEN, Auth.REFRESH_TOKEN):
+        for type_ in token_types:
             Auth.bind_set_cookie(
                 response=response,
                 token=tokens[type_]

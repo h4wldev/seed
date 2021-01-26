@@ -43,8 +43,8 @@ class JWTToken(JWTTokenType):
         )
         self.token_type: str = self.claims['type']
         self.expires_in: int = self.claims['exp_in']
-        self.expires: 'Arrow' = arrow.get(self.claims['exp'])
-        self.created_at: 'Arrow' = arrow.get(self.claims['iat'])
+        self.expires: 'Arrow' = arrow.get(self.claims['exp']).to(setting.timezone)
+        self.created_at: 'Arrow' = arrow.get(self.claims['iat']).to(setting.timezone)
 
         self.redis_name: str = f'token:{self.subject}'
 
