@@ -46,6 +46,10 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - run: pip install -r requirements.txt
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+    - name: Start MySQL Service
+      run:
+        sudo systemctl enable mysql.service
+        sudo systemctl start mysql.service
     - name: Create Table into Database with alembic
       run: |
         alembic upgrade head
