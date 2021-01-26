@@ -59,8 +59,6 @@ class KakaoOAuthHandler(OAuthHandler):
         )
         response: Dict[str, any] = response.json()
 
-        print(response)
-
         if status_code != 200:
             logger.error(response)
 
