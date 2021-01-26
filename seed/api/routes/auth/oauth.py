@@ -70,10 +70,12 @@ class OAuth(Route):
         access_token, refresh_token = oauth_handler.get_tokens(oauth_code.code)
         social_id, email = oauth_handler.get_user_info(access_token)
 
-        user_social_account = UserSocialAccountModel.q().filter(
-            UserSocialAccountModel.social_id == social_id,
-            UserSocialAccountModel.provider == oauth_code.provider
-        ).first()
+        user_social_account = UserSocialAccountModel.q()\
+            .filter(
+                UserSocialAccountModel.social_id == social_id,
+                UserSocialAccountModel.provider == oauth_code.provider
+            )\
+            .first()
 
         if user_social_account is None:
             return {
