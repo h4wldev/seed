@@ -47,7 +47,7 @@
 ## How to Test
 #### 1. Add Dummy data into Database
 ```bash
- $ mysql -u root <test_database> < ./tests/testdata.sql
+ $ mysql -u root <test_database> < tests/testdata.sql
 ```
 
 #### 2. Run script!
