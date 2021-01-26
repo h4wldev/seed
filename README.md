@@ -36,7 +36,18 @@
 
 #### 4. Just Run!
 ```bash
- $ uvicorn app:app
+ $ uvicorn app:app # or ./scripts/run 
+```
+
+## How to Test
+#### 1. Add Dummy data into Database
+```bash
+ $ mysql -u root <test_database> < ./tests/testdata.sql
+```
+
+#### 2. Run script!
+```bash
+ $ pytest # or ./scripts/test
 ```
 
 

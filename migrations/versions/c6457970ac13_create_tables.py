@@ -20,6 +20,7 @@ from seed.models import Base
 from seed.models import (
     AbilityModel,
     UserModel,
+    UserAbilityModel,
     UserLoginHistoryModel,
     UserMetaModel,
     UserProfileModel,
