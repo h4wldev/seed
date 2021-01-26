@@ -21,6 +21,11 @@
 - __[Integrate]__ Integrate with Sentry, Logstash
 - And support all features of fastapi
 
+## Endpoints
+- [x] __[Auth]__ POST /oauth - Using OAuth for Authentication
+- [x] __[Auth]__ POST /token/refresh - Token Refresh
+- [x] __[Auth]__ POST /logout - Logout
+
 
 ## How to Run
 #### 1. Pull this Repo
@@ -198,6 +203,18 @@ def logger_with_uuid(context_logger: ContextLogger = Depends()) -> Any:
   context_logger.info('show uuid!')  # show uuid on stdout log
   return None
 ```
+
+
+### Redis Depend
+```python
+from seed.depends.redis import Redis
+
+@router.get('/uuid')
+def uuid(redis: Redis() = Depends()) -> Any:
+  with redis() as r:
+    print(r.get('test'))
+```
+
 
 ## How to custom OAuth handler
 #### 1. Configuration
