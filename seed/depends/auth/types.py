@@ -25,14 +25,15 @@ class JWTToken(JWTTokenType):
     def __init__(
         self,
         credential: str,
-        algorithm: str = 'HS256',
-        claims: Optional[Dict[str, Any]] = None,
+        algorithm: str = None,
+        claims: Optional[Dict[str, Any]] = None
     ) -> None:
         self.credential: str = credential
+        self.algorithm: str = algorithm or setting.jwt.algorithm
 
         self.claims: Dict[str, Any] = claims or self.decode(
             credential=credential,
-            algorithm=algorithm
+            algorithm=self.algorithm
         )
 
         self.id: str = self.claims['jti']
@@ -66,7 +67,7 @@ class JWTToken(JWTTokenType):
         secrets: Dict[str, Any] = {},
         token_type: Optional[str] = 'access',
         expires: Union[int, str] = None,
-        algorithm: Optional[str] = 'HS256'
+        algorithm: Optional[str] = None
     ) -> str:
         token_type: str = token_type or JWTTokenType.ACCESS_TOKEN
         algorithm: str = algorithm or setting.jwt.algorithm
