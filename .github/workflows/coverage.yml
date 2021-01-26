@@ -8,6 +8,28 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: seed_test
+        ports:
+          - 3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+  
     steps:
     - name: Extract branch name
       shell: bash
@@ -32,6 +54,14 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - run: pip install -r requirements.txt
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+    - name: Create Table into Database with alembic
+      run: |
+        alembic upgrade head
+      env:
+        ENV: testing
+    - name: Add dummy data on Database
+      run: |
+        mysql -u root seed_test < tests/testdata.sql
     - name: Run Tests And Generate coverage report
       run: |
         pytest --cov-report=xml
