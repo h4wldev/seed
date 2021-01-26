@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import text, ARRAY, Column, Integer, String, DateTime, Index
+from sqlalchemy import text, Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 from typing import Any
 

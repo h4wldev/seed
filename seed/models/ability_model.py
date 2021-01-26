@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Text, String, DateTime, Index
+from sqlalchemy import Column, Text, String, DateTime
 
 from .mixin import Base, ModelMixin
 
