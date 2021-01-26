@@ -34,6 +34,9 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
+    - name: Start MySQL Service
+      run:
+        sudo /etc/init.d/mysql start
     - name: Start Redis
       uses: supercharge/redis-github-action@1.2.0
       with:
@@ -46,10 +49,6 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - run: pip install -r requirements.txt
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-    - name: Start MySQL Service
-      run:
-        sudo systemctl enable mysql.service
-        sudo systemctl start mysql.service
     - name: Create Table into Database with alembic
       run: |
         alembic upgrade head
