@@ -2,13 +2,12 @@ import datetime
 import user_agents
 
 from fastapi import Request
-from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime
 from typing import Optional
 
 from seed.utils.geoip import GeoIP
 
-from . import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class UserLoginHistoryModel(Base, ModelMixin):
@@ -43,10 +42,13 @@ class UserLoginHistoryModel(Base, ModelMixin):
         self.os = os
         self.location = None
 
-        geoip: GeoIP = GeoIP(self.ip)
+        try:
+            geoip: GeoIP = GeoIP(self.ip)
 
-        if geoip.country and geoip.city:
-            self.location = f"{geoip.country['iso_code']}/{geoip.city['names']['en']}"
+            if geoip.country and geoip.city:
+                self.location = f"{geoip.country['iso_code']}/{geoip.city['names']['en']}"
+        except Exception:
+            pass
 
     @classmethod
     def from_request(
@@ -73,6 +75,3 @@ class UserLoginHistoryModel(Base, ModelMixin):
             device=user_agent.device.family,
             os=user_agent.os.family,
         )
-
-
-UserLoginHistory = sqlalchemy_to_pydantic(UserLoginHistoryModel)

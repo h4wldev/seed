@@ -5,7 +5,7 @@ from .types import JWTToken
 from setting import setting
 
 
-class JWTUtil:
+class AuthUtil:
     @classmethod
     def bind_delete_cookie(
         cls,
@@ -39,6 +39,6 @@ class JWTUtil:
     def token_type_filter(
         token_types: List[str]
     ) -> List[str]:
-        return list(filter(
+        return set(filter(
             lambda t: t in ('access', 'refresh'), token_types
         ))

@@ -1,16 +1,16 @@
 
 def make_database_url(
     dbms: str,
-    host: str,
     user: str,
-    password: str,
     database: str,
-    charset: str = 'utf8'
+    host: str = '',
+    password: str = '',
+    charset: str = 'utf-8'
 ) -> str:
-    if len(password):
+    if password and len(password):
         password = f':{password}'
 
-    if len(host):
+    if host and len(host):
         host = f'@{host}'
 
     return f'{dbms}://{user}{password}{host}/{database}?charset={charset}'

@@ -25,14 +25,15 @@ class JWTToken(JWTTokenType):
     def __init__(
         self,
         credential: str,
-        algorithm: str = 'HS256',
-        claims: Optional[Dict[str, Any]] = None,
+        algorithm: str = None,
+        claims: Optional[Dict[str, Any]] = None
     ) -> None:
         self.credential: str = credential
+        self.algorithm: str = algorithm or setting.jwt.algorithm
 
         self.claims: Dict[str, Any] = claims or self.decode(
             credential=credential,
-            algorithm=algorithm
+            algorithm=self.algorithm
         )
 
         self.id: str = self.claims['jti']
@@ -42,36 +43,21 @@ class JWTToken(JWTTokenType):
             self.claims['secrets']
         )
         self.token_type: str = self.claims['type']
-        self.expires: Optional[int] = self.claims.get('exp', None)
-        self.expires_in: Optional[int] = self.claims.get('exp_in', None)
-        self.created_at: int = self.claims['iat']
+        self.expires_in: int = self.claims['exp_in']
+        self.expires: 'Arrow' = arrow.get(self.claims['exp']).to(setting.timezone)
+        self.created_at: 'Arrow' = arrow.get(self.claims['iat']).to(setting.timezone)
+
+        self.redis_name: str = f'token:{self.subject}'
 
     def verify(self) -> bool:
         with RedisContextManager() as r:
             stored_uuid: str = r.hget(
-                name=f'token:{self.subject}',
+                name=self.redis_name,
                 key=self.token_type,
             )
 
-            return stored_uuid and (
+            return stored_uuid is not None and \
                 self.id == stored_uuid.decode()
-            )
-
-    @classmethod
-    @exception_wrapper(
-        JWTHTTPException,
-        excs=(jwt.exceptions.PyJWTError),
-    )
-    def decode(
-        cls,
-        credential: str,
-        algorithm: str = 'HS256'
-    ) -> Dict[str, Any]:
-        return jwt.decode(
-            credential,
-            setting.secret_key.jwt_secret_key,
-            algorithms=algorithm
-        )
 
     @classmethod
     def create(
@@ -79,11 +65,11 @@ class JWTToken(JWTTokenType):
         subject: str,
         payload: Dict[str, Any] = {},
         secrets: Dict[str, Any] = {},
-        token_type: Optional[str] = None,
+        token_type: Optional[str] = 'access',
         expires: Union[int, str] = None,
         algorithm: Optional[str] = None
     ) -> str:
-        token_type: str = token_type or self.ACCESS_TOKEN
+        token_type: str = token_type or JWTTokenType.ACCESS_TOKEN
         algorithm: str = algorithm or setting.jwt.algorithm
         expires: Union[int, str] = expires or (
             setting.jwt.get(f'{token_type}_token_expires', None)
@@ -118,10 +104,10 @@ class JWTToken(JWTTokenType):
                 value=uuid_,
             )
 
-            if token_type == JWTTokenType.REFRESH_TOKEN:
+            if token_type == JWTTokenType.REFRESH_TOKEN:  # pragma: no cover
                 r.expire(
                     name=f'token:{subject}',
-                    time=claims['exp'],
+                    time=claims['exp_in'],
                 )
 
         return cls(
@@ -133,4 +119,19 @@ class JWTToken(JWTTokenType):
             ),
             algorithm=algorithm,
             claims=claims,
+        )
+
+    @staticmethod
+    @exception_wrapper(
+        JWTHTTPException,
+        excs=(jwt.exceptions.PyJWTError),
+    )
+    def decode(
+        credential: str,
+        algorithm: str = 'HS256'
+    ) -> Dict[str, Any]:
+        return jwt.decode(
+            credential,
+            setting.secret_key.jwt_secret_key,
+            algorithms=algorithm
         )

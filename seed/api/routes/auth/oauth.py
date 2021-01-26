@@ -1,19 +1,22 @@
-import datetime
 import orjson
 import importlib
 
 from fastapi import Request
+from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
-from typing import Any, Optional, List, Tuple
+from typing import Any, Dict, Optional, List, Tuple, Union
+
+from db import db
+from setting import setting
 
 from seed.api.router import Route, status
-from db import db
 from seed.exceptions import HTTPException
-from seed.models.user_login_history_model import UserLoginHistoryModel
-from seed.models.user_social_account_model import UserSocialAccountModel
-from seed.depends.jwt.depend import JWT
+from seed.depends.auth import Auth, JWTToken
+from seed.models import (
+    UserSocialAccountModel,
+    UserLoginHistoryModel
+)
 from seed.utils.crypto import AESCipher
-from setting import setting
 
 
 class OAuthCode(BaseModel):
@@ -59,55 +62,95 @@ class OAuth(Route):
         request: Request,
         oauth_code: OAuthCode
     ) -> Tuple[Any, int]:
-        if oauth_code.provider not in setting.oauth.providers:
+        oauth_handler: 'OAuthHandler' = OAuth.get_oauth_handler(oauth_code.provider)
+
+        if oauth_handler is None:
             raise HTTPException(f"'{oauth_code.provider}' is not support provider")
 
-        oauth_handler = OAuth.get_handler(oauth_code.provider)
-
         access_token, refresh_token = oauth_handler.get_tokens(oauth_code.code)
-        user_id: str = oauth_handler.get_user_id(access_token)
+        social_id, email = oauth_handler.get_user_info(access_token)
 
-        user_social_account = db.session.query(UserSocialAccountModel)\
-            .filter(UserSocialAccountModel.provider == oauth_code.provider)\
-            .filter(UserSocialAccountModel.social_id == user_id)\
+        user_social_account = UserSocialAccountModel.q()\
+            .filter(
+                UserSocialAccountModel.social_id == social_id,
+                UserSocialAccountModel.provider == oauth_code.provider
+            )\
             .first()
 
-        print(type(db))
+        if user_social_account is None:
+            return {
+                'email': email,
+                'code': OAuth.get_code(
+                    provider=oauth_code.provider,
+                    social_id=social_id,
+                )
+            }, status.HTTP_404_NOT_FOUND
 
-        return None
-        # if user_social_account is None:
-        #     aes_cipher: AESCipher = AESCipher()
+        user_social_account.access_token = access_token
+        user_social_account.refresh_token = refresh_token
 
-        #     return {
-        #         'code': aes_cipher.encrypt(orjson.dumps({
-        #             'provider': 'kakao',
-        #             'user_social_id': user_id
-        #         }).decode('utf-8')),
-        #     }, status.HTTP_404_NOT_FOUND
+        response: ORJSONResponse = OAuth.get_token_response(
+            subject=user_social_account.user.key_field,
+            payload={},
+        )
 
-        # user_social_account.access_token = access_token
-        # user_social_account.refresh_token = refresh_token
+        login_history = UserLoginHistoryModel.from_request(
+            user_id=user_social_account.user_id,
+            request=request,
+            success=True,
+            provider=oauth_code.provider
+        )
 
-        # login_history = UserLoginHistoryModel.from_request(
-        #     user_id=user_social_account.user_id,
-        #     request=request,
-        #     success=True,
-        #     provider=oauth_code.provider
-        # )
+        db.session.add(login_history)
 
-        # db.session.add(login_history)
-        # db.session.commit()
-
-        # return JWT(mode=setting.jwt.mode).get_create_response(
-        #     subject=user_social_account.user.key_field,
-        #     payload={}
-        # ), status.HTTP_201_CREATED
+        return response, status.HTTP_201_CREATED
 
     @staticmethod
-    def get_handler(
-        provider: str
-    ) -> 'OAuthHandler':
-        handler_setting: Optional['Dynaconf'] = setting.oauth.get(provider)
+    def get_code(
+        provider: str,
+        social_id: str
+    ) -> str:  # pragma: no cover
+        payload: str = orjson.dumps({
+            'provider': provider,
+            'social_id': social_id,
+        }).decode('utf-8')
+
+        return AESCipher().encrypt(payload)
+
+    @staticmethod
+    def get_token_response(
+        token_types: List[str] = ['access', 'refresh'],
+        **kwargs
+    ) -> ORJSONResponse:
+        tokens: Dict[str, JWTToken] = {}
+        content: Dict[str, Union[str, int]] = {}
+
+        for type_ in token_types:
+            kwargs['token_type']: str = type_
+            kwargs['expires']: str = setting.jwt.get(f'{type_}_token_expires')
+
+            token: JWTToken = JWTToken.create(**kwargs)
+
+            tokens[type_] = token
+            content[f'{type_}_token'] = token.credential
+            content[f'{type_}_token_expires'] = token.expires_in
+
+        response: ORJSONResponse = ORJSONResponse(content=content)
+
+        for type_ in token_types:
+            Auth.bind_set_cookie(
+                response=response,
+                token=tokens[type_]
+            )
+
+        return response
+
+    @staticmethod
+    def get_oauth_handler(provider: str) -> Optional['OAuthHandler']:
+        handler_setting: Optional['Dynaconf'] = getattr(setting.oauth, provider, None)
+
+        if handler_setting is None:
+            return None
 
         handler_path: str = handler_setting.get('handler', 'seed.oauth.OAuthHandler')
         handler_path_tokens: List[str] = handler_path.split('.')

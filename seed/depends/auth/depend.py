@@ -2,22 +2,19 @@ from fastapi import (
     Header,
     Request
 )
-from fastapi.responses import ORJSONResponse
-from typing import Any, Dict, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 from db import db
 from seed.exceptions import JWTHTTPException
-from seed.models.user_model import UserModel
+from seed.models import UserModel
 from setting import setting
 
 from .types import JWTToken, JWTTokenType
-from .util import JWTUtil
+from .util import AuthUtil
 
 
-class JWT(JWTTokenType, JWTUtil):
+class Auth(AuthUtil, JWTTokenType):
     token: Optional[JWTToken] = None
-
-    _user: Any = None
 
     def __init__(
         self,
@@ -33,19 +30,17 @@ class JWT(JWTTokenType, JWTUtil):
         self,
         request: Request,
         authorization: Optional[str] = Header(None)
-    ) -> 'JWT':
+    ) -> 'Auth':
         credential: Optional[str] = self._get_credential(
             request=request,
             authorization=authorization
         )
 
-        if self.required and credential is None:
-            raise JWTHTTPException('JWT credential required')
+        if credential is not None:
+            self.token: JWTToken = JWTToken(credential)
 
-        self.token: JWTToken = JWTToken(credential)
-
-        if self.token.token_type != self.token_type:
-            raise JWTHTTPException(f"Token type must be '{self.token_type}'")
+            if self.token.token_type != self.token_type:
+                raise JWTHTTPException(f"Token type must be '{self.token_type}'")
 
             if not self.token.verify():
                 raise JWTHTTPException('Signature has expired or not verified')
@@ -58,9 +53,6 @@ class JWT(JWTTokenType, JWTUtil):
     def user(self) -> Any:
         if self.token is None:
             return None
-
-        if self._user is not None:
-            return self._user
 
         return self.user_loader(self.token.subject)
 
@@ -120,7 +112,7 @@ class JWT(JWTTokenType, JWTUtil):
     def _user_loader(
         self,
         subject: str
-    ) -> Optional[UserModel]:
+    ) -> Optional[UserModel]:  # pragma: no cover
         user_key_field: 'Column' = getattr(UserModel, setting.user_key_field)
 
         return db.session.query(UserModel)\

@@ -10,7 +10,13 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 )  # noqa: E501
 
-from app import app as application
+from db import db
+
+from seed.application import Application
+
+
+# Initialize testing application
+application = Application(env='testing').create_app()
 
 
 @pytest.fixture
@@ -18,7 +24,7 @@ def get_test_client():
     return lambda app: TestClient(app)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def app():
     return application
 
@@ -39,3 +45,37 @@ def empty_endpoint():
         return {'foo': 'bar'}
 
     return endpoint
+
+
+@pytest.fixture
+def query_string():
+    def strip(s):
+        return s.replace('  ', '\t').strip('\t')
+
+    return lambda s: '\n'.join(map(
+        lambda s: f'{strip(s)} ',
+        s.split('\n')
+    )).strip()
+
+
+@pytest.fixture
+def dummy_record():
+    class _:
+        def __init__(self, *data):
+            self.data = data
+
+        def __enter__(self):
+            for data in self.data:
+                db.session.add(data)
+
+            db.session.commit()
+
+            return self.data
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            for data in self.data:
+                db.session.delete(data)
+
+            db.session.commit()
+
+    return _

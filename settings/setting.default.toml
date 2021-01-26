@@ -35,8 +35,6 @@ user_key_field = 'email'
         refresh = 'refresh_token'
 
     [default.oauth]
-    providers = ['kakao']
-
         [default.oauth.kakao]
         redirect_uri = '/oauth/kakao'
         handler = 'seed.oauth.kakao.KakaoOAuthHandler'
@@ -96,4 +94,3 @@ user_key_field = 'email'
 
         [default.sqlalchemy.engine_args]
             [default.sqlalchemy.engine_args.connect_args]
-            check_same_thread = false
