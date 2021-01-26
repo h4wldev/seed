@@ -46,10 +46,12 @@ class JWTToken(JWTTokenType):
         self.expires: 'Arrow' = arrow.get(self.claims['exp'])
         self.created_at: 'Arrow' = arrow.get(self.claims['iat'])
 
+        self.redis_name: str = f'token:{self.subject}'
+
     def verify(self) -> bool:
         with RedisContextManager() as r:
             stored_uuid: str = r.hget(
-                name=f'token:{self.subject}',
+                name=self.redis_name,
                 key=self.token_type,
             )
 
