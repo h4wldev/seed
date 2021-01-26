@@ -6,6 +6,7 @@
  Boilerplate for restful API with <a href="https://github.com/tiangolo/fastapi">tiangolo/fastapi</a>
 </p>
 <p align="center">
+ <a href="https://github.com/h4wldev/seed/actions?query=workflow%3AUnittest"><img src="https://github.com/h4wldev/seed/workflows/Unittest/badge.svg"></a>
  <a href="https://codecov.io/gh/h4wldev/seed"><img src="https://codecov.io/gh/h4wldev/seed/branch/develop/graph/badge.svg?token=56FGFR91EX"></a>
 </p>
 
