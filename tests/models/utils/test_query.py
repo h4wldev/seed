@@ -45,12 +45,11 @@ def test_query_paging(query_string):
 
 def test_query_exists(dummy_record):
     with db(commit_on_exit=False):
-        assert not Query(UserModel).exists()
-
-        with dummy_record(UserModel(email='test@foobar.com', username='foobar')):
-            assert Query(UserModel).exists()
+        assert Query(UserModel).filter(
+            UserModel.email == 'test@foobar.com'
+        ).exists()
 
 
 def test_query_getattribute_on_sa_query(app):
     with db(commit_on_exit=False):
-        assert Query(UserModel).count() == 0
+        assert Query(UserModel).count()
