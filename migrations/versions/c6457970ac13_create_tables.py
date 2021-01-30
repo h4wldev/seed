@@ -16,8 +16,8 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 )
 
-from seed.models import Base
-from seed.models import (
+from app.models import Base
+from app.models import (
     AbilityModel,
     UserModel,
     UserAbilityModel,

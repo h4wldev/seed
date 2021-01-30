@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from logger import logger
+from seed.logger import logger
 
 from .uuid import UUID
 

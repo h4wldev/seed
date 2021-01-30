@@ -2,7 +2,7 @@ import logging
 
 from typing import Dict
 
-from setting import setting
+from seed.setting import setting
 
 
 class Formatter:

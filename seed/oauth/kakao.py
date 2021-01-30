@@ -1,7 +1,7 @@
 from typing import Dict, Tuple
 
-from logger import logger
-from setting import setting
+from seed.logger import logger
+from seed.setting import setting
 
 from seed.exceptions import OAuthHTTPException
 

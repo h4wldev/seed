@@ -4,10 +4,10 @@ from fastapi import (
 )
 from typing import Any, Callable, List, Optional, Tuple, Union
 
-from db import db
+from seed.db import db
 from seed.exceptions import JWTHTTPException
-from seed.models import UserModel
-from setting import setting
+from app.models import UserModel
+from seed.setting import setting
 
 from .types import JWTToken, JWTTokenType
 from .util import AuthUtil

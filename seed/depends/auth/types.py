@@ -11,7 +11,7 @@ from seed.utils.convert import units2seconds
 from seed.utils.crypto import AESCipher
 from seed.utils.exception import exception_wrapper
 
-from setting import setting
+from seed.setting import setting
 
 
 class JWTTokenType:

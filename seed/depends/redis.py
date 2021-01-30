@@ -2,7 +2,7 @@ import redis
 
 from typing import Any
 
-from setting import setting
+from seed.setting import setting
 
 
 class RedisContextManager:  # pragma: no cover

@@ -1,6 +1,6 @@
 from seed.application import Application
 
-from routes import router
+from app.routes import router
 
 
 app = Application(

@@ -2,7 +2,7 @@ from typing import List
 
 from .types import JWTToken
 
-from setting import setting
+from seed.setting import setting
 
 
 class AuthUtil:

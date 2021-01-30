@@ -1,6 +1,6 @@
 import logging
 
-import logger
+import seed.logger as logger
 
 from dynaconf import Dynaconf
 from fastapi import FastAPI, APIRouter
@@ -8,7 +8,7 @@ from fastapi_sqlalchemy import DBSessionMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from seed.utils.database import make_database_url
-from setting import setting
+from seed.setting import setting
 
 
 class Application:  # pragma: no cover

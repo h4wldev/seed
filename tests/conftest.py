@@ -10,9 +10,9 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 )  # noqa: E501
 
-from db import db
+from seed.db import db
 
-from routes import router
+from app.routes import router
 
 from seed.application import Application
 

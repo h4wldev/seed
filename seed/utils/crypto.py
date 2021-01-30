@@ -4,7 +4,7 @@ import hashlib
 from Crypto import Random
 from Crypto.Cipher import AES
 
-from setting import setting
+from seed.setting import setting
 
 
 class AESCipher:

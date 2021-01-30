@@ -194,7 +194,7 @@ Get uuid with fastapi request
 > This depend include UUID depend, same usage with just logger<br>
 
 ```python
-from logger import logger as default_logger
+from seed.logger import logger as default_logger
 from seed.depends.context_logger import ContextLogger
 
 
