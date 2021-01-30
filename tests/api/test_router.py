@@ -2,7 +2,7 @@ import pytest
 
 from fastapi.responses import ORJSONResponse
 
-from seed.api.router import Route, Router
+from seed.router import Route, Router
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from seed.api.router import Router
+from seed.router import Router
 
 from .oauth import OAuth
 from .logout import Logout

@@ -2,7 +2,7 @@ from fastapi import Depends
 from fastapi.responses import ORJSONResponse
 from typing import Any, Tuple
 
-from seed.api.router import Route
+from seed.router import Route
 from seed.depends.auth import Auth
 from seed.depends.redis import Redis
 

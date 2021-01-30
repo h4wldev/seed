@@ -1,4 +1,4 @@
-from seed.api.router import Router
+from seed.router import Router
 
 from .auth import router as auth_router
 

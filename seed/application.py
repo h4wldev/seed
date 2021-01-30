@@ -10,16 +10,14 @@ from starlette.middleware.cors import CORSMiddleware
 from seed.utils.database import make_database_url
 from setting import setting
 
-from .api.routes import router
-
 
 class Application:  # pragma: no cover
     def __init__(
         self,
+        router: APIRouter,
         name: str = __name__,
         env: str = 'development',
         setting: Dynaconf = setting,
-        router: APIRouter = router
     ) -> None:
         self.name: str = name
         self.env: str = env
@@ -66,7 +64,7 @@ class Application:  # pragma: no cover
 
             self.app.add_middleware(SentryAsgiMiddleware)
 
-        self.app.include_router(router, prefix=self.setting.api_prefix)
+        self.app.include_router(self.router, prefix=self.setting.api_prefix)
 
         self.logger_configure()
 

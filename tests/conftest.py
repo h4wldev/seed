@@ -12,11 +12,16 @@ sys.path.insert(
 
 from db import db
 
+from routes import router
+
 from seed.application import Application
 
 
 # Initialize testing application
-application = Application(env='testing').create_app()
+application = Application(
+    router=router,
+    env='testing',
+).create_app()
 
 
 @pytest.fixture

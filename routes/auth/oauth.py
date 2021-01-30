@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional, List, Tuple, Union
 from db import db
 from setting import setting
 
-from seed.api.router import Route, status
+from seed.router import Route, status
 from seed.exceptions import HTTPException
 from seed.depends.auth import Auth, JWTToken
 from seed.models import (

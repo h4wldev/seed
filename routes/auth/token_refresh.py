@@ -6,11 +6,11 @@ from typing import Any, Tuple, List
 
 from setting import setting
 
-from seed.api.router import Route, status
-from seed.api.routes.auth.oauth import OAuth
+from seed.router import Route, status
 from seed.depends.auth import Auth
 from seed.depends.redis import Redis
 from seed.utils.convert import units2seconds
+from routes.auth.oauth import OAuth
 
 
 class TokenRefresh(Route):
