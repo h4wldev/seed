@@ -21,6 +21,6 @@ class UserRoleModel(Base, ModelMixin):
     role_ = Column('role', String(20), ForeignKey('roles.role'), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
-    ability = relationship(
+    role = relationship(
         'RoleModel',
     )

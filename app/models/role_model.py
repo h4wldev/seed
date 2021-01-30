@@ -11,7 +11,7 @@ from .role_ability_model import RoleAbilityModel  # noqa: F401
 class RoleModel(Base, ModelMixin):
     __tablename__ = 'roles'
 
-    _repr_attrs = ('role')
+    _repr_attrs = ('role',)
 
     role = Column(String(20), primary_key=True)
     description = Column(Text)
