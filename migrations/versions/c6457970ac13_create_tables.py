@@ -16,7 +16,6 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 )
 
-from app.models import Base
 from app.models import (
     AbilityModel,
     UserModel,
@@ -26,6 +25,7 @@ from app.models import (
     UserProfileModel,
     UserSocialAccountModel
 )
+from seed.models import Base
 
 
 revision = 'c6457970ac13'
