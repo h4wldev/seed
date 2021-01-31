@@ -1,5 +1,5 @@
-from app.models import UserModel
-from seed.model.utils.query import Query
+from seed.models import UserModel
+from seed.models.utils.query import Query
 
 from seed.db import db
 

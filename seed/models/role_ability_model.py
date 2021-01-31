@@ -3,21 +3,21 @@ import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 from .ability_model import AbilityModel  # noqa: F401
 
 
-class UserAbilityModel(Base, ModelMixin):
-    __tablename__ = 'user_abilities'
+class RoleAbilityModel(Base, ModelMixin):
+    __tablename__ = 'role_abilities'
     __table_args__ = (
-        Index('user_id'), Index('ability'),
+        Index('role'), Index('ability'),
     )
 
-    _repr_attrs = ('id', 'user_id')
+    _repr_attrs = ('id', 'role', 'ability')
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    role_ = Column('role', String(20), ForeignKey('roles.role'), nullable=False)
     ability_ = Column('ability', String(20), ForeignKey('abilities.ability'), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now)
 

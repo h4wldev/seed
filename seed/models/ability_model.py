@@ -2,13 +2,13 @@ import datetime
 
 from sqlalchemy import Column, Text, String, DateTime
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class AbilityModel(Base, ModelMixin):
     __tablename__ = 'abilities'
 
-    _repr_attrs = ('ability')
+    _repr_attrs = ('ability',)
 
     ability = Column(String(20), primary_key=True)
     description = Column(Text)

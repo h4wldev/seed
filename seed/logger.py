@@ -11,7 +11,7 @@ from seed.utils.logger.handlers import InterceptHandler
 from seed.setting import setting
 
 
-def logger_configure(log_level: int = logging.DEBUG) -> None:
+def logger_configure(log_level: int = logging.DEBUG) -> None:  # pragma: no cover
     formatter: Formatter = Formatter()
 
     logger.configure(**{
@@ -38,7 +38,7 @@ def logger_configure(log_level: int = logging.DEBUG) -> None:
 def intercept_loggers(
     logger_names: List[str] = [],
     log_level: int = logging.DEBUG,
-) -> None:
+) -> None:  # pragma: no cover
     for logger_name in logger_names:
         logging_logger = logging.getLogger(logger_name)
 

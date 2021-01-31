@@ -16,16 +16,18 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 )
 
-from app.models import (
+from seed.models import (
     AbilityModel,
     UserModel,
-    UserAbilityModel,
+    UserRoleModel,
     UserLoginHistoryModel,
     UserMetaModel,
     UserProfileModel,
-    UserSocialAccountModel
+    UserSocialAccountModel,
+    RoleModel,
+    RoleAbilityModel
 )
-from seed.models import Base
+from .mixin import Base
 
 
 revision = 'c6457970ac13'
@@ -75,8 +77,10 @@ def table_args(model: Base) -> None:
 
 models: List[Base] = [
     AbilityModel,
+    RoleModel,
+    RoleAbilityModel,
     UserModel,
-    UserAbilityModel,
+    UserRoleModel,
     UserLoginHistoryModel,
     UserMetaModel,
     UserProfileModel,
@@ -91,4 +95,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     for model in reversed(models):
-        op.drop_table(model.__tablename__)
+        try:
+            op.drop_table(model.__tablename__)
+        except Exception:
+            pass

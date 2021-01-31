@@ -137,20 +137,23 @@ def auth_required(auth: Auth(token_type='refresh') = Depends()) -> Any:
   return auth.user
 ```
 
-#### Auth(required, token_type, user_loader)
+#### Auth(required, token_type, roles, abilities)
 You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
 
-| argument    | type                 | description                                                                          | default             |
-|-------------|----------------------|--------------------------------------------------------------------------------------|---------------------|
-| required    | bool                 | token required or not                                                                | False               |
-| token_type  | str                  | select token's type (access, refresh)                                                | 'access'            |
-| user_loader | Callable[[str], Any] | custom user loader (parameter : jwt token's subject) [example](depends/auth/depend.py#L112) | load from UserModel |
+| argument    | type                        | description                                                    | default  |
+|-------------|-----------------------------|----------------------------------------------------------------|----------|
+| required    | bool                        | token required or not                                          | False    |
+| token_type  | str                         | select token's type (access, refresh)                          | 'access' |
+| roles       | List[Union[List[str], str]] | check user roles (1 depth is and, 2 depth is or operation)     | []       |
+| abilities   | List[Union[List[str], str]] | check user abilities (1 depth is and, 2 depth is or operation) | []       |
+
 
 ##### > Auth.user -> Union[UserModel, Any]  @property
 User data property, after load token and user data
 
 ##### > Auth.token -> Optional[JWTToken] @property
 Get token data with [JWTToken](depends/auth/types.py#L22)
+
 
 #### JWTToken(credential, algorithm, claims)
 

@@ -12,7 +12,7 @@ from seed.setting import setting
 from seed.router import Route, status
 from seed.exceptions import HTTPException
 from seed.depends.auth import Auth, JWTToken
-from app.models import (
+from seed.models import (
     UserSocialAccountModel,
     UserLoginHistoryModel
 )

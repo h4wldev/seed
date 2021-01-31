@@ -26,7 +26,8 @@ application = Application(
 
 @pytest.fixture
 def get_test_client():
-    return lambda app: TestClient(app)
+    with db():
+        yield lambda app: TestClient(app)
 
 
 @pytest.fixture(scope='session')
@@ -36,7 +37,8 @@ def app():
 
 @pytest.fixture
 def client(app):
-    return TestClient(app)
+    with db():
+        yield TestClient(app)
 
 
 @pytest.fixture(scope='function')
@@ -83,4 +85,5 @@ def dummy_record():
 
             db.session.commit()
 
-    return _
+    with db():
+        yield _
