@@ -19,7 +19,7 @@ from seed.models import (
     UserProfileModel,
     UserSocialAccountModel
 )  # noqa: F401
-from .mixin.mixin import Base
+from seed.models.mixin import Base
 from seed.utils.database import make_database_url
 from seed.setting import setting
 
