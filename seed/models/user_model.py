@@ -6,7 +6,7 @@ from typing import Any
 
 from seed.setting import setting
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 from .user_role_model import UserRoleModel  # noqa: F401
 from .user_login_history_model import UserLoginHistoryModel  # noqa: F401

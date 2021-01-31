@@ -6,7 +6,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime
 from typing import Optional
 
 from seed.utils.geoip import GeoIP
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class UserLoginHistoryModel(Base, ModelMixin):

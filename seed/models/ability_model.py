@@ -2,7 +2,7 @@ import datetime
 
 from sqlalchemy import Column, Text, String, DateTime
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class AbilityModel(Base, ModelMixin):

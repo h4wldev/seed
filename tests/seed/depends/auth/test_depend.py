@@ -3,13 +3,18 @@ from fastapi import Depends, Request, Header
 from seed.depends.auth.depend import Auth
 from seed.depends.auth.types import JWTToken
 from seed.depends.redis import RedisContextManager
+from seed.models import RoleModel, AbilityModel, RoleAbilityModel, UserRoleModel
 
 from seed.setting import setting
 
 
-def create_token(type_='access', expires='10s'):
+def create_token(
+    subject='foobar',
+    type_='access',
+    expires='10s'
+):
     return JWTToken.create(
-        subject='foobar',
+        subject=subject,
         token_type=type_,
         expires=expires
     )
@@ -47,7 +52,7 @@ def test_auth_depend_with_token_type(empty_app, get_test_client):
         return auth.token is not None
 
     access_token = create_token().credential
-    refresh_token = create_token('refresh').credential
+    refresh_token = create_token(type_='refresh').credential
 
     client = get_test_client(empty_app)
 
@@ -177,38 +182,107 @@ def test_auth_depend_get_credential_cookie(empty_app, get_test_client):
     assert response.json() == 'foobar'
 
 
-def test_auth_depend_user_loader(empty_app, get_test_client):
-    def user_loader(subject):
-        return subject
+def test_auth_role_check(empty_app, get_test_client, dummy_record):
+    @empty_app.get('/role_check')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            roles=['user', ['admin', 'super-admin']]
+        ) = Depends()
+    ) -> str:
+        return True
 
-    @empty_app.get('/user_loader')
-    def endpoint(auth: Auth(
-        required=True,
-        user_loader=user_loader
-    ) = Depends()):
-        return auth.user
-
-    access_token = create_token().credential
-
+    token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
-    response = client.get('/user_loader', headers={'Authorization': f'Bearer {access_token}'})
 
-    assert response.status_code == 200
-    assert response.json() == 'foobar'
+    with dummy_record(
+        RoleModel(role='user'),
+        RoleModel(role='admin'),
+        RoleModel(role='user-admin'),
+        UserRoleModel(user_id=1, role_='user'),
+        UserRoleModel(user_id=1, role_='admin')
+    ):
+        response = client.get('/role_check', headers={
+            'Authorization': f'Bearer {token.credential}',
+        })
+
+        assert response.status_code == 200
+        assert response.json()
 
 
-def test_auth_depend_user_loader_without_token(empty_app, get_test_client):
-    def user_loader(subject):
-        return subject
+def test_auth_ability_check(empty_app, get_test_client, dummy_record):
+    @empty_app.get('/ability_check')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            abilities=['auth', ['read', 'write']]
+        ) = Depends()
+    ) -> str:
+        return True
 
-    @empty_app.get('/user_loader_without_token')
-    def endpoint(auth: Auth(
-        user_loader=user_loader
-    ) = Depends()):
-        return auth.user
-
+    token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
-    response = client.get('/user_loader_without_token')
 
-    assert response.status_code == 200
-    assert response.json() is None
+    with dummy_record(
+        RoleModel(role='user'),
+        AbilityModel(ability='auth'),
+        AbilityModel(ability='read'),
+        RoleAbilityModel(role_='user', ability_='auth'),
+        RoleAbilityModel(role_='user', ability_='read'),
+        UserRoleModel(user_id=1, role_='user')
+    ):
+        response = client.get('/ability_check', headers={
+            'Authorization': f'Bearer {token.credential}',
+        })
+
+        assert response.status_code == 200
+        assert response.json()
+
+
+def test_auth_check_permission_user_not_exist(empty_app, get_test_client, dummy_record):
+    @empty_app.get('/user_not_exist')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            abilities=['auth']
+        ) = Depends()
+    ) -> str:
+        return True
+
+    token = create_token(subject='not_exist_user')
+    client = get_test_client(empty_app)
+
+    response = client.get('/user_not_exist', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 400
+    assert response.json()['detail'] == 'User does not exists'
+
+
+def test_check_has():
+    assert Auth()._check_has({'has1', 'has2'}, ['has1', ['has2', 'has3']])
+    assert not Auth()._check_has({'has1', 'has2'}, ['has1', ['has3', 'has4']])
+    assert not Auth()._check_has({'has1', 'has2'}, ['has1', 'has3'])
+    assert not Auth()._check_has(set(), ['has1', 'has3'])
+
+
+def test_auth_check_permission_permission_denied(empty_app, get_test_client):
+    @empty_app.get('/permission_denied')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            roles=['user']
+        ) = Depends()
+    ) -> str:
+        return True
+
+    token = create_token(subject='test@foobar.com')
+    client = get_test_client(empty_app)
+
+    response = client.get('/permission_denied', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 400
+    assert response.json()['detail'] == 'Permission Denied'

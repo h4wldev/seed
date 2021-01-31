@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from seed.db import db
 
-from app.models import UserLoginHistoryModel
+from seed.models import UserLoginHistoryModel
 
 
 @patch('seed.oauth.kakao.KakaoOAuthHandler.get_tokens', return_value=('access', 'refresh'))

@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy import Column, Text, String, DateTime
 from sqlalchemy.orm import relationship
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 from .role_ability_model import RoleAbilityModel  # noqa: F401
 
@@ -17,7 +17,7 @@ class RoleModel(Base, ModelMixin):
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
-    abilites = relationship(
+    abilities = relationship(
         'RoleAbilityModel',
         backref='role',
         cascade='all,delete',

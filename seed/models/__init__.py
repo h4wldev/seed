@@ -1,3 +1,5 @@
+from .mixin import Base, ModelMixin  # noqa: F401
+
 from .ability_model import AbilityModel  # noqa: F401
 from .user_model import UserModel  # noqa: F401
 from .user_role_model import UserRoleModel  # noqa: F401

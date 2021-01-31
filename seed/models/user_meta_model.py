@@ -1,6 +1,6 @@
 from sqlalchemy import text, Column, ForeignKey, Integer, Boolean, DateTime, Index
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 
 class UserMetaModel(Base, ModelMixin):

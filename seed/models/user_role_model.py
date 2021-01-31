@@ -2,8 +2,9 @@ import datetime
 
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
+from typing import Set
 
-from seed.model import Base, ModelMixin
+from .mixin import Base, ModelMixin
 
 from .role_model import RoleModel  # noqa: F401
 
@@ -24,3 +25,7 @@ class UserRoleModel(Base, ModelMixin):
     role = relationship(
         'RoleModel',
     )
+
+    @property
+    def abilities(self) -> Set[str]:
+        return set(map(lambda a: a.ability_, self.role.abilities))

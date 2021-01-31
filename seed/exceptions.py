@@ -19,7 +19,7 @@ class HTTPException(FastAPIHTTPException):
         self.headers = headers
 
 
-class JWTHTTPException(HTTPException):
+class AuthHTTPException(HTTPException):
     pass
 
 

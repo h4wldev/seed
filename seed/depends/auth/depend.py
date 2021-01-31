@@ -2,11 +2,11 @@ from fastapi import (
     Header,
     Request
 )
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union, Set
 
 from seed.db import db
-from seed.exceptions import JWTHTTPException
-from app.models import UserModel
+from seed.exceptions import AuthHTTPException
+from seed.models import UserModel
 from seed.setting import setting
 
 from .types import JWTToken, JWTTokenType
@@ -14,17 +14,21 @@ from .util import AuthUtil
 
 
 class Auth(AuthUtil, JWTTokenType):
+    user: Optional[UserModel] = None
     token: Optional[JWTToken] = None
 
     def __init__(
         self,
         required: bool = False,
         token_type: Optional[str] = None,
-        user_loader: Optional[Callable[[str], Any]] = None,
+        roles: List[Union[List[str], str]] = [],
+        abilities: List[Union[List[str], str]] = []
     ) -> None:
         self.required: bool = required
         self.token_type: str = token_type or self.ACCESS_TOKEN
-        self.user_loader: Callable[str, Any] = user_loader or self._user_loader
+
+        self.roles: List[Union[List[str], str]] = roles
+        self.abilities: List[Union[List[str], str]] = abilities
 
     def __call__(
         self,
@@ -40,21 +44,58 @@ class Auth(AuthUtil, JWTTokenType):
             self.token: JWTToken = JWTToken(credential)
 
             if self.token.token_type != self.token_type:
-                raise JWTHTTPException(f"Token type must be '{self.token_type}'")
+                raise AuthHTTPException(f"Token type must be '{self.token_type}'")
 
             if not self.token.verify():
-                raise JWTHTTPException('Signature has expired or not verified')
+                raise AuthHTTPException('Signature has expired or not verified')
+
+            self.user: Optional[UserModel] = self._user_loader(self.token.subject)
+
+            if len(self.roles) or len(self.abilities):
+                self._check_permission()
         elif self.required:
-            raise JWTHTTPException('JWT credential required')
+            raise AuthHTTPException('JWT credential required')
 
         return self
 
-    @property
-    def user(self) -> Any:
-        if self.token is None:
-            return None
+    def _check_permission(self) -> None:
+        if self.user is None:
+            raise AuthHTTPException('User does not exists')
 
-        return self.user_loader(self.token.subject)
+        roles: Set[str] = set()
+        abilities: Set[str] = set()
+
+        for role in self.user.roles:
+            roles.add(role.role_)
+
+            if len(self.abilities):
+                abilities |= role.abilities
+
+        if not self._check_has(roles, self.roles)\
+           or not self._check_has(abilities, self.abilities):
+            raise AuthHTTPException('Permission Denied')
+
+    def _check_has(
+        self,
+        has: Set[str],
+        check: List[Union[List[str], str]]
+    ) -> bool:
+        for item in check:
+            if isinstance(item, list):
+                checked: bool = False
+
+                for i in item:
+                    if i in has:
+                        checked = True
+                        break
+
+                if not checked:
+                    return False
+            else:
+                if item not in has:
+                    return False
+
+        return True
 
     def _get_credential(
         self,
@@ -99,13 +140,13 @@ class Auth(AuthUtil, JWTTokenType):
         tokens: List[str] = str(authorization).split(' ')
 
         if len(tokens) != 2:
-            raise JWTHTTPException("Authorization header must like 'Bearer <credentials>'")
+            raise AuthHTTPException("Authorization header must like 'Bearer <credentials>'")
 
         type_: str = tokens[0]
         credential: str = tokens[1]
 
         if type_ != 'Bearer':
-            raise JWTHTTPException("Authorization token type must be 'Bearer'")
+            raise AuthHTTPException("Authorization token type must be 'Bearer'")
 
         return credential
 
