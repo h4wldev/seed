@@ -71,6 +71,13 @@ class Auth(AuthUtil, JWTTokenType):
             if len(self.abilities):
                 abilities |= role.abilities
 
+        for ban in self.user.bans:
+            if not ban.is_continue:
+                continue
+
+            if ban.role_ in self.roles or ban.ability_ in self.abilities:
+                raise AuthHTTPException('Banned')
+
         if not self._check_has(roles, self.roles)\
            or not self._check_has(abilities, self.abilities):
             raise AuthHTTPException('Permission Denied')

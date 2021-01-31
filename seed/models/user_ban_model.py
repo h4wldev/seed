@@ -34,3 +34,10 @@ class UserBanModel(Base, ModelMixin):
     ability = relationship(
         'AbilityModel',
     )
+
+    @property
+    def is_continue(self) -> bool:
+        if self.until_at is None:
+            return True
+
+        return self.until_at < datetime.datetime.now()
