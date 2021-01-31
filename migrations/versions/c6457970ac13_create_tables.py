@@ -27,7 +27,7 @@ from seed.models import (
     RoleModel,
     RoleAbilityModel
 )
-from .mixin import Base
+from seed.models.mixin import Base
 
 
 revision = 'c6457970ac13'
