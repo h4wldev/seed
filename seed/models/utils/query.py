@@ -28,7 +28,7 @@ class Query:
 
     def filter(
         self,
-        *filters: Tuple[Union[Tuple[str], str]]
+        *filters: Tuple[Union[Tuple['BinaryExpression'], 'BinaryExpression']]
     ) -> 'Query':
         for f in filters:
             if isinstance(f, tuple):

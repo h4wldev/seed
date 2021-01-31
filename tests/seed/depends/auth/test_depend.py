@@ -187,7 +187,7 @@ def test_auth_role_check(empty_app, get_test_client, dummy_record):
     def endpoint(
         auth: Auth(
             required=True,
-            roles=['user', ['admin', 'super-admin']]
+            roles=['user', ('admin', 'super-admin')]
         ) = Depends()
     ) -> str:
         return True
@@ -215,7 +215,7 @@ def test_auth_ability_check(empty_app, get_test_client, dummy_record):
     def endpoint(
         auth: Auth(
             required=True,
-            abilities=['auth', ['read', 'write']]
+            abilities=['auth', ('read', 'write')]
         ) = Depends()
     ) -> str:
         return True
@@ -261,8 +261,8 @@ def test_auth_check_permission_user_not_exist(empty_app, get_test_client, dummy_
 
 
 def test_check_has():
-    assert Auth()._check_has({'has1', 'has2'}, ['has1', ['has2', 'has3']])
-    assert not Auth()._check_has({'has1', 'has2'}, ['has1', ['has3', 'has4']])
+    assert Auth()._check_has({'has1', 'has2'}, ['has1', ('has2', 'has3')])
+    assert not Auth()._check_has({'has1', 'has2'}, ['has1', ('has3', 'has4')])
     assert not Auth()._check_has({'has1', 'has2'}, ['has1', 'has3'])
     assert not Auth()._check_has(set(), ['has1', 'has3'])
 

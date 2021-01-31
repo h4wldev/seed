@@ -21,14 +21,14 @@ class Auth(AuthUtil, JWTTokenType):
         self,
         required: bool = False,
         token_type: Optional[str] = None,
-        roles: List[Union[List[str], str]] = [],
-        abilities: List[Union[List[str], str]] = []
+        roles: List[Union[Tuple[str], str]] = [],
+        abilities: List[Union[Tuple[str], str]] = []
     ) -> None:
         self.required: bool = required
         self.token_type: str = token_type or self.ACCESS_TOKEN
 
-        self.roles: List[Union[List[str], str]] = roles
-        self.abilities: List[Union[List[str], str]] = abilities
+        self.roles: List[Union[Tuple[str], str]] = roles
+        self.abilities: List[Union[Tuple[str], str]] = abilities
 
     def __call__(
         self,
@@ -78,10 +78,10 @@ class Auth(AuthUtil, JWTTokenType):
     def _check_has(
         self,
         has: Set[str],
-        check: List[Union[List[str], str]]
+        check: List[Union[Tuple[str], str]]
     ) -> bool:
         for item in check:
-            if isinstance(item, list):
+            if isinstance(item, tuple):
                 checked: bool = False
 
                 for i in item:

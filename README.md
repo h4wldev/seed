@@ -20,6 +20,7 @@
 - __[Depend]__ User specific id with UUID
 - __[Depend]__ Logger with UUID
 - __[Integrate]__ Integrate with Sentry, Logstash
+- __[Comfy Query]__ Using Query, Easily 
 - And support all features of fastapi
 
 ## Endpoints
@@ -140,12 +141,12 @@ def auth_required(auth: Auth(token_type='refresh') = Depends()) -> Any:
 #### Auth(required, token_type, roles, abilities)
 You can setting jwt expires time, algorithm on [here](settings/settings.toml), and secret key on [here](settings/.secrets.settings.toml.example)
 
-| argument    | type                        | description                                                    | default  |
-|-------------|-----------------------------|----------------------------------------------------------------|----------|
-| required    | bool                        | token required or not                                          | False    |
-| token_type  | str                         | select token's type (access, refresh)                          | 'access' |
-| roles       | List[Union[List[str], str]] | check user roles (1 depth is and, 2 depth is or operation)     | []       |
-| abilities   | List[Union[List[str], str]] | check user abilities (1 depth is and, 2 depth is or operation) | []       |
+| argument    | type                         | description                                                    | default  |
+|-------------|------------------------------|----------------------------------------------------------------|----------|
+| required    | bool                         | token required or not                                          | False    |
+| token_type  | str                          | select token's type (access, refresh)                          | 'access' |
+| roles       | List[Union[Tuple[str], str]] | check user roles (1 depth is and, 2 depth is or operation)     | []       |
+| abilities   | List[Union[Tuple[str], str]] | check user abilities (1 depth is and, 2 depth is or operation) | []       |
 
 
 ##### > Auth.user -> Union[UserModel, Any]  @property
@@ -163,21 +164,21 @@ Get token data with [JWTToken](depends/auth/types.py#L22)
 | algorithm  | str                      | JWT token algorithm                       | 'HS256' |
 | claims     | Optional[Dict[str, Any]] | JWT Token claims (using on create method) | None    |
 
-#### JWTToken.verify() -> bool
+##### > JWTToken.verify() -> bool
 Verify with redis stored data
 
-#### JWTToken.create(subject: str, payload: Dict[str, Any] = {}, , secrets: Dict[str, Any] = {}, token_type: str = 'access', expires: Union[int, str] = setting, algorithm: str = 'HS256') -> Dict[str, Any]  @classmethod
+##### > JWTToken.create(subject: str, payload: Dict[str, Any] = {}, , secrets: Dict[str, Any] = {}, token_type: str = 'access', expires: Union[int, str] = setting, algorithm: str = 'HS256') -> Dict[str, Any]  @classmethod
 
-#### JWTToken.decode(credential: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
+##### > JWTToken.decode(credential: str, algorithm: str = 'HS256') -> Dict[str, Any]  @staticmethod
 
-#### JWTToken.id -> str  @property
-#### JWTToken.subject -> str  @property
-#### JWTToken.payload -> Dict[str, Any]  @property
-#### JWTToken.secrets -> Dict[str, Any]  @property
-#### JWTToken.token_type -> str  @property
-#### JWTToken.expires -> Arrow  @property
-#### JWTToken.expires_in -> int  @property
-#### JWTToken.created_at -> Arrow  @property
+##### > JWTToken.id -> str  @property
+##### > JWTToken.subject -> str  @property
+##### > JWTToken.payload -> Dict[str, Any]  @property
+##### > JWTToken.secrets -> Dict[str, Any]  @property
+##### > JWTToken.token_type -> str  @property
+##### > JWTToken.expires -> Arrow  @property
+##### > JWTToken.expires_in -> int  @property
+##### > JWTToken.created_at -> Arrow  @property
 
 
 ### UUID Depend
@@ -218,6 +219,30 @@ def uuid(redis: Redis() = Depends()) -> Any:
   with redis() as r:
     print(r.get('test'))
 ```
+
+### Comfy Query
+```python
+from seed.models import Base, ModelMixin
+
+class Model(Base, ModelMixin):
+  ...
+
+Model.q()\
+  .filter(
+    Model.field == 'field',
+    [Model.field2 == 'field2', Model.field2 == 'field3']
+  )\
+  .paging(page=0, limit=30)\
+  .all()
+```
+
+#### Model.q(models: Tuple[Any])
+##### > Model.q.filter(*filters: Tuple[Union[Tuple['BinaryExpression'], 'BinaryExpression']])
+1 depth is and operation, 2depth is or operation
+
+##### > Model.q.paging(page: int, limit: int)  # page zero based indexing
+##### > Model.q.exists() -> bool
+##### And same as sqlalchemy query
 
 
 ## How to custom OAuth handler
