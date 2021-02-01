@@ -2,6 +2,7 @@ from .mixin import Base, ModelMixin  # noqa: F401
 
 from .ability_model import AbilityModel  # noqa: F401
 from .user_model import UserModel  # noqa: F401
+from .user_ban_model import UserBanModel  # noqa: F401
 from .user_role_model import UserRoleModel  # noqa: F401
 from .user_login_history_model import UserLoginHistoryModel  # noqa: F401
 from .user_meta_model import UserMetaModel  # noqa: F401

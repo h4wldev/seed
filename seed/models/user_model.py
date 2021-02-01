@@ -8,7 +8,7 @@ from seed.setting import setting
 
 from .mixin import Base, ModelMixin
 
-from .user_role_model import UserRoleModel  # noqa: F401
+from .user_ban_model import UserBanModel  # noqa: F401
 from .user_login_history_model import UserLoginHistoryModel  # noqa: F401
 from .user_meta_model import UserMetaModel  # noqa: F401
 from .user_profile_model import UserProfileModel  # noqa: F401
@@ -41,6 +41,12 @@ class UserModel(Base, ModelMixin):
         backref='user',
         cascade='all,delete',
         uselist=False,
+    )
+
+    bans = relationship(
+        'UserBanModel',
+        backref='user',
+        cascade='all,delete',
     )
 
     social_accounts = relationship(

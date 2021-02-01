@@ -19,6 +19,7 @@ sys.path.insert(
 from seed.models import (
     AbilityModel,
     UserModel,
+    UserBanModel,
     UserRoleModel,
     UserLoginHistoryModel,
     UserMetaModel,
@@ -80,6 +81,7 @@ models: List[Base] = [
     RoleModel,
     RoleAbilityModel,
     UserModel,
+    UserBanModel,
     UserRoleModel,
     UserLoginHistoryModel,
     UserMetaModel,
@@ -95,7 +97,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     for model in reversed(models):
-        try:
-            op.drop_table(model.__tablename__)
-        except Exception:
-            pass
+        op.drop_table(model.__tablename__)
