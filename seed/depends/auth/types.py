@@ -6,7 +6,7 @@ import orjson
 from typing import Any, Dict, Union, Optional
 
 from seed.depends.redis import RedisContextManager
-from seed.utils.convert import units2seconds
+from seed.utils.convert import units_to_seconds
 from seed.utils.crypto import AESCipher
 
 from seed.setting import setting
@@ -90,7 +90,7 @@ class JWTToken(JWTTokenType):
 
         if expires is not None:
             if isinstance(expires, str):
-                expires = units2seconds(expires)
+                expires = units_to_seconds(expires)
 
             claims['exp'] = now + expires
             claims['exp_in'] = expires
