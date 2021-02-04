@@ -225,7 +225,11 @@ class Router(APIRouter):
                 'tracebacks': tracebacks,
             }
 
-            logger.exception(f'trace_id: {str(exc.trace_id)}')
+            logger.exception({
+                'exception': e.__class__.__name__,
+                'message': str(e),
+                'trace_id': str(exc.trace_id),
+            })
 
         if setting.integrate.sentry.enable:
             import sentry_sdk
