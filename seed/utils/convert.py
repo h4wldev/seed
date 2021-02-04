@@ -1,22 +1,13 @@
-from typing import List
+import re
 
 
-def int2bitfield(value: int) -> List[bool]:
-    return list(reversed([
-        bool(int(digit)) for digit in bin(value)[2:]
-    ]))
+def camelcase_to_underscore(string: str) -> str:
+    pattern: 'Pattern' = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+
+    return pattern.sub(r'_\1', string).lower()
 
 
-def bitfield2int(value: List[bool]) -> int:
-    result: int = 0
-
-    for i, v in enumerate(value):
-        result += int(v) * (2 ** i)
-
-    return result
-
-
-def units2seconds(value: str) -> int:
+def units_to_seconds(value: str) -> int:
     if isinstance(value, int):
         return value
 

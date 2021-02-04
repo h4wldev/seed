@@ -6,12 +6,14 @@ from dynaconf import Dynaconf
 from fastapi import FastAPI, APIRouter
 from fastapi.exceptions import HTTPException as FastAPIHTTPException
 from fastapi_sqlalchemy import DBSessionMiddleware
+from jwt.exceptions import PyJWTError
 from starlette.middleware.cors import CORSMiddleware
 
 from seed.exceptions import HTTPException as SeedHTTPException
 from seed.exceptions.handlers import (
     fastapi_exception_handler,
-    seed_http_exception_handler
+    seed_http_exception_handler,
+    pyjwt_exception_handler
 )
 from seed.utils.database import make_database_url
 from seed.setting import setting
@@ -38,7 +40,8 @@ class Application:  # pragma: no cover
             debug=self.setting.debug,
             exception_handlers={
                 FastAPIHTTPException: fastapi_exception_handler,
-                SeedHTTPException: seed_http_exception_handler
+                SeedHTTPException: seed_http_exception_handler,
+                PyJWTError: pyjwt_exception_handler,
             },
         )
 
