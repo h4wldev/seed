@@ -16,6 +16,19 @@ def test_seed_http_exception_handler(empty_app, get_test_client):
     assert list(response.json().keys()) == ['trace_id', 'symbol', 'status_code', 'type']
 
 
+def test_request_validation_exception_handler(empty_app, get_test_client):
+    @empty_app.get('/request-validation-exception')
+    def endpoint(q: str):
+        pass
+
+    client = get_test_client(empty_app)
+    response = client.get('/request-validation-exception')
+
+    assert response.status_code == 400
+    assert list(response.json().keys()) == ['trace_id', 'symbol', 'detail', 'status_code', 'type']
+    assert response.json()['symbol'] == 'request_validation_failed'
+
+
 def test_seed_fastapi_exception_handler(empty_app, get_test_client):
     @empty_app.get('/fastapi-exception')
     def endpoint():
