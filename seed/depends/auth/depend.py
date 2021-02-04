@@ -45,7 +45,7 @@ class Auth(AuthUtil, JWTTokenType):
 
             if self.token.token_type != self.token_type:
                 raise AuthHTTPException(
-                    symbol='auth_token_type_not_correct'
+                    symbol='auth_token_type_not_correct',
                     message=f"Token type must be '{self.token_type}'",
                 )
 

@@ -4,8 +4,6 @@ from typing import Any, Dict, Optional, Iterator
 
 from fastapi import status
 
-from seed.request import Request as SeedRequest
-
 
 class HTTPException(Exception):
     _default_status_code: int = status.HTTP_400_BAD_REQUEST
@@ -35,6 +33,9 @@ class HTTPException(Exception):
 
     def __repr__(self) -> str:
         return f"<{self.type_} symbol='{self.symbol}' status_code={self.status_code}>"
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
     def __iter__(self) -> Iterator[Any]:
         iterate_dict: Dict[str, Any] = {

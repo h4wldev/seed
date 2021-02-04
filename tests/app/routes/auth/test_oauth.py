@@ -44,4 +44,4 @@ def test_oauth_not_supported_provider(client):
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == "'not_supported' is not support provider"
+    assert response.json()['symbol'] == 'oauth_not_supported'

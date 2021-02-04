@@ -16,10 +16,10 @@ def test_http_exception_init_with_status_code():
     assert exception.status_code == 500
 
 
-def test_http_exception_repr():
+def test_http_exception_str():
     exception = HTTPException('foobar')
 
-    assert str(exception) == "<HTTPExcetion symbol='foobar' status_code=400>"
+    assert str(exception) == "<HTTPException symbol='foobar' status_code=400>"
 
 
 def test_http_exception_iter():

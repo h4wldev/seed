@@ -3,7 +3,6 @@ import re
 from typing import Dict, Any
 
 from fastapi import Request as FastAPIRequest
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 
 from seed.logger import logger

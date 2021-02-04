@@ -16,7 +16,7 @@ class Request(FastAPIRequest):
     def trace_dict(self) -> Dict[str, Any]:
         keys: Tuple[str] = ('path', 'path_params', 'scheme', 'type', 'http_version')
         result: Dict[str, Any] = dict(map(
-            lambda k: (k, dict(self).get(k, None)), keys            
+            lambda k: (k, dict(self).get(k, None)), keys
         ))
 
         result['query_string'] = dict(self).get('query_string', b'').decode('utf-8')

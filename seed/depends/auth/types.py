@@ -6,10 +6,8 @@ import orjson
 from typing import Any, Dict, Union, Optional
 
 from seed.depends.redis import RedisContextManager
-from seed.exceptions import AuthHTTPException
 from seed.utils.convert import units2seconds
 from seed.utils.crypto import AESCipher
-from seed.utils.exception import exception_wrapper
 
 from seed.setting import setting
 
@@ -122,10 +120,6 @@ class JWTToken(JWTTokenType):
         )
 
     @staticmethod
-    @exception_wrapper(
-        AuthHTTPException,
-        excs=(jwt.exceptions.PyJWTError),
-    )
     def decode(
         credential: str,
         algorithm: str = 'HS256'

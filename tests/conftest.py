@@ -2,7 +2,7 @@ import os
 import pytest
 import sys
 
-from fastapi import FastAPI
+from fastapi import APIRouter
 from fastapi.testclient import TestClient
 
 
@@ -43,7 +43,10 @@ def client(app):
 
 @pytest.fixture(scope='function')
 def empty_app():
-    return FastAPI()
+    return Application(
+        router=APIRouter(),
+        env='testing'
+    ).create_app()
 
 
 @pytest.fixture
