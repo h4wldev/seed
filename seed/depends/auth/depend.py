@@ -83,6 +83,13 @@ class Auth(AuthUtil, JWTTokenType):
             if len(self.abilities):
                 abilities |= role.abilities
 
+        if not self._check_has(roles, self.roles)\
+           or not self._check_has(abilities, self.abilities):
+            raise AuthHTTPException(
+                symbol='auth_permmision_denied',
+                message='Permission Denied',
+            )
+
         for ban in self.user.bans:
             if not ban.is_continue:
                 continue
@@ -96,13 +103,6 @@ class Auth(AuthUtil, JWTTokenType):
                         'until_at': ban.until_at,
                     },
                 )
-
-        if not self._check_has(roles, self.roles)\
-           or not self._check_has(abilities, self.abilities):
-            raise AuthHTTPException(
-                symbol='auth_permmision_denied',
-                message='Permission Denied',
-            )
 
     def _check_has(
         self,

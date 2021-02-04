@@ -56,7 +56,7 @@ class HTTPException(Exception):
 
 
 class AuthHTTPException(HTTPException):
-    pass
+    _default_status_code: int = status.HTTP_401_UNAUTHORIZED
 
 
 class OAuthHTTPException(HTTPException):

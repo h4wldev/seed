@@ -10,7 +10,7 @@ from seed.db import db
 from seed.setting import setting
 
 from seed.router import Route, status
-from seed.exceptions import AuthHTTPException
+from seed.exceptions import OAuthHTTPException
 from seed.depends.auth import Auth, JWTToken
 from seed.models import (
     UserSocialAccountModel,
@@ -65,7 +65,7 @@ class OAuth(Route):
         oauth_handler: 'OAuthHandler' = OAuth.get_oauth_handler(oauth_code.provider)
 
         if oauth_handler is None:
-            raise AuthHTTPException(
+            raise OAuthHTTPException(
                 symbol='oauth_not_supported',
                 message=f"'{oauth_code.provider}' is not support provider",
                 detail={

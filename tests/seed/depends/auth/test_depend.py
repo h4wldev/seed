@@ -3,7 +3,13 @@ from fastapi import Depends, Request, Header
 from seed.depends.auth.depend import Auth
 from seed.depends.auth.types import JWTToken
 from seed.depends.redis import RedisContextManager
-from seed.models import RoleModel, AbilityModel, RoleAbilityModel, UserRoleModel
+from seed.models import (
+    RoleModel,
+    AbilityModel,
+    RoleAbilityModel,
+    UserRoleModel,
+    UserBanModel
+)
 
 from seed.setting import setting
 
@@ -60,7 +66,7 @@ def test_auth_depend_with_token_type(empty_app, get_test_client):
         'Authorization': f'Bearer {access_token}',
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_token_type_not_correct'
 
     response = client.get('/auth_optional', headers={
@@ -87,7 +93,7 @@ def test_auth_depend_jwt_notin_redis(empty_app, get_test_client):
         'Authorization': f'Bearer {credential}',
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_token_expired_or_not_verified'
 
 
@@ -99,7 +105,7 @@ def test_auth_depend_auth_required(empty_app, get_test_client):
     client = get_test_client(empty_app)
     response = client.get('/auth_required')
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_token_required'
 
 
@@ -150,7 +156,7 @@ def test_auth_depend_get_credential_header_struct_error(empty_app, get_test_clie
         'Authorization': 'foobar',
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_header_structure_not_correct'
 
 
@@ -164,7 +170,7 @@ def test_auth_depend_get_credential_header_type_error(empty_app, get_test_client
         'Authorization': 'ErrorType foobar',
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_header_type_not_correct'
 
 
@@ -256,15 +262,8 @@ def test_auth_check_permission_user_not_exist(empty_app, get_test_client, dummy_
         'Authorization': f'Bearer {token.credential}',
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_user_not_exists'
-
-
-def test_check_has():
-    assert Auth()._check_has({'has1', 'has2'}, ['has1', ('has2', 'has3')])
-    assert not Auth()._check_has({'has1', 'has2'}, ['has1', ('has3', 'has4')])
-    assert not Auth()._check_has({'has1', 'has2'}, ['has1', 'has3'])
-    assert not Auth()._check_has(set(), ['has1', 'has3'])
 
 
 def test_auth_check_permission_permission_denied(empty_app, get_test_client):
@@ -284,5 +283,68 @@ def test_auth_check_permission_permission_denied(empty_app, get_test_client):
         'Authorization': f'Bearer {token.credential}',
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     assert response.json()['symbol'] == 'auth_permmision_denied'
+
+
+def test_auth_check_permission_banned_role(empty_app, get_test_client, dummy_record):
+    @empty_app.get('/banned-role')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            roles=['user']
+        ) = Depends()
+    ) -> str:
+        return True
+
+    token = create_token(subject='test@foobar.com')
+    client = get_test_client(empty_app)
+
+    with dummy_record(
+        RoleModel(role='user'),
+        AbilityModel(ability='auth'),
+        RoleAbilityModel(role_='user', ability_='auth'),
+        UserRoleModel(user_id=1, role_='user'),
+        UserBanModel(user_id=1, role_='user', reason='foobar')
+    ):
+        response = client.get('/banned-role', headers={
+            'Authorization': f'Bearer {token.credential}',
+        })
+
+        assert response.status_code == 401
+        assert response.json()['symbol'] == 'auth_banned_user'
+
+
+def test_auth_check_permission_banned_ability(empty_app, get_test_client, dummy_record):
+    @empty_app.get('/banned-ability')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            abilities=['auth']
+        ) = Depends()
+    ) -> str:
+        return True
+
+    token = create_token(subject='test@foobar.com')
+    client = get_test_client(empty_app)
+
+    with dummy_record(
+        RoleModel(role='user'),
+        AbilityModel(ability='auth'),
+        RoleAbilityModel(role_='user', ability_='auth'),
+        UserRoleModel(user_id=1, role_='user'),
+        UserBanModel(user_id=1, ability_='auth', reason='foobar')
+    ):
+        response = client.get('/banned-ability', headers={
+            'Authorization': f'Bearer {token.credential}',
+        })
+
+        assert response.status_code == 401
+        assert response.json()['symbol'] == 'auth_banned_user'
+
+
+def test_check_has():
+    assert Auth()._check_has({'has1', 'has2'}, ['has1', ('has2', 'has3')])
+    assert not Auth()._check_has({'has1', 'has2'}, ['has1', ('has3', 'has4')])
+    assert not Auth()._check_has({'has1', 'has2'}, ['has1', 'has3'])
+    assert not Auth()._check_has(set(), ['has1', 'has3'])
