@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Request as FastAPIRequest
 from fastapi.responses import Response, ORJSONResponse
 from functools import wraps
 from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
+from .request import Request as SeedRequest
 
 
 class Route:
@@ -138,14 +140,18 @@ class Router(APIRouter):
 
         return _
 
-    @staticmethod
     def _endpoint_wrapper(
+        self,
         method: Callable[..., Any]
     ) -> Any:
         @wraps(method)
         async def _(*args, **kwargs):
             response: Any = None
             method_options: Dict[str, Any] = {}
+
+            for key, value in kwargs.items():
+                if isinstance(value, FastAPIRequest):  # Request Override
+                    kwargs[key] = SeedRequest.from_request(value)
 
             try:
                 method_options = method.options
