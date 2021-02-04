@@ -14,7 +14,7 @@ from .exceptions import HTTPException as SeedHTTPException
 async def seed_http_exception_handler(
     request: FastAPIRequest,
     exc: SeedHTTPException
-) -> ORJSONResponse:
+) -> ORJSONResponse:  # pragma: no cover
     exc.request = SeedRequest.from_request(request)
     error_data: Dict[str, Any] = dict(exc)
 
@@ -34,7 +34,7 @@ async def seed_http_exception_handler(
 async def fastapi_exception_handler(
     request: FastAPIRequest,
     exc: 'FastAPIHTTPException'
-) -> ORJSONResponse:
+) -> ORJSONResponse:  # pragma: no cover
     pattern: 'Pattern' = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
 
     exc_type: str = exc.__class__.__name__
@@ -49,4 +49,7 @@ async def fastapi_exception_handler(
     )
     exc.type_: str = exc.__class__.__name__
 
-    return seed_http_exception_handler(exc)
+    return seed_http_exception_handler(
+        request=request,
+        exc=exc,
+    )
