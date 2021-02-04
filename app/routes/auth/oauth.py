@@ -3,7 +3,7 @@ import importlib
 
 from fastapi import Request
 from fastapi.responses import ORJSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional, List, Tuple, Union
 
 from seed.db import db
@@ -20,8 +20,8 @@ from seed.utils.crypto import AESCipher
 
 
 class OAuthCode(BaseModel):
-    provider: str
-    code: str
+    provider: str = Field(...)
+    code: str = Field(...)
 
 
 class OAuth(Route):
