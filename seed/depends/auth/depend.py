@@ -44,23 +44,35 @@ class Auth(AuthUtil, JWTTokenType):
             self.token: JWTToken = JWTToken(credential)
 
             if self.token.token_type != self.token_type:
-                raise AuthHTTPException(f"Token type must be '{self.token_type}'")
+                raise AuthHTTPException(
+                    symbol='auth_token_type_not_correct'
+                    message=f"Token type must be '{self.token_type}'",
+                )
 
             if not self.token.verify():
-                raise AuthHTTPException('Signature has expired or not verified')
+                raise AuthHTTPException(
+                    symbol='auth_token_expired_or_not_verified',
+                    message='Signature has expired or not verified',
+                )
 
             self.user: Optional[UserModel] = self._user_loader(self.token.subject)
 
             if len(self.roles) or len(self.abilities):
                 self._check_permission()
         elif self.required:
-            raise AuthHTTPException('JWT credential required')
+            raise AuthHTTPException(
+                symbol='auth_token_required',
+                message='JWT credential required',
+            )
 
         return self
 
     def _check_permission(self) -> None:
         if self.user is None:
-            raise AuthHTTPException('User does not exists')
+            raise AuthHTTPException(
+                symbol='auth_user_not_exists',
+                message='User does not exists',
+            )
 
         roles: Set[str] = set()
         abilities: Set[str] = set()
@@ -76,11 +88,21 @@ class Auth(AuthUtil, JWTTokenType):
                 continue
 
             if ban.role_ in self.roles or ban.ability_ in self.abilities:
-                raise AuthHTTPException('Banned')
+                raise AuthHTTPException(
+                    symbol='auth_banned_user',
+                    message='Banned',
+                    detail={
+                        'reason': ban.reason,
+                        'until_at': ban.until_at,
+                    },
+                )
 
         if not self._check_has(roles, self.roles)\
            or not self._check_has(abilities, self.abilities):
-            raise AuthHTTPException('Permission Denied')
+            raise AuthHTTPException(
+                symbol='auth_permmision_denied',
+                message='Permission Denied',
+            )
 
     def _check_has(
         self,
@@ -147,13 +169,19 @@ class Auth(AuthUtil, JWTTokenType):
         tokens: List[str] = str(authorization).split(' ')
 
         if len(tokens) != 2:
-            raise AuthHTTPException("Authorization header must like 'Bearer <credentials>'")
+            raise AuthHTTPException(
+                symbol='auth_header_structure_not_correct',
+                message="Authorization header must like 'Bearer <credentials>'",
+            )
 
         type_: str = tokens[0]
         credential: str = tokens[1]
 
         if type_ != 'Bearer':
-            raise AuthHTTPException("Authorization token type must be 'Bearer'")
+            raise AuthHTTPException(
+                symbol='auth_header_type_not_correct',
+                message="Authorization token type must be 'Bearer'",
+            )
 
         return credential
 
