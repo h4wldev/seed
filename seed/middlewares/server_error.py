@@ -57,6 +57,13 @@ class ServerErrorMiddleware:
             'message': str(e),
         }
 
+        if setting.integrate.sentry.enable:  # pragma: no cover
+            import sentry_sdk
+
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra('trace_id', str(exc.trace_id))
+                exc_info['event_id']: str = sentry_sdk.capture_exception(e)
+
         if setting.debug:
             exc_type, exc_value, tb = sys.exc_info()
 
@@ -78,12 +85,5 @@ class ServerErrorMiddleware:
                 **exc_info,
                 **{'trace_id': str(exc.trace_id)},
             })
-
-        if setting.integrate.sentry.enable:  # pragma: no cover
-            import sentry_sdk
-
-            with sentry_sdk.push_scope() as scope:
-                scope.set_extra('trace_id', str(exc.trace_id))
-                sentry_sdk.capture_exception(e)
 
         return await seed_http_exception_handler(request=request, exc=exc)
