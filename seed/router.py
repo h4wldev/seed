@@ -4,6 +4,11 @@ from functools import wraps
 from inspect import iscoroutinefunction
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+from seed.logger import logger
+from seed.setting import setting
+from seed.exceptions import HTTPException as SeedHTTPException
+from seed.exceptions.handlers import seed_http_exception_handler
+
 from .request import Request as SeedRequest
 
 
@@ -165,28 +170,71 @@ class Router(APIRouter):
 
             if not hasattr(method, 'is_coroutine'):
                 method.is_coroutine: bool = iscoroutinefunction(method)
+            try:
+                if method.is_coroutine:
+                    response: Any = await method(*args, **kwargs)
+                else:
+                    response: Any = method(*args, **kwargs)
 
-            if method.is_coroutine:
-                response: Any = await method(*args, **kwargs)
-            else:
-                response: Any = method(*args, **kwargs)
+                if isinstance(response, tuple):
+                    assert len(response) == 2, 'Response must be Tuple[response, status_code]'
 
-            if isinstance(response, tuple):
-                assert len(response) == 2, 'Response must be Tuple[response, status_code]'
+                    response, status_code = response
 
-                response, status_code = response
+                assert isinstance(status_code, int), 'Status code must be integer type'
 
-            assert isinstance(status_code, int), 'Status code must be integer type'
-
-            if isinstance(response, Response):
-                response.status_code = status_code
-            else:
-                response_class = method_options.get('response_class', ORJSONResponse)
-                response = response_class(response, status_code=status_code)
+                if isinstance(response, Response):
+                    response.status_code = status_code
+                else:
+                    response_class = method_options.get('response_class', ORJSONResponse)
+                    response = response_class(response, status_code=status_code)
+            except Exception as e:
+                response: ORJSONResponse = await self._catch_server_error(e)
 
             return response
 
         return _
+
+    async def _catch_server_error(
+        self,
+        e: Exception
+    ) -> ORJSONResponse:
+        exc: SeedHTTPException = SeedHTTPException(
+            symbol='server_error_occurred',
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+        if setting.debug:
+            traceback: 'traceback' = e.__traceback__
+            traceback = traceback.tb_next
+
+            tracebacks: List[Dict[str, Any]] = []
+
+            while traceback is not None:
+                tracebacks.append({
+                    'filename': traceback.tb_frame.f_code.co_filename,
+                    'name': traceback.tb_frame.f_code.co_name,
+                    'lineno': traceback.tb_lineno,
+                })
+
+                traceback = traceback.tb_next
+
+            exc.detail: Dict[str, Any] = {
+                'exception': e.__class__.__name__,
+                'message': str(e),
+                'tracebacks': tracebacks,
+            }
+
+            logger.exception(f'trace_id: {str(exc.trace_id)}')
+
+        if setting.integrate.sentry.enable:
+            import sentry_sdk
+
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra('trace_id', str(exc.trace_id))
+                sentry_sdk.capture_exception(e)
+
+        return await seed_http_exception_handler(exc=exc)
 
     def __add__(
         self,

@@ -1,6 +1,7 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
-from fastapi import Request as FastAPIRequest
+from fastapi import Request as FastAPIRequest, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 
 from seed.logger import logger
@@ -11,17 +12,19 @@ from .exceptions import HTTPException as SeedHTTPException
 
 
 async def seed_http_exception_handler(
-    request: FastAPIRequest,
-    exc: SeedHTTPException
+    request: Optional[FastAPIRequest] = None,
+    exc: SeedHTTPException = SeedHTTPException
 ) -> ORJSONResponse:
-    exc.request = SeedRequest.from_request(request)
     error_data: Dict[str, Any] = dict(exc)
+    extra: Dict[str, Any] = {}
+
+    if request:
+        request = SeedRequest.from_request(request)
+        extra = { 'request': request.trace_dict }
 
     logger.error({
         **error_data,
-        **{
-            'request': exc.request.trace_dict,
-        },
+        **extra
     })
 
     return ORJSONResponse(
@@ -42,6 +45,26 @@ async def fastapi_exception_handler(
         detail=exc.detail,
         headers=exc.headers,
         status_code=exc.status_code,
+        request=request
+    )
+    exc.type_: str = exc_type
+
+    return await seed_http_exception_handler(
+        request=request,
+        exc=exc,
+    )
+
+
+async def request_validation_exception_handler(
+    request: FastAPIRequest,
+    exc: 'RequestValidationError'
+) -> ORJSONResponse:
+    exc_type: str = exc.__class__.__name__
+    detail: Dict[str, Any] = jsonable_encoder(exc.errors())
+
+    exc: SeedHTTPException = SeedHTTPException(
+        symbol='request_validation_failed',
+        detail=detail,
         request=request
     )
     exc.type_: str = exc_type
