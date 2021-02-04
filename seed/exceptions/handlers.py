@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 
-from fastapi import Request as FastAPIRequest, status
+from fastapi import Request as FastAPIRequest
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 
@@ -20,7 +20,7 @@ async def seed_http_exception_handler(
 
     if request:
         request = SeedRequest.from_request(request)
-        extra = { 'request': request.trace_dict }
+        extra = {'request': request.trace_dict}
 
     logger.error({
         **error_data,

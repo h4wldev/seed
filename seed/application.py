@@ -2,7 +2,6 @@ import logging
 
 import seed.logger as logger
 
-from dynaconf import Dynaconf
 from fastapi import FastAPI, APIRouter
 from fastapi.exceptions import (
     HTTPException as FastAPIHTTPException,
@@ -19,6 +18,7 @@ from seed.exceptions.handlers import (
     pyjwt_exception_handler,
     request_validation_exception_handler
 )
+from seed.middlewares.server_error import ServerErrorMiddleware
 from seed.utils.database import make_database_url
 from seed.setting import setting
 
@@ -40,24 +40,24 @@ class Application:  # pragma: no cover
         self.app: FastAPI = FastAPI(
             title=self.name,
             debug=setting.debug,
-            exception_handlers={
-                FastAPIHTTPException: fastapi_exception_handler,
-                SeedHTTPException: seed_http_exception_handler,
-                RequestValidationError: request_validation_exception_handler,
-                PyJWTError: pyjwt_exception_handler,
-            },
         )
 
         self.app.include_router(self.router, prefix=setting.api_prefix)
 
         self.bind_database_middleware()
         self.bind_middleware()
-
         self.bind_integrates()
+        self.bind_exception_handlers()
 
         self.logger_configure()
 
         return self.app
+
+    def bind_exception_handlers(self) -> None:
+        self.app.add_exception_handler(FastAPIHTTPException, fastapi_exception_handler)
+        self.app.add_exception_handler(SeedHTTPException, seed_http_exception_handler)
+        self.app.add_exception_handler(RequestValidationError, request_validation_exception_handler)
+        self.app.add_exception_handler(PyJWTError, pyjwt_exception_handler)
 
     def bind_middleware(self) -> None:
         self.app.add_middleware(
@@ -67,6 +67,8 @@ class Application:  # pragma: no cover
             allow_methods=setting.cors.allow_methods,
             allow_headers=setting.cors.allow_headers,
         )
+
+        self.app.add_middleware(ServerErrorMiddleware)
 
     def bind_database_middleware(self) -> None:
         database_setting: Dict[str, str] = {
