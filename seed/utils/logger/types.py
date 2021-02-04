@@ -35,5 +35,5 @@ LOG_LEVELS: List[LogLevel] = [
     LogLevel(name='ERROR', level=40, icon=figures('cross'), color='<red>'),
     LogLevel(name='WARNING', level=30, icon=figures('warning'), color='<yellow>'),
     LogLevel(name='INFO', level=20, icon=figures('info'), color='<blue>'),
-    LogLevel(name='DEBUG', level=10, icon=figures('bullets'), color='<red>'),
+    LogLevel(name='DEBUG', level=10, icon=figures('bullets'), color='<light-black>'),
 ]

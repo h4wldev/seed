@@ -1,3 +1,5 @@
+import sys
+
 from fastapi import APIRouter, status, Request as FastAPIRequest
 from fastapi.responses import Response, ORJSONResponse
 from functools import wraps
@@ -225,7 +227,10 @@ class Router(APIRouter):
                 'tracebacks': tracebacks,
             }
 
-            logger.exception({
+            exc_type, exc_value, tb = sys.exc_info()
+            tb = tb.tb_next
+
+            logger.opt(exception=(None, exc_value, tb)).debug({
                 'exception': e.__class__.__name__,
                 'message': str(e),
                 'trace_id': str(exc.trace_id),
