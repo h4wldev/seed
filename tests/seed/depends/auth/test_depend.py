@@ -61,7 +61,7 @@ def test_auth_depend_with_token_type(empty_app, get_test_client):
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == "Token type must be 'refresh'"
+    assert response.json()['symbol'] == 'auth_token_type_not_correct'
 
     response = client.get('/auth_optional', headers={
         'Authorization': f'Bearer {refresh_token}',
@@ -88,7 +88,7 @@ def test_auth_depend_jwt_notin_redis(empty_app, get_test_client):
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == 'Signature has expired or not verified'
+    assert response.json()['symbol'] == 'auth_token_expired_or_not_verified'
 
 
 def test_auth_depend_auth_required(empty_app, get_test_client):
@@ -100,7 +100,7 @@ def test_auth_depend_auth_required(empty_app, get_test_client):
     response = client.get('/auth_required')
 
     assert response.status_code == 400
-    assert response.json()['detail'] == 'JWT credential required'
+    assert response.json()['symbol'] == 'auth_token_required'
 
 
 def test_auth_depend_get_credential(empty_app, get_test_client):
@@ -151,7 +151,7 @@ def test_auth_depend_get_credential_header_struct_error(empty_app, get_test_clie
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == "Authorization header must like 'Bearer <credentials>'"
+    assert response.json()['symbol'] == 'auth_header_structure_not_correct'
 
 
 def test_auth_depend_get_credential_header_type_error(empty_app, get_test_client):
@@ -165,7 +165,7 @@ def test_auth_depend_get_credential_header_type_error(empty_app, get_test_client
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == "Authorization token type must be 'Bearer'"
+    assert response.json()['symbol'] == 'auth_header_type_not_correct'
 
 
 def test_auth_depend_get_credential_cookie(empty_app, get_test_client):
@@ -257,7 +257,7 @@ def test_auth_check_permission_user_not_exist(empty_app, get_test_client, dummy_
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == 'User does not exists'
+    assert response.json()['symbol'] == 'auth_user_not_exists'
 
 
 def test_check_has():
@@ -285,4 +285,4 @@ def test_auth_check_permission_permission_denied(empty_app, get_test_client):
     })
 
     assert response.status_code == 400
-    assert response.json()['detail'] == 'Permission Denied'
+    assert response.json()['symbol'] == 'auth_permmision_denied'

@@ -21,25 +21,29 @@ class KakaoOAuthHandler(OAuthHandler):
             'grant_type': 'authorization_code',
             'client_id': self.api_key,
             'redirect_uri': self.redirect_uri,
-            'code': code
+            'code': code,
         }
 
         status_code, response = self.api_call(
             self.setting.auth_api_url,
             '/oauth/token',
             method='post',
-            data=data
+            data=data,
         )
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
             logger.error(response)
 
-            raise OAuthHTTPException({
-                'provider': 'kakao',
-                'error': response.get('error', None),
-                'on': 'get_tokens'
-            })
+            raise OAuthHTTPException(
+                symbol='oauth_get_token_error',
+                message='Error has been occurs with OAuth Provider',
+                detail={
+                    'provider': 'kakao',
+                    'message': response.get('error', None),
+                    'on': 'get_tokens',
+                },
+            )
 
         return response['access_token'], response['refresh_token']
 
@@ -55,18 +59,22 @@ class KakaoOAuthHandler(OAuthHandler):
             self.setting.api_url,
             '/v2/user/me',
             method='get',
-            headers=headers
+            headers=headers,
         )
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
             logger.error(response)
 
-            raise OAuthHTTPException({
-                'provider': 'kakao',
-                'error': response.get('error', None),
-                'on': 'get_user_info'
-            })
+            raise OAuthHTTPException(
+                symbol='oauth_get_user_info_error',
+                message='Error has been occurs with OAuth Provider',
+                detail={
+                    'provider': 'kakao',
+                    'error': response.get('error', None),
+                    'on': 'get_user_info',
+                },
+            )
 
         email: str = response['kakao_account'].get('email', None)
         user_id: str = str(response['id'])
@@ -80,25 +88,29 @@ class KakaoOAuthHandler(OAuthHandler):
         data: Dict[str, str] = {
             'grant_type': 'refresh_token',
             'client_id': self.api_key,
-            'refresh_token': refresh_token
+            'refresh_token': refresh_token,
         }
 
         status_code, response = self.api_call(
             self.setting.auth_api_url,
             '/oauth/token',
             method='post',
-            data=data
+            data=data,
         )
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
             logger.error(response)
 
-            raise OAuthHTTPException({
-                'provider': 'kakao',
-                'error': response.get('error', None),
-                'on': 'get_token_by_refresh_token'
-            })
+            raise OAuthHTTPException(
+                symbol='oauth_get_token_by_refresh_token_error',
+                message='Error has been occurs with OAuth Provider',
+                detail={
+                    'provider': 'kakao',
+                    'error': response.get('error', None),
+                    'on': 'get_token_by_refresh_token',
+                },
+            )
 
         return response['access_token'], response.get('refresh_token', refresh_token)
 
@@ -107,25 +119,29 @@ class KakaoOAuthHandler(OAuthHandler):
         access_token: str
     ) -> bool:
         headers: Dict[str, str] = {
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f'Bearer {access_token}',
         }
 
         status_code, response = self.api_call(
             self.setting.api_url,
             '/v1/user/unlink',
             method='post',
-            headers=headers
+            headers=headers,
         )
         response: Dict[str, any] = response.json()
 
         if status_code != 200:
             logger.error(response)
 
-            raise OAuthHTTPException({
-                'provider': 'kakao',
-                'error': response.get('error', None),
-                'on': 'unlink'
-            })
+            raise OAuthHTTPException(
+                symbol='oauth_unlink_error',
+                message='Error has been occurs with OAuth Provider',
+                detail={
+                    'provider': 'kakao',
+                    'error': response.get('error', None),
+                    'on': 'unlink',
+                },
+            )
 
         return True
 

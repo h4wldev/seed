@@ -12,11 +12,12 @@ def valid_uuid(uuid):
     return bool(match)
 
 
-def test_uuid_depend(app, client):
-    @app.get('/uuid-depend')
+def test_uuid_depend(empty_app, get_test_client):
+    @empty_app.get('/uuid-depend')
     def endpoint(request: Request, uuid: UUID = Depends()):
         return uuid
 
+    client = get_test_client(empty_app)
     response = client.get('/uuid-depend')
 
     assert response.status_code == 200

@@ -33,4 +33,4 @@ def test_logout_redis_expire(client):
     response = client.post('/api/logout', headers=headers)
 
     assert response.status_code == 400
-    assert response.json()['detail'] == 'Signature has expired or not verified'
+    assert response.json()['symbol'] == 'auth_token_expired_or_not_verified'

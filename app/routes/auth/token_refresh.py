@@ -9,7 +9,7 @@ from seed.setting import setting
 from seed.router import Route, status
 from seed.depends.auth import Auth
 from seed.depends.redis import Redis
-from seed.utils.convert import units2seconds
+from seed.utils.convert import units_to_seconds
 from app.routes.auth.oauth import OAuth
 
 
@@ -42,7 +42,7 @@ class TokenRefresh(Route):
     ) -> Tuple[Any, int]:
         now: int = arrow.now(setting.timezone).int_timestamp
         token_types: List[str] = ['access', 'refresh']
-        renewal_in: int = units2seconds(
+        renewal_in: int = units_to_seconds(
             setting.jwt.refresh_token_renewal_before_expire
         )
 
