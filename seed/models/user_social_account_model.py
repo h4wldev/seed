@@ -18,3 +18,15 @@ class UserSocialAccountModel(Base, ModelMixin):
     access_token = Column(Text)
     refresh_token = Column(Text)
     updated_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+
+    @classmethod
+    def q_social_id_and_provider(
+        cls,
+        social_id: str,
+        provider: str
+    ) -> 'Query':
+        return cls.q()\
+            .filter(
+                cls.social_id == social_id,
+                cls.provider == provider
+            )

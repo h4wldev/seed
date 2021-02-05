@@ -190,7 +190,7 @@ def test_auth_depend_get_credential_cookie(empty_app, get_test_client):
     assert response.json() == 'foobar'
 
 
-def test_auth_role_check(empty_app, get_test_client, dummy_record):
+def test_auth_role_check(session, empty_app, get_test_client):
     @empty_app.get('/role_check')
     def endpoint(
         auth: Auth(
@@ -203,22 +203,22 @@ def test_auth_role_check(empty_app, get_test_client, dummy_record):
     token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
 
-    with dummy_record(
+    session.bulk_save_objects([
         RoleModel(role='user'),
         RoleModel(role='admin'),
-        RoleModel(role='user-admin'),
         UserRoleModel(user_id=1, role_='user'),
         UserRoleModel(user_id=1, role_='admin')
-    ):
-        response = client.get('/role_check', headers={
-            'Authorization': f'Bearer {token.credential}',
-        })
+    ])
 
-        assert response.status_code == 200
-        assert response.json()
+    response = client.get('/role_check', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 200
+    assert response.json()
 
 
-def test_auth_ability_check(empty_app, get_test_client, dummy_record):
+def test_auth_ability_check(session, empty_app, get_test_client):
     @empty_app.get('/ability_check')
     def endpoint(
         auth: Auth(
@@ -231,23 +231,24 @@ def test_auth_ability_check(empty_app, get_test_client, dummy_record):
     token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
 
-    with dummy_record(
+    session.bulk_save_objects([
         RoleModel(role='user'),
         AbilityModel(ability='auth'),
         AbilityModel(ability='read'),
         RoleAbilityModel(role_='user', ability_='auth'),
         RoleAbilityModel(role_='user', ability_='read'),
         UserRoleModel(user_id=1, role_='user')
-    ):
-        response = client.get('/ability_check', headers={
-            'Authorization': f'Bearer {token.credential}',
-        })
+    ])
 
-        assert response.status_code == 200
-        assert response.json()
+    response = client.get('/ability_check', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 200
+    assert response.json()
 
 
-def test_auth_check_permission_user_not_exist(empty_app, get_test_client, dummy_record):
+def test_auth_check_permission_user_not_exist(empty_app, get_test_client):
     @empty_app.get('/user_not_exist')
     def endpoint(
         auth: Auth(
@@ -289,7 +290,7 @@ def test_auth_check_permission_permission_denied(empty_app, get_test_client):
     assert response.json()['symbol'] == 'auth_permmision_denied'
 
 
-def test_auth_check_permission_banned_role(empty_app, get_test_client, dummy_record):
+def test_auth_check_permission_banned_role(session, empty_app, get_test_client):
     @empty_app.get('/banned-role')
     def endpoint(
         auth: Auth(
@@ -302,22 +303,23 @@ def test_auth_check_permission_banned_role(empty_app, get_test_client, dummy_rec
     token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
 
-    with dummy_record(
+    session.bulk_save_objects([
         RoleModel(role='user'),
         AbilityModel(ability='auth'),
         RoleAbilityModel(role_='user', ability_='auth'),
         UserRoleModel(user_id=1, role_='user'),
         UserBanModel(user_id=1, role_='user', reason='foobar')
-    ):
-        response = client.get('/banned-role', headers={
-            'Authorization': f'Bearer {token.credential}',
-        })
+    ])
 
-        assert response.status_code == 401
-        assert response.json()['symbol'] == 'auth_banned_user'
+    response = client.get('/banned-role', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 401
+    assert response.json()['symbol'] == 'auth_banned_user'
 
 
-def test_auth_check_permission_banned_ability(empty_app, get_test_client, dummy_record):
+def test_auth_check_permission_banned_ability(session, empty_app, get_test_client):
     @empty_app.get('/banned-ability')
     def endpoint(
         auth: Auth(
@@ -330,22 +332,23 @@ def test_auth_check_permission_banned_ability(empty_app, get_test_client, dummy_
     token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
 
-    with dummy_record(
+    session.bulk_save_objects([
         RoleModel(role='user'),
         AbilityModel(ability='auth'),
         RoleAbilityModel(role_='user', ability_='auth'),
         UserRoleModel(user_id=1, role_='user'),
         UserBanModel(user_id=1, ability_='auth', reason='foobar')
-    ):
-        response = client.get('/banned-ability', headers={
-            'Authorization': f'Bearer {token.credential}',
-        })
+    ])
 
-        assert response.status_code == 401
-        assert response.json()['symbol'] == 'auth_banned_user'
+    response = client.get('/banned-ability', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 401
+    assert response.json()['symbol'] == 'auth_banned_user'
 
 
-def test_auth_check_permission_banned_not_continue(empty_app, get_test_client, dummy_record):
+def test_auth_check_permission_banned_not_continue(session, empty_app, get_test_client):
     @empty_app.get('/banned-not-continue')
     def endpoint(
         auth: Auth(
@@ -358,19 +361,20 @@ def test_auth_check_permission_banned_not_continue(empty_app, get_test_client, d
     token = create_token(subject='test@foobar.com')
     client = get_test_client(empty_app)
 
-    with dummy_record(
+    session.bulk_save_objects([
         RoleModel(role='user'),
         AbilityModel(ability='auth'),
         RoleAbilityModel(role_='user', ability_='auth'),
         UserRoleModel(user_id=1, role_='user'),
         UserBanModel(user_id=1, role_='user', until_at=datetime.datetime(1999, 3, 6))
-    ):
-        response = client.get('/banned-not-continue', headers={
-            'Authorization': f'Bearer {token.credential}',
-        })
+    ])
 
-        assert response.status_code == 200
-        assert response.json()
+    response = client.get('/banned-not-continue', headers={
+        'Authorization': f'Bearer {token.credential}',
+    })
+
+    assert response.status_code == 200
+    assert response.json()
 
 
 def test_check_has():

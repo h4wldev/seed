@@ -1,3 +1,5 @@
+import orjson
+
 from typing import Dict, Any, Optional
 
 from fastapi import Request as FastAPIRequest
@@ -5,8 +7,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 
 from seed.logger import logger
-from seed.request import Request as SeedRequest
 from seed.utils.convert import camelcase_to_underscore
+from seed.utils.request import get_trace_dict
 
 from .exceptions import HTTPException as SeedHTTPException
 
@@ -18,14 +20,17 @@ async def seed_http_exception_handler(
     error_data: Dict[str, Any] = dict(exc)
     extra: Dict[str, Any] = {}
 
-    if request:
-        request = SeedRequest.from_request(request)
-        extra = {'request': request.trace_dict}
+    if exc.request:
+        extra = {'request': await get_trace_dict(exc.request)}
+    elif request:
+        extra = {'request': await get_trace_dict(request)}
 
-    logger.error({
+    logger_data: str = orjson.dumps({
         **error_data,
         **extra
-    })
+    }).decode('utf-8')
+
+    logger.error(logger_data)
 
     return ORJSONResponse(
         error_data,

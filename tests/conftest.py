@@ -2,6 +2,8 @@ import os
 import pytest
 import sys
 
+from unittest.mock import patch, PropertyMock
+
 from fastapi import APIRouter
 from fastapi.testclient import TestClient
 
@@ -24,10 +26,25 @@ application = Application(
 ).create_app()
 
 
+@pytest.fixture(autouse=True)
+def session():
+    with db():
+        db.session.begin_nested()
+
+        with patch(
+            'fastapi_sqlalchemy.middleware.DBSessionMeta.session',
+            return_value=db.session,
+            new_callable=PropertyMock
+        ):
+            yield db.session
+
+        db.session.rollback()
+        db.session.close()
+
+
 @pytest.fixture
 def get_test_client():
-    with db():
-        yield lambda app: TestClient(app)
+    return lambda app: TestClient(app)
 
 
 @pytest.fixture(scope='session')
@@ -36,12 +53,11 @@ def app():
 
 
 @pytest.fixture
-def client(app):
-    with db():
-        yield TestClient(app)
+def client(session, app):
+    return TestClient(app)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture
 def empty_app():
     return Application(
         router=APIRouter(),
@@ -68,25 +84,22 @@ def query_string():
     )).strip()
 
 
-@pytest.fixture
-def dummy_record():
-    class _:
-        def __init__(self, *data):
-            self.data = data
+# @pytest.fixture
+# def dummy_record():
+#     class _:
+#         def __init__(self, *data):
+#             self.data = data
 
-        def __enter__(self):
-            for data in self.data:
-                db.session.add(data)
+#         def __enter__(self):
+#             for data in self.data:
+#                 db.session.add(data)
 
-            db.session.commit()
+#             db.session.commit()
 
-            return self.data
+#             return self.data
 
-        def __exit__(self, exc_type, exc_val, exc_tb):
-            for data in self.data:
-                db.session.delete(data)
+#         def __exit__(self, exc_type, exc_val, exc_tb):
+#             db.session.rollback()
 
-            db.session.commit()
-
-    with db():
-        yield _
+#     with db():
+#         yield _

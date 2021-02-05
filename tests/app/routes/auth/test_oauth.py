@@ -1,28 +1,21 @@
 from unittest.mock import patch
-
-from seed.db import db
-
 from seed.models import UserLoginHistoryModel
 
 
 @patch('seed.oauth.kakao.KakaoOAuthHandler.get_tokens', return_value=('access', 'refresh'))
 @patch('seed.oauth.kakao.KakaoOAuthHandler.get_user_info', return_value=('1', 'test@foobar.com'))
-def test_oauth_get_tokens(get_tokens, get_user_info, dummy_record, client):
-    with db(commit_on_exit=False):
-        response = client.post('/api/oauth', json={
-            'provider': 'kakao',
-            'code': 'code'
-        })
+def test_oauth_get_tokens(get_tokens, get_user_info, client):
+    response = client.post('/api/oauth', json={
+        'provider': 'kakao',
+        'code': 'code'
+    })
 
-        login_history = UserLoginHistoryModel.q()\
-            .filter(
-                UserLoginHistoryModel.user_id == 1,
-            )\
-            .order_by(UserLoginHistoryModel.id.desc())\
-            .first()
+    login_history = UserLoginHistoryModel.q_user_id(1)\
+        .order_by(UserLoginHistoryModel.id.desc())\
+        .first()
 
-        assert response.status_code == 201
-        assert login_history.success is True
+    assert response.status_code == 201
+    assert login_history.success is True
 
 
 @patch('seed.oauth.kakao.KakaoOAuthHandler.get_tokens', return_value=('access', 'refresh'))

@@ -74,3 +74,10 @@ class UserLoginHistoryModel(Base, ModelMixin):
             device=user_agent.device.family,
             os=user_agent.os.family,
         )
+
+    @classmethod
+    def q_user_id(
+        cls,
+        user_id: int
+    ) -> 'Query':
+        return cls.q().filter(cls.user_id == user_id)

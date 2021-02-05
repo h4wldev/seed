@@ -17,8 +17,7 @@ user_key_field = 'email'
     allow_headers = ['*']
 
     [default.role]
-    permissions = ['']
-    roles = ['']
+    roles = ['user']
 
     [default.jwt]
     algorithm = 'HS256'

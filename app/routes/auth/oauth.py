@@ -76,10 +76,10 @@ class OAuth(Route):
         access_token, refresh_token = oauth_handler.get_tokens(oauth_code.code)
         social_id, email = oauth_handler.get_user_info(access_token)
 
-        user_social_account = UserSocialAccountModel.q()\
-            .filter(
-                UserSocialAccountModel.social_id == social_id,
-                UserSocialAccountModel.provider == oauth_code.provider
+        user_social_account: UserSocialAccountModel = UserSocialAccountModel\
+            .q_social_id_and_provider(
+                social_id=social_id,
+                provider=oauth_code.provider
             )\
             .first()
 
@@ -100,7 +100,7 @@ class OAuth(Route):
             payload={},
         )
 
-        login_history = UserLoginHistoryModel.from_request(
+        login_history: UserLoginHistoryModel = UserLoginHistoryModel.from_request(
             user_id=user_social_account.user_id,
             request=request,
             success=True,
@@ -108,6 +108,7 @@ class OAuth(Route):
         )
 
         db.session.add(login_history)
+        db.session.commit()
 
         return response, status.HTTP_201_CREATED
 

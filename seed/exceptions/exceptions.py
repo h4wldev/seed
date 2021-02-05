@@ -61,3 +61,7 @@ class AuthHTTPException(HTTPException):
 
 class OAuthHTTPException(HTTPException):
     pass
+
+
+class UserHTTPException(HTTPException):
+    pass

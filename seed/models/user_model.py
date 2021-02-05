@@ -2,8 +2,10 @@ import datetime
 
 from sqlalchemy import text, Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
-from typing import Any
+from typing import Any, Optional, Set, Dict
 
+from seed.db import db
+from seed.fields.user_fields import RegisterFields, SocialInfoFields
 from seed.setting import setting
 
 from .mixin import Base, ModelMixin
@@ -13,6 +15,7 @@ from .user_login_history_model import UserLoginHistoryModel  # noqa: F401
 from .user_meta_model import UserMetaModel  # noqa: F401
 from .user_profile_model import UserProfileModel  # noqa: F401
 from .user_social_account_model import UserSocialAccountModel  # noqa: F401
+from .user_role_model import UserRoleModel  # noqa: F401
 
 
 class UserModel(Base, ModelMixin):
@@ -70,3 +73,62 @@ class UserModel(Base, ModelMixin):
     @property
     def key_field(self) -> Any:
         return getattr(self, setting.user_key_field)
+
+    @classmethod
+    def create(
+        cls,
+        register_fields: RegisterFields,
+        social_info_fields: SocialInfoFields,
+        roles: Set[str] = set()
+    ) -> 'UserModel':
+        roles.update(setting.role.roles)
+
+        user: 'UserModel' = cls(
+            email=register_fields.email,
+            username=register_fields.username,
+        )
+        db.session.add(user)
+        db.session.flush()
+
+        user_profile: UserProfileModel = UserProfileModel(
+            user_id=user.id,
+            display_name=register_fields.display_name,
+        )
+
+        user_meta: UserMetaModel = UserMetaModel(
+            user_id=user.id,
+            email_promotion=register_fields.email_promotion,
+            email_notification=register_fields.email_notification
+        )
+
+        user_social_account: UserSocialAccountModel = UserSocialAccountModel(
+            user_id=user.id,
+            social_id=social_info_fields.social_id,
+            provider=social_info_fields.provider
+        )
+
+        roles: List[UserRoleModel] = list(map(
+            lambda r: UserRoleModel(user_id=user.id, role_=r),
+            roles
+        ))
+
+        db.session.add(user_profile)
+        db.session.add(user_meta)
+        db.session.add(user_social_account)
+        db.session.add(user_profile)
+        db.session.bulk_save_objects(roles)
+
+
+    @classmethod
+    def q_email_or_username(
+        cls,
+        email: str,
+        username: str
+    ) -> 'Query':
+        return cls.q()\
+            .filter(
+                (
+                    cls.email == email,
+                    cls.username == username
+                )
+            )
