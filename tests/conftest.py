@@ -82,24 +82,3 @@ def query_string():
         lambda s: f'{strip(s)} ',
         s.split('\n')
     )).strip()
-
-
-# @pytest.fixture
-# def dummy_record():
-#     class _:
-#         def __init__(self, *data):
-#             self.data = data
-
-#         def __enter__(self):
-#             for data in self.data:
-#                 db.session.add(data)
-
-#             db.session.commit()
-
-#             return self.data
-
-#         def __exit__(self, exc_type, exc_val, exc_tb):
-#             db.session.rollback()
-
-#     with db():
-#         yield _
