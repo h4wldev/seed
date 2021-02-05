@@ -1,8 +1,11 @@
+import arrow
 import datetime
 
 from sqlalchemy import Column, ForeignKey, CheckConstraint, Text, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 from typing import Set
+
+from seed.setting import setting
 
 from .mixin import Base, ModelMixin
 
@@ -40,4 +43,4 @@ class UserBanModel(Base, ModelMixin):
         if self.until_at is None:
             return True
 
-        return self.until_at < datetime.datetime.now()
+        return self.until_at >= arrow.now(setting.timezone).naive

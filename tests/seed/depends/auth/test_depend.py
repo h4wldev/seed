@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import Depends, Request, Header
 
 from seed.depends.auth.depend import Auth
@@ -341,6 +343,34 @@ def test_auth_check_permission_banned_ability(empty_app, get_test_client, dummy_
 
         assert response.status_code == 401
         assert response.json()['symbol'] == 'auth_banned_user'
+
+
+def test_auth_check_permission_banned_not_continue(empty_app, get_test_client, dummy_record):
+    @empty_app.get('/banned-not-continue')
+    def endpoint(
+        auth: Auth(
+            required=True,
+            roles=['user']
+        ) = Depends()
+    ) -> str:
+        return True
+
+    token = create_token(subject='test@foobar.com')
+    client = get_test_client(empty_app)
+
+    with dummy_record(
+        RoleModel(role='user'),
+        AbilityModel(ability='auth'),
+        RoleAbilityModel(role_='user', ability_='auth'),
+        UserRoleModel(user_id=1, role_='user'),
+        UserBanModel(user_id=1, role_='user', until_at=datetime.datetime(1999, 3, 6))
+    ):
+        response = client.get('/banned-not-continue', headers={
+            'Authorization': f'Bearer {token.credential}',
+        })
+
+        assert response.status_code == 200
+        assert response.json()
 
 
 def test_check_has():
