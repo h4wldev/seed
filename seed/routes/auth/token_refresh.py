@@ -10,7 +10,8 @@ from seed.router import Route, status
 from seed.depends.auth import Auth
 from seed.depends.redis import Redis
 from seed.utils.convert import units_to_seconds
-from app.routes.auth.oauth import OAuth
+
+from .oauth import OAuth
 
 
 class TokenRefresh(Route):

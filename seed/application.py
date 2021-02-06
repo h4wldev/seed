@@ -21,6 +21,7 @@ from seed.exceptions.handlers import (
 from seed.middlewares.server_error import ServerErrorMiddleware
 from seed.utils.database import make_database_url
 from seed.setting import setting
+from seed.routes import router as seed_router
 
 
 class Application:  # pragma: no cover
@@ -42,6 +43,7 @@ class Application:  # pragma: no cover
             debug=setting.debug,
         )
 
+        self.app.include_router(seed_router, prefix=setting.api_prefix)
         self.app.include_router(self.router, prefix=setting.api_prefix)
 
         self.bind_database_middleware()
