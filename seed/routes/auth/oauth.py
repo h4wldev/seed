@@ -3,7 +3,6 @@ import importlib
 
 from fastapi import Request
 from fastapi.responses import ORJSONResponse
-from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional, List, Tuple, Union
 
 from seed.db import db
@@ -11,6 +10,7 @@ from seed.setting import setting
 
 from seed.router import Route, status
 from seed.exceptions import OAuthHTTPException
+from seed.fields.auth_fields import OAuthCodeField
 from seed.depends.auth import Auth, JWTToken
 from seed.models import (
     UserSocialAccountModel,
@@ -18,10 +18,6 @@ from seed.models import (
 )
 from seed.utils.crypto import AESCipher
 
-
-class OAuthCode(BaseModel):
-    provider: str = Field(...)
-    code: str = Field(...)
 
 
 class OAuth(Route):
@@ -60,7 +56,7 @@ class OAuth(Route):
     )
     async def post(
         request: Request,
-        oauth_code: OAuthCode
+        oauth_code: OAuthCodeField
     ) -> Tuple[Any, int]:
         oauth_handler: 'OAuthHandler' = OAuth.get_oauth_handler(oauth_code.provider)
 
