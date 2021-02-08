@@ -1,7 +1,5 @@
 from seed.models import ModelMixin, UserModel
 
-from seed.db import db
-
 
 def test_model_mixin_repr():
     class Model(ModelMixin):
@@ -16,6 +14,16 @@ def test_model_mixin_repr():
     assert str(model) == '<Model id=id, name=name>'
 
 
+def test_model_mixin_json():
+    assert UserModel.q().first().json() == {
+        'id': 1,
+        'email': 'test@foobar.com',
+        'updated_at': '2012-08-02T08:54:30',
+        'username': 'test',
+        'created_at': '1987-06-28T23:28:17'
+    }
+
+
 def test_model_mixin_query(query_string):
     model_mixin = ModelMixin()
     query_string = query_string("""
@@ -23,8 +31,7 @@ def test_model_mixin_query(query_string):
         FROM users
     """)  # noqa: E501
 
-    with db():
-        assert str(model_mixin.q(UserModel)) == query_string
+    assert str(model_mixin.q(UserModel)) == query_string
 
 
 def test_model_mixin_query_on_model(query_string):
@@ -33,5 +40,4 @@ def test_model_mixin_query_on_model(query_string):
         FROM users
     """)  # noqa: E501
 
-    with db():
-        assert str(UserModel.q()) == query_string
+    assert str(UserModel.q()) == query_string

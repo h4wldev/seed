@@ -1,5 +1,6 @@
-from typing import Any, Tuple
+from typing import Any, Tuple, Dict, Optional, Callable
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.declarative import api, declarative_base
 
 from seed.db import db as db_
@@ -30,6 +31,28 @@ class ModelMixin:
             attr_string = f' {repr_attrs}'
 
         return f'<{self.__class__.__name__}{attr_string}>'
+
+    def json(
+        self,
+        include: Optional[str] = None,
+        exclude: Optional[str] = None,
+        by_alias: bool = True,
+        exclude_unset: bool = False,
+        exclude_defaults: bool = False,
+        exclude_none: bool = False,
+        custom_encoder: Dict[Any, Callable[[Any], Any]] = {}
+    ) -> Dict[str, str]:
+        return jsonable_encoder(
+            self,
+            include=include,
+            exclude=exclude,
+            by_alias=by_alias,
+            exclude_unset=exclude_unset,
+            exclude_defaults=exclude_defaults,
+            exclude_none=exclude_none,
+            custom_encoder=custom_encoder,
+            sqlalchemy_safe=True
+        )
 
     @classmethod
     def q(

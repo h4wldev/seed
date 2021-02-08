@@ -17,6 +17,7 @@ from seed.db import db
 from app.routes import router
 
 from seed.application import Application
+from seed.depends.auth.types import JWTToken
 
 
 # Initialize testing application
@@ -82,3 +83,19 @@ def query_string():
         lambda s: f'{strip(s)} ',
         s.split('\n')
     )).strip()
+
+
+@pytest.fixture
+def create_token():
+    def _(
+        subject='foobar',
+        type_='access',
+        expires='10s'
+    ):
+        return JWTToken.create(
+            subject=subject,
+            token_type=type_,
+            expires=expires
+        )
+
+    return _
