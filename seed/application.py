@@ -44,6 +44,7 @@ class Application:  # pragma: no cover
             debug=setting.debug,
             responses={
                 422: {
+                    'description': '__[RequestValidationException]__\n\nRequest validation failed',
                     'content': {
                         'application/json': {
                             'example': {
