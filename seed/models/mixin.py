@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Dict, Optional, Callable
+from typing import Any, Tuple, Dict, Union, Optional, Callable
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.declarative import api, declarative_base
@@ -34,25 +34,29 @@ class ModelMixin:
 
     def json(
         self,
-        include: Optional[str] = None,
-        exclude: Optional[str] = None,
-        by_alias: bool = True,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
+        include: Optional[Union[str, set]] = None,
+        exclude: Optional[Union[str, set]] = None,
         exclude_none: bool = False,
-        custom_encoder: Dict[Any, Callable[[Any], Any]] = {}
+        custom_handler: Dict[str, Callable[[Any], Any]] = {}
     ) -> Dict[str, str]:
-        return jsonable_encoder(
-            self,
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-            custom_encoder=custom_encoder,
-            sqlalchemy_safe=True
-        )
+        result: Dict[str, Any] = {}
+
+        for column in self.__table__.columns:
+            if (include and column.key not in include)\
+                or (exclude and column.key in exclude):
+                continue
+
+            data: Any = jsonable_encoder(getattr(self, column.key, None))
+
+            if column.key in custom_handler.keys():
+                data = custom_handler[column.key](data)
+
+            if exclude_none and data is None:
+                continue
+
+            result[column.key]: Any = data
+
+        return result
 
     @classmethod
     def q(

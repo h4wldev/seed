@@ -15,13 +15,27 @@ def test_model_mixin_repr():
 
 
 def test_model_mixin_json():
-    assert UserModel.q().first().json() == {
-        'id': 1,
-        'email': 'test@foobar.com',
-        'updated_at': '2012-08-02T08:54:30',
-        'username': 'test',
-        'created_at': '1987-06-28T23:28:17'
-    }
+    data = UserModel.q().first().json()
+
+    assert list(data.keys()) == ['id', 'email', 'username', 'updated_at', 'created_at']
+
+
+def test_model_mixin_json_include():
+    data = UserModel.q().first().json(include={'email', 'username'})
+
+    assert list(data.keys()) == ['email', 'username']
+
+
+def test_model_mixin_json_exclude():
+    data = UserModel.q().first().json(exclude={'id'})
+
+    assert list(data.keys()) == ['email', 'username', 'updated_at', 'created_at']
+
+
+def test_model_mixin_json_custom_handler():
+    data = UserModel.q().first().json(custom_handler={'email': lambda e: e.split('@')[1]})
+
+    assert data['email'] == 'foobar.com'
 
 
 def test_model_mixin_query(query_string):
