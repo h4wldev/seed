@@ -19,7 +19,8 @@ from seed.utils.crypto import AESCipher
 
 class Users(Route):
     @Route.option(
-        name='Register'
+        name='Register',
+        default_status_code=201
     )
     @Route.doc_option(
         tags=['users'],
@@ -32,7 +33,12 @@ class Users(Route):
                         'example': None
                     }
                 }
-            }
+            },
+            **UserHTTPException.doc_object([
+                'invalid_register_code',
+                'social_user_already_exists',
+                'already_exist_email_or_username'
+            ])
         }
     )
     async def post(

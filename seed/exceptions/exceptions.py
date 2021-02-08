@@ -1,12 +1,25 @@
 import uuid
 
-from typing import Any, Dict, Optional, Iterator
+from typing import Any, Dict, Optional, Iterator, Union, List, TypeVar
 
 from fastapi import status
+from pydantic import BaseModel, Field
+
+
+
+class HTTPExceptionSchema(BaseModel):
+    trace_id: str = Field(...)
+    symbol: str = Field(...)
+    status_code: int = Field(400)
+    type: str = Field('HTTPException')
+    message: Optional[str]
+    detail: Optional[Any]
+    headers: Optional[Dict[str, Union[str, int]]]
 
 
 class HTTPException(Exception):
     _default_status_code: int = status.HTTP_400_BAD_REQUEST
+    _schema: BaseModel = HTTPExceptionSchema
 
     def __init__(
         self,
@@ -53,6 +66,30 @@ class HTTPException(Exception):
                 continue
 
             yield (key, value)
+
+    @classmethod
+    def doc_object(
+        cls,
+        symbols: List[str] = []
+    ) -> Dict[str, Any]:
+        description: str = '\n\n'.join(map(lambda s: f'* {s}', symbols))
+
+        return {
+            cls._default_status_code: {
+                'description': f'__[{cls.__name__}]__\n\n{description}',
+                'content': {
+                    'application/json': {
+                        'example': {
+                            'trace_id': '<error_trace_id>',
+                            'symbol': '|'.join(symbols),
+                            'status_code': cls._default_status_code,
+                            'type': cls.__name__
+                        }
+                    }
+                },
+                'model': cls._schema
+            }
+        }
 
 
 class AuthHTTPException(HTTPException):
