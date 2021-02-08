@@ -3,7 +3,6 @@ import datetime
 from fastapi import Depends, Request, Header
 
 from seed.depends.auth.depend import Auth
-from seed.depends.auth.types import JWTToken
 from seed.depends.redis import RedisContextManager
 from seed.models import (
     RoleModel,
@@ -16,19 +15,7 @@ from seed.models import (
 from seed.setting import setting
 
 
-def create_token(
-    subject='foobar',
-    type_='access',
-    expires='10s'
-):
-    return JWTToken.create(
-        subject=subject,
-        token_type=type_,
-        expires=expires
-    )
-
-
-def test_auth_depend(empty_app, get_test_client):
+def test_auth_depend(empty_app, get_test_client, create_token):
     @empty_app.get('/auth_optional')
     def endpoint(auth: Auth() = Depends()):
         return auth.token is not None
@@ -54,7 +41,7 @@ def test_auth_depend_optional_without_credential(empty_app, get_test_client):
     assert not response.json()
 
 
-def test_auth_depend_with_token_type(empty_app, get_test_client):
+def test_auth_depend_with_token_type(empty_app, get_test_client, create_token):
     @empty_app.get('/auth_optional')
     def endpoint(auth: Auth(token_type='refresh') = Depends()):
         return auth.token is not None
@@ -79,7 +66,7 @@ def test_auth_depend_with_token_type(empty_app, get_test_client):
     assert response.json()
 
 
-def test_auth_depend_jwt_notin_redis(empty_app, get_test_client):
+def test_auth_depend_jwt_notin_redis(empty_app, get_test_client, create_token):
     @empty_app.get('/auth_optional')
     def endpoint(auth: Auth() = Depends()):
         return auth.token is not None
@@ -190,7 +177,7 @@ def test_auth_depend_get_credential_cookie(empty_app, get_test_client):
     assert response.json() == 'foobar'
 
 
-def test_auth_role_check(session, empty_app, get_test_client):
+def test_auth_role_check(session, empty_app, get_test_client, create_token):
     @empty_app.get('/role_check')
     def endpoint(
         auth: Auth(
@@ -218,7 +205,7 @@ def test_auth_role_check(session, empty_app, get_test_client):
     assert response.json()
 
 
-def test_auth_ability_check(session, empty_app, get_test_client):
+def test_auth_ability_check(session, empty_app, get_test_client, create_token):
     @empty_app.get('/ability_check')
     def endpoint(
         auth: Auth(
@@ -248,7 +235,7 @@ def test_auth_ability_check(session, empty_app, get_test_client):
     assert response.json()
 
 
-def test_auth_check_permission_user_not_exist(empty_app, get_test_client):
+def test_auth_check_permission_user_not_exist(empty_app, get_test_client, create_token):
     @empty_app.get('/user_not_exist')
     def endpoint(
         auth: Auth(
@@ -269,7 +256,7 @@ def test_auth_check_permission_user_not_exist(empty_app, get_test_client):
     assert response.json()['symbol'] == 'auth_user_not_exists'
 
 
-def test_auth_check_permission_permission_denied(empty_app, get_test_client):
+def test_auth_check_permission_permission_denied(empty_app, get_test_client, create_token):
     @empty_app.get('/permission_denied')
     def endpoint(
         auth: Auth(
@@ -290,7 +277,7 @@ def test_auth_check_permission_permission_denied(empty_app, get_test_client):
     assert response.json()['symbol'] == 'auth_permmision_denied'
 
 
-def test_auth_check_permission_banned_role(session, empty_app, get_test_client):
+def test_auth_check_permission_banned_role(session, empty_app, get_test_client, create_token):
     @empty_app.get('/banned-role')
     def endpoint(
         auth: Auth(
@@ -319,7 +306,7 @@ def test_auth_check_permission_banned_role(session, empty_app, get_test_client):
     assert response.json()['symbol'] == 'auth_banned_user'
 
 
-def test_auth_check_permission_banned_ability(session, empty_app, get_test_client):
+def test_auth_check_permission_banned_ability(session, empty_app, get_test_client, create_token):
     @empty_app.get('/banned-ability')
     def endpoint(
         auth: Auth(
@@ -348,7 +335,7 @@ def test_auth_check_permission_banned_ability(session, empty_app, get_test_clien
     assert response.json()['symbol'] == 'auth_banned_user'
 
 
-def test_auth_check_permission_banned_not_continue(session, empty_app, get_test_client):
+def test_auth_check_permission_banned_not_continue(session, empty_app, get_test_client, create_token):
     @empty_app.get('/banned-not-continue')
     def endpoint(
         auth: Auth(
