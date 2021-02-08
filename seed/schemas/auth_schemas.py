@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
 
-class OAuthCodeField(BaseModel):
+class OAuthCodeSchema(BaseModel):
     provider: str = Field(...)
     code: str = Field(...)

@@ -5,7 +5,7 @@ from typing import Any, Tuple, Optional, Dict
 
 from seed.db import db
 from seed.exceptions import UserHTTPException
-from seed.fields.user_fields import RegisterFields, SocialInfoFields
+from seed.schemas.user_schemas import RegisterSchema, SocialInfoSchema
 from seed.router import Route, status
 from seed.models import (
     UserModel,
@@ -43,10 +43,10 @@ class Users(Route):
     )
     async def post(
         request: Request,
-        body: RegisterFields
+        body: RegisterSchema
     ) -> Tuple[Any, int]:
         try:
-            social_info: SocialInfoFields = SocialInfoFields(
+            social_info: SocialInfoSchema = SocialInfoSchema(
                 **orjson.loads(AESCipher().decrypt(body.code))
             )
         except Exception:

@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, validator
 from seed.utils.regex_patterns import email_pattern
 
 
-class RegisterFields(BaseModel):
+class RegisterSchema(BaseModel):
     code: str = Field(..., min_length=20)
     email: str = Field(..., max_length=100)
     username: str = Field(..., min_length=3, max_length=50)
@@ -24,6 +24,6 @@ class RegisterFields(BaseModel):
         return value
 
 
-class SocialInfoFields(BaseModel):
+class SocialInfoSchema(BaseModel):
     social_id: str = Field(...)
     provider: str = Field(...)

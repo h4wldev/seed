@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from typing import Any, Optional, Set, Dict
 
 from seed.db import db
-from seed.fields.user_fields import RegisterFields, SocialInfoFields
+from seed.schemas.user_schemas import RegisterSchema, SocialInfoSchema
 from seed.setting import setting
 
 from .mixin import Base, ModelMixin
@@ -77,8 +77,8 @@ class UserModel(Base, ModelMixin):
     @classmethod
     def create(
         cls,
-        register_fields: RegisterFields,
-        social_info_fields: SocialInfoFields,
+        register_fields: RegisterSchema,
+        social_info_fields: SocialInfoSchema,
         roles: Set[str] = set()
     ) -> 'UserModel':
         roles.update(setting.role.roles)

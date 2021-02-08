@@ -10,7 +10,7 @@ from seed.setting import setting
 
 from seed.router import Route, status
 from seed.exceptions import OAuthHTTPException  
-from seed.fields.auth_fields import OAuthCodeField
+from seed.schemas.auth_schemas import OAuthCodeSchema
 from seed.depends.auth import Auth, JWTToken
 from seed.models import (
     UserSocialAccountModel,
@@ -59,7 +59,7 @@ class OAuth(Route):
     )
     async def post(
         request: Request,
-        oauth_code: OAuthCodeField
+        oauth_code: OAuthCodeSchema
     ) -> Tuple[Any, int]:
         oauth_handler: 'OAuthHandler' = OAuth.get_oauth_handler(oauth_code.provider)
 
