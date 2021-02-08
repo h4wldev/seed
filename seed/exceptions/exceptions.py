@@ -5,16 +5,7 @@ from typing import Any, Dict, Optional, Iterator, Union, List, TypeVar
 from fastapi import status
 from pydantic import BaseModel, Field
 
-
-
-class HTTPExceptionSchema(BaseModel):
-    trace_id: str = Field(...)
-    symbol: str = Field(...)
-    status_code: int = Field(400)
-    type: str = Field('HTTPException')
-    message: Optional[str]
-    detail: Optional[Any]
-    headers: Optional[Dict[str, Union[str, int]]]
+from .schemas import HTTPExceptionSchema
 
 
 class HTTPException(Exception):

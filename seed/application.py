@@ -18,6 +18,7 @@ from seed.exceptions.handlers import (
     pyjwt_exception_handler,
     request_validation_exception_handler
 )
+from seed.exceptions.schemas import RequestValidationExceptionSchema
 from seed.middlewares.server_error import ServerErrorMiddleware
 from seed.utils.database import make_database_url
 from seed.setting import setting
@@ -41,6 +42,24 @@ class Application:  # pragma: no cover
         self.app: FastAPI = FastAPI(
             title=self.name,
             debug=setting.debug,
+            responses={
+                422: {
+                    'content': {
+                        'application/json': {
+                            'example': {
+                                'trace_id': '<error_trace_id>',
+                                'symbol': 'request_validation_failed',
+                                'status_code': 422,
+                                'type': 'RequestValidationError',
+                                'detail': [
+                                    {'loc': ['<string>'], 'msg': '<message>', 'type': '<type>'}
+                                ]
+                            }
+                        }
+                    },
+                    'model': RequestValidationExceptionSchema
+                }
+            },
         )
 
         self.app.include_router(seed_router, prefix=setting.api_prefix)
