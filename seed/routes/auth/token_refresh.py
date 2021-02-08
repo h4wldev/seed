@@ -16,13 +16,14 @@ from .oauth import OAuth
 
 class TokenRefresh(Route):
     @Route.option(
-        name='Token Refresh'
+        name='Token Refresh',
+        default_status_code=status.HTTP_201_CREATED
     )
     @Route.doc_option(
         tags=['auth'],
         description='Return access / refresh token with refresh token',
         responses={
-            200: {
+            status.HTTP_201_CREATED: {
                 'description': 'Return jwt access / refresh tokens (refresh_token_renewal_before_expire)',
                 'content': {
                     'application/json': {

@@ -2,7 +2,7 @@ from fastapi import Depends
 from fastapi.responses import ORJSONResponse
 from typing import Any, Tuple
 
-from seed.router import Route
+from seed.router import Route, status
 from seed.depends.auth import Auth
 from seed.depends.redis import Redis
 
@@ -15,7 +15,7 @@ class Logout(Route):
         tags=['auth'],
         description='Expire access, refresh token',
         responses={
-            200: {
+            status.HTTP_200_OK: {
                 'description': 'Expire access, refresh token',
                 'content': {
                     'application/json': {

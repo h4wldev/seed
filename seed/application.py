@@ -2,7 +2,7 @@ import logging
 
 import seed.logger as logger
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, status
 from fastapi.exceptions import (
     HTTPException as FastAPIHTTPException,
     RequestValidationError
@@ -43,14 +43,14 @@ class Application:  # pragma: no cover
             title=self.name,
             debug=setting.debug,
             responses={
-                422: {
+                status.HTTP_422_UNPROCESSABLE_ENTITY: {
                     'description': '__[RequestValidationException]__\n\nRequest validation failed',
                     'content': {
                         'application/json': {
                             'example': {
                                 'trace_id': '<error_trace_id>',
                                 'symbol': 'request_validation_failed',
-                                'status_code': 422,
+                                'status_code': status.HTTP_422_UNPROCESSABLE_ENTITY,
                                 'type': 'RequestValidationError',
                                 'detail': [
                                     {'loc': ['<string>'], 'msg': '<message>', 'type': '<type>'}

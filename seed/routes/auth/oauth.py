@@ -23,13 +23,13 @@ from seed.utils.crypto import AESCipher
 class OAuth(Route):
     @Route.option(
         name='OAuth',
-        default_status_code=201
+        default_status_code=status.HTTP_201_CREATED
     )
     @Route.doc_option(
         tags=['auth'],
         description='Using OAuth for Authentication',
         responses={
-            201: {
+            status.HTTP_201_CREATED: {
                 'description': 'Return jwt access, refresh tokens',
                 'content': {
                     'application/json': {
@@ -42,7 +42,7 @@ class OAuth(Route):
                     }
                 }
             },
-            404: {
+            status.HTTP_404_NOT_FOUND: {
                 'description': 'That social user not exists',
                 'content': {
                     'application/json': {
