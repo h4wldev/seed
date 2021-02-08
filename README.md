@@ -27,7 +27,8 @@
 - [x] __[Auth]__ POST /oauth - Using OAuth for Authentication
 - [x] __[Auth]__ POST /token/refresh - Token Refresh
 - [x] __[Auth]__ POST /logout - Logout
-- [x] __[Auth]__ POST /users/ - Register
+- [x] __[User]__ POST /users/ - Register
+- [x] __[User]__ Get /users/me - Get user information (me)
 
 
 ## How to Run
