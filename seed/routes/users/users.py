@@ -20,13 +20,13 @@ from seed.utils.crypto import AESCipher
 class Users(Route):
     @Route.option(
         name='Register',
-        default_status_code=201
+        default_status_code=status.HTTP_201_CREATED
     )
     @Route.doc_option(
         tags=['users'],
         description='Register with OAuth Code',
         responses={
-            201: {
+            status.HTTP_201_CREATED: {
                 'description': 'Successfully create user',
                 'content': {
                     'application/json': {
