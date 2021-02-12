@@ -47,7 +47,7 @@ class ModelMixin:
                 or (exclude and column.key in exclude):
                 continue
 
-            column_key: str = column.key
+            column_key: str = str(column.key)
 
             if column_key in self._column_alias:
                 column_key = self._column_alias[column_key]
@@ -60,7 +60,7 @@ class ModelMixin:
             if exclude_none and data is None:
                 continue
 
-            result[column.key]: Any = data
+            result[str(column.key)]: Any = data
 
         return result
 
