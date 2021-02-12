@@ -1,5 +1,7 @@
-from sqlalchemy import or_
-from typing import Any, Tuple, Union
+import enum
+
+from sqlalchemy import or_, case, asc, desc
+from typing import Any, Tuple, Union, Set, Callable
 
 from seed.db import db as db_
 
@@ -49,3 +51,26 @@ class Query:
 
     def exists(self) -> bool:
         return self.query_.count() > 0
+
+    def enum_order_by(
+        self,
+        column: 'InstrumentedAttribute',
+        priorities: Set[Any] = set(),
+        order_by: Union[str, Callable[..., Any]] = asc
+    ) -> 'Query':
+        whens: Dict[str, int] = {}
+
+        for i, item in enumerate(priorities):
+            if isinstance(item, enum.Enum):
+                item = item.value
+
+            whens[item] = i
+
+        if isinstance(order_by, str):
+            order_by = {'desc': desc, 'asc': asc}.get(order_by, asc)
+
+        self.query_ = self.query_.order_by(
+            order_by(case(value=column, whens=whens).label(column.key))
+        )
+
+        return self

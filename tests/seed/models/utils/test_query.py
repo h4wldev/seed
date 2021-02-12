@@ -1,3 +1,5 @@
+import enum
+
 from seed.models import UserModel
 from seed.models.utils.query import Query
 
@@ -51,3 +53,41 @@ def test_query_exists():
 
 def test_query_getattribute_on_sa_query():
     assert Query(UserModel).count()
+
+
+def test_query_enum_order_by(query_string):
+    query = Query(UserModel).enum_order_by(UserModel.username, ['super-admin', 'admin'])
+    query_string = query_string("""
+    SELECT users.id AS users_id, users.email AS users_email, users.username AS users_username, users.updated_at AS users_updated_at, users.created_at AS users_created_at
+FROM users ORDER BY CASE users.username WHEN %s THEN %s WHEN %s THEN %s END ASC
+""")  # noqa: E501
+
+    assert str(query) == query_string
+
+
+def test_query_enum_order_by_with_enum(query_string):
+    class Enum(enum.Enum):
+        one = 'one'
+        two = 'two'
+
+    query = Query(UserModel).enum_order_by(UserModel.username, [Enum.one, Enum.two])
+    query_string = query_string("""
+    SELECT users.id AS users_id, users.email AS users_email, users.username AS users_username, users.updated_at AS users_updated_at, users.created_at AS users_created_at
+FROM users ORDER BY CASE users.username WHEN %s THEN %s WHEN %s THEN %s END ASC
+""")  # noqa: E501
+
+    assert str(query) == query_string
+
+
+def test_query_enum_order_by_with_order(query_string):
+    class Enum(enum.Enum):
+        one = 'one'
+        two = 'two'
+
+    query = Query(UserModel).enum_order_by(UserModel.username, [], 'desc')
+    query_string = query_string("""
+    SELECT users.id AS users_id, users.email AS users_email, users.username AS users_username, users.updated_at AS users_updated_at, users.created_at AS users_created_at
+FROM users ORDER BY CASE users.username END DESC
+""")  # noqa: E501
+
+    assert str(query) == query_string

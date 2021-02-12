@@ -229,12 +229,17 @@ from seed.models import Base, ModelMixin
 class Model(Base, ModelMixin):
   ...
 
+class Enum(enum.Enum):
+  one = 'one'
+  two = 'two'
+
 Model.q()\
   .filter(
     Model.field == 'field',
     [Model.field2 == 'field2', Model.field2 == 'field3']
   )\
   .paging(page=0, limit=30)\
+  .enum_order_by(UserModel.username, [Enum.one, Enum.two], 'desc')\
   .all()
 ```
 
@@ -243,6 +248,7 @@ Model.q()\
 1 depth is and operation, 2depth is or operation
 
 ##### > Model.q.paging(page: int, limit: int)  # page zero based indexing
+##### > Model.q.enum_order_by(column: Column, priority: Set[Union[str, Enum]] = {}, order_by: Union[str, Callable] = 'asc)
 ##### > Model.q.exists() -> bool
 ##### And same as sqlalchemy query
 
