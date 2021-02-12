@@ -14,33 +14,33 @@ def test_model_mixin_repr():
     assert str(model) == '<Model id=id, name=name>'
 
 
-def test_model_mixin_json():
-    data = UserModel.q().first().json()
+def test_model_mixin_jsonify():
+    data = UserModel.q().first().jsonify()
 
     assert list(data.keys()) == ['id', 'email', 'username', 'updated_at', 'created_at']
 
 
-def test_model_mixin_json_include():
-    data = UserModel.q().first().json(include={'email', 'username'})
+def test_model_mixin_jsonify_include():
+    data = UserModel.q().first().jsonify(include={'email', 'username'})
 
     assert list(data.keys()) == ['email', 'username']
 
 
-def test_model_mixin_json_exclude():
-    data = UserModel.q().first().json(exclude={'id'})
+def test_model_mixin_jsonify_exclude():
+    data = UserModel.q().first().jsonify(exclude={'id'})
 
     assert list(data.keys()) == ['email', 'username', 'updated_at', 'created_at']
 
 
-def test_model_mixin_json_custom_handler():
-    data = UserModel.q().first().json(custom_handler={'email': lambda e: e.split('@')[1]})
+def test_model_mixin_jsonify_custom_handler():
+    data = UserModel.q().first().jsonify(custom_handler={'email': lambda e: e.split('@')[1]})
 
     assert data['email'] == 'foobar.com'
 
 
-def test_model_mixin_json_column_alias():
+def test_model_mixin_jsonify_column_alias():
     UserModel._column_alias = {'email': 'id'}
-    data = UserModel.q().first().json()
+    data = UserModel.q().first().jsonify()
 
     UserModel._column_alias = {}
 

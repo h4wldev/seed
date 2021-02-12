@@ -33,7 +33,7 @@ class ModelMixin:
 
         return f'<{self.__class__.__name__}{attr_string}>'
 
-    def json(
+    def jsonify(
         self,
         include: Optional[Union[str, set]] = None,
         exclude: Optional[Union[str, set]] = None,

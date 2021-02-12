@@ -46,8 +46,8 @@ class UserMe(Route):
         exclude: Set[str] = {'id', 'user_id', 'updated_at'}
 
         return {
-            **auth.user.json(include={'email', 'username'}),
-            'profile': auth.user.profile.json(exclude=exclude),
-            'meta': auth.user.meta.json(exclude=exclude),
+            **auth.user.jsonify(include={'email', 'username'}),
+            'profile': auth.user.profile.jsonify(exclude=exclude),
+            'meta': auth.user.meta.jsonify(exclude=exclude),
             'social_accounts': list(map(lambda s: s.provider, auth.user.social_accounts))
         }, status.HTTP_200_OK
