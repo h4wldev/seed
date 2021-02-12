@@ -38,6 +38,15 @@ def test_model_mixin_json_custom_handler():
     assert data['email'] == 'foobar.com'
 
 
+def test_model_mixin_json_column_alias():
+    UserModel._column_alias = {'email': 'id'}
+    data = UserModel.q().first().json()
+
+    UserModel._column_alias = {}
+
+    assert data['email'] == data['id']
+
+
 def test_model_mixin_query(query_string):
     model_mixin = ModelMixin()
     query_string = query_string("""

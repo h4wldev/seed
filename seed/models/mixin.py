@@ -13,6 +13,7 @@ Base = declarative_base()
 
 class ModelMixin:
     _repr_attrs: Tuple[str] = ()
+    _column_alias: Dict[str, str] = {}
 
     db: 'DBSessionMeta' = db_
 
@@ -46,10 +47,15 @@ class ModelMixin:
                 or (exclude and column.key in exclude):
                 continue
 
-            data: Any = jsonable_encoder(getattr(self, column.key, None))
+            column_key: str = column.key
 
-            if column.key in custom_handler.keys():
-                data = custom_handler[column.key](data)
+            if column_key in self._column_alias:
+                column_key = self._column_alias[column_key]
+
+            data: Any = jsonable_encoder(getattr(self, column_key, None))
+
+            if column_key in custom_handler.keys():
+                data = custom_handler[column_key](data)
 
             if exclude_none and data is None:
                 continue
