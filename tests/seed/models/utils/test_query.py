@@ -1,4 +1,5 @@
 import enum
+import pytest
 
 from seed.models import UserModel
 from seed.models.utils.query import Query
@@ -53,6 +54,18 @@ def test_query_exists():
 
 def test_query_getattribute_on_sa_query():
     assert Query(UserModel).count()
+
+
+def test_query_getattribute_attribute_error():
+    with pytest.raises(AttributeError):
+        Query(UserModel).foobar()
+
+
+def test_query_mix_query_and_sa_query():
+    assert Query(UserModel)\
+        .order_by(UserModel.id.desc())\
+        .paging(page=0, limit=30)\
+        .count()
 
 
 def test_query_enum_order_by(query_string):

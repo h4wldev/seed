@@ -1,6 +1,7 @@
 import enum
 
 from sqlalchemy import or_, case, asc, desc
+from sqlalchemy.orm.query import Query as SAQuery
 from typing import Any, Tuple, Union, Set, Callable
 
 from seed.db import db as db_
@@ -25,8 +26,8 @@ class Query:
     ) -> Any:
         try:
             return object.__getattribute__(self, name)
-        except AttributeError:
-            return getattr(self.query_, name)
+        except AttributeError as e:
+            return self._mapper(name)
 
     def filter(
         self,
@@ -74,3 +75,19 @@ class Query:
         )
 
         return self
+
+    def _mapper(
+        self,
+        name: str
+    ) -> 'Query':
+        def _(*args, **kwargs) -> Any:
+            result: Any = getattr(self.query_, name)(*args, **kwargs)
+
+            if isinstance(result, SAQuery):
+                self.query_ = result
+
+                return self
+
+            return result
+
+        return _
