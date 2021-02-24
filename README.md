@@ -35,8 +35,7 @@
 #### 1. Pull this Repo
 
 #### 2. Configuration
-1. Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example) 
-2. Uncomment or add on [setting.py](setting.py), setting files
+Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example)
 
 #### 3. DB Migration
 ```bash

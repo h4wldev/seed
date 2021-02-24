@@ -11,5 +11,8 @@ setting: Dynaconf = Dynaconf(
         'seed/settings/.secrets.default.toml',
         'seed/settings/setting.default.toml'
     ],
-    DYNACONF_INCLUDE=['../../settings/*.toml']
+    DYNACONF_INCLUDE=[
+        '../../settings/*.toml',
+        '../../settings/secrets/.secrets.*.toml'
+    ]
 )
