@@ -1,3 +1,5 @@
+import os
+import sys
 import logging
 
 import seed.logger as logger
@@ -8,21 +10,22 @@ from fastapi.exceptions import (
     RequestValidationError
 )
 from fastapi_sqlalchemy import DBSessionMiddleware
+from typing import List, Union, Dict
 from jwt.exceptions import PyJWTError
 from starlette.middleware.cors import CORSMiddleware
 
-from seed.exceptions import HTTPException as SeedHTTPException
-from seed.exceptions.handlers import (
+from .exceptions import HTTPException as SeedHTTPException
+from .exceptions.handlers import (
     fastapi_exception_handler,
     seed_http_exception_handler,
     pyjwt_exception_handler,
     request_validation_exception_handler
 )
-from seed.exceptions.schemas import RequestValidationExceptionSchema
-from seed.middlewares.server_error import ServerErrorMiddleware
-from seed.utils.database import make_database_url
-from seed.setting import setting
-from seed.routes import router as seed_router
+from .exceptions.schemas import RequestValidationExceptionSchema
+from .middlewares.server_error import ServerErrorMiddleware
+from .utils.database import make_database_url
+from .setting import setting
+from .routes import router as seed_router
 
 
 class Application:  # pragma: no cover
@@ -31,14 +34,19 @@ class Application:  # pragma: no cover
         router: APIRouter,
         name: str = __name__,
         env: str = 'development',
+        setting_files: List[str] = [
+            'settings/*.toml',
+            'settings/secrets/.secrets.*.toml'
+        ]
     ) -> None:
         self.name: str = name
         self.env: str = env
         self.router: APIRouter = router
-
-        setting.setenv(self.env)
+        self.setting_files: List[str] = setting_files
 
     def create_app(self) -> FastAPI:
+        self.load_setting_files()
+
         self.app: FastAPI = FastAPI(
             title=self.name,
             debug=setting.debug,
@@ -74,6 +82,15 @@ class Application:  # pragma: no cover
         self.logger_configure()
 
         return self.app
+
+    def load_setting_files(self) -> None:
+        setting_files: List[str] = list(map(
+            lambda p: os.path.join(os.getcwd(), p),
+            self.setting_files
+        ))
+
+        setting.setenv(self.env)
+        setting.load_file(path=setting_files)
 
     def bind_exception_handlers(self) -> None:
         self.app.add_exception_handler(FastAPIHTTPException, fastapi_exception_handler)
@@ -122,7 +139,12 @@ class Application:  # pragma: no cover
             self.app.add_middleware(SentryAsgiMiddleware)
 
     def logger_configure(self) -> None:
-        log_level: int = logging.DEBUG if setting.debug else logging.INFO
+        log_level: Union[int, str] = setting.logging.get('level', 'INFO')
+
+        if isinstance(log_level, str):
+            log_level = getattr(logging, log_level.upper(), logging.INFO)
+
+        log_level: int = logging.DEBUG if setting.debug else log_level
 
         logger.logger_configure(log_level)
         logger.intercept_loggers(setting.logging.intercept_loggers, log_level)

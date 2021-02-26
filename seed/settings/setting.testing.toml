@@ -1,0 +1,13 @@
+dynaconf_merge=true
+[testing]
+debug = false
+
+    [testing.database]
+    dbms = 'mysql'
+    host = '127.0.0.1'
+    user = 'root'
+    database = 'seed_test'
+    charset = 'utf8'
+
+    [testing.logging]
+    level = 99
