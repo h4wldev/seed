@@ -57,7 +57,7 @@ jobs:
         ENV: testing
     - name: Add dummy data on Database
       run: |
-        mysql --ho  st 127.0.0.1 --port 3306 -uroot seed_test < tests/testdata.sql
+        mysql --host 127.0.0.1 --port 3306 -uroot seed_test < tests/testdata.sql
     - name: Run Tests And Generate coverage report
       run: |
         pytest --cov-report=xml
