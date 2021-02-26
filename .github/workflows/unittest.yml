@@ -50,6 +50,9 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - run: pip install -r requirements.txt
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+    - name: Install alembic for database migrate
+      run: |
+        pip install alembic
     - name: Create Table into Database with alembic
       run: |
         alembic upgrade head
@@ -57,7 +60,7 @@ jobs:
         ENV: testing
     - name: Add dummy data on Database
       run: |
-        mysql --host 127.0.0.1 --port 3306 -uroot seed_test < tests/testdata.sql
+        mysql --ho  st 127.0.0.1 --port 3306 -uroot seed_test < tests/testdata.sql
     - name: Run Tests And Generate coverage report
       run: |
         pytest --cov-report=xml

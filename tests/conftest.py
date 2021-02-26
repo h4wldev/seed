@@ -23,7 +23,7 @@ from seed.depends.auth.types import JWTToken
 # Initialize testing application
 application = Application(
     router=router,
-    env='testing',
+    env='testing'
 ).create_app()
 
 

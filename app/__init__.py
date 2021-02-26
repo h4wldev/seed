@@ -4,5 +4,5 @@ from .routes import router
 
 
 app = Application(
-    router=router,
+    router=router
 ).create_app()
