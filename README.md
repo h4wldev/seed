@@ -270,7 +270,7 @@ Change or add setting `<env>.integrate.sentry`
 ```toml
 [<env>.integrate.sentry]
 enable = true
-dsn = '<set_your_sentry_dsn'
+dsn = '<set_your_sentry_dsn>'
 ```
 
 ### Logstash
