@@ -35,7 +35,7 @@
 #### 1. Pull this Repo
 
 #### 2. Configuration
-Remove `.example` extension, change env on filename & content from [.secrets.<<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.<<env>.toml.example](settings/setting.<env>.toml.example)
+Remove `.example` extension, change env on filename & content from [.secrets.\<env>.toml.example](settings/secrets/.secrets.<env>.toml.example) and [setting.\<env>.toml.example](settings/setting.<env>.toml.example)
 
 #### 3. DB Migration
 ```bash
