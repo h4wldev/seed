@@ -31,9 +31,9 @@ jobs:
       with:
         ref: ${{ steps.extract_branch.outputs.branch }}
     - name: Setup Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: ['3.7.9']
     - name: Start MySQL
       run: |
         sudo apt-get install -y mysql-client libmysqlclient-dev
@@ -50,9 +50,6 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
     - run: pip install -r requirements.txt
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-    - name: Install alembic for database migrate
-      run: |
-        pip install alembic
     - name: Create Table into Database with alembic
       run: |
         alembic upgrade head
