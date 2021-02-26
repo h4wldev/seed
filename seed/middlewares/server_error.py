@@ -64,7 +64,7 @@ class ServerErrorMiddleware:
                 scope.set_extra('trace_id', str(exc.trace_id))
                 exc_info['event_id']: str = sentry_sdk.capture_exception(e)
 
-        if setting.debug:
+        if setting.debug:  # pragma: no cover
             exc_type, exc_value, tb = sys.exc_info()
 
             while tb.tb_next is not None:
