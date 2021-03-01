@@ -5,12 +5,13 @@ from logging.config import fileConfig
 
 from sqlalchemy import create_engine
 from sqlalchemy import pool
+from typing import List
 
 from alembic import context
 
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-)  # noqa: E501
+root_path: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+sys.path.insert(0, root_path)  # noqa: E501
 
 from seed.models import (
     UserModel,
@@ -24,10 +25,17 @@ from seed.utils.database import make_database_url
 from seed.setting import setting
 
 
+setting_files: List[str] = [
+    './settings/*.toml',
+    './settings/secrets/.secrets.*.toml'
+]
+
+
 config = context.config
 fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+setting.load_file(path=list(map(lambda p: os.path.join(root_path, p), setting_files)))
 
 database_url: str = make_database_url(**{
     **setting.database,
