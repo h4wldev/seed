@@ -61,8 +61,11 @@ class HTTPException(Exception):
     @classmethod
     def doc_object(
         cls,
-        symbols: List[str] = []
+        symbols: List[str] = None
     ) -> Dict[str, Any]:
+        if symbols is None:
+            symbols = []
+
         description: str = '\n\n'.join(map(lambda s: f'* {s}', symbols))
 
         return {

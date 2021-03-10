@@ -36,9 +36,12 @@ def logger_configure(log_level: int = logging.DEBUG) -> None:  # pragma: no cove
 
 
 def intercept_loggers(
-    logger_names: List[str] = [],
+    logger_names: List[str] = None,
     log_level: int = logging.DEBUG,
 ) -> None:  # pragma: no cover
+    if logger_names is None:
+        logger_names = []
+
     for logger_name in logger_names:
         logging_logger = logging.getLogger(logger_name)
 

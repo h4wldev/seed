@@ -21,14 +21,14 @@ class Auth(AuthUtil, JWTTokenType):
         self,
         required: bool = False,
         token_type: Optional[str] = None,
-        roles: List[Union[Tuple[str], str]] = [],
-        abilities: List[Union[Tuple[str], str]] = []
+        roles: List[Union[Tuple[str], str]] = None,
+        abilities: List[Union[Tuple[str], str]] = None
     ) -> None:
         self.required: bool = required
         self.token_type: str = token_type or self.ACCESS_TOKEN
 
-        self.roles: List[Union[Tuple[str], str]] = roles
-        self.abilities: List[Union[Tuple[str], str]] = abilities
+        self.roles: List[Union[Tuple[str], str]] = roles or []
+        self.abilities: List[Union[Tuple[str], str]] = abilities or []
 
     def __call__(
         self,
